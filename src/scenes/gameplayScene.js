@@ -35,6 +35,35 @@ var GamePlayScene = function(game, stage)
       }
       self.buff = (self.buff+1)%2;
     }
+    self.sample = function(x,y)
+    {
+      x = x*self.w;
+      y = y*self.h;
+      var low_x  = Math.floor(x-0.5+self.w)%self.w;
+      var high_x = Math.ceil( x-0.5+self.w)%self.w;
+      var low_y  = Math.floor(y-0.5+self.h)%self.h;
+      var high_y = Math.ceil( y-0.5+self.h)%self.h;
+
+      var tl = self.data[self.iFor( low_x, low_y)];
+      var tr = self.data[self.iFor(high_x, low_y)];
+      var bl = self.data[self.iFor( low_x,high_y)];
+      var br = self.data[self.iFor(high_x,high_y)];
+      var t = lerp(tl,tr,(x+.5)%1);
+      var b = lerp(bl,br,(x+.5)%1);
+
+      return lerp(t,b,(y+.5)%1);
+    }
+    self.takeValsFromHmap = function(hmap)
+    {
+      for(var y = 0; y < self.h; y++)
+      {
+        for(var x = 0; x < self.w; x++)
+        {
+          var index = self.iFor(x,y);
+          self.data[index] = hmap.sample(x/self.w,y/self.h);
+        }
+      }
+    }
   }
   var VecField2d = function(w,h)
   {
@@ -67,18 +96,16 @@ var GamePlayScene = function(game, stage)
   self.vfield;
 
 
-
-
-
-
-
-
-
-
-
   self.ready = function()
   {
-    self.hmap   = new HeightMap(50,50);
+    self.lowfhmap = new HeightMap(10,10);
+    self.hmap = new HeightMap(200,200);
+    self.hmap.takeValsFromHmap(self.lowfhmap);
+    self.hmap.anneal();
+    self.hmap.anneal();
+    self.hmap.anneal();
+    self.hmap.anneal();
+
     self.vfield = new VecField2d(50,50);
   };
 
@@ -122,9 +149,9 @@ var GamePlayScene = function(game, stage)
         x = x_space*j;
         index = self.vfield.iFor(j,i);
         canv.context.strokeStyle = "#ff0000";
-        canv.context.strokeRect(x-0.5,y-0.5,1,1);
+        canv.context.strokeRect(x-0.5+x_space/2,y-0.5+y_space/2,1,1);
         canv.context.strokeStyle = "#000000";
-        canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
+        canv.drawLine(x+x_space/2,y+y_space/2,x+self.vfield.data[index]+x_space/2,y+self.vfield.data[index+1]+y_space/2);
       }
     }
   };
