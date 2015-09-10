@@ -1,3 +1,4 @@
+var hack_scene;
 var Game = function(init)
 {
   var default_init =
@@ -34,6 +35,7 @@ var Game = function(init)
     scenes[currentScene].cleanup();
     currentScene++;
     scenes[currentScene].ready();
+    hack_scene = scenes[currentScene]; //set global var for easy access
   };
 };
 

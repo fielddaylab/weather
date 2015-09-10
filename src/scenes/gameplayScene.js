@@ -95,7 +95,6 @@ var GamePlayScene = function(game, stage)
       }
     }
   }
-
   var PressureSystem = function(x,y,r,delta,label,color,hmap)
   {
     var self = this;
@@ -139,6 +138,11 @@ var GamePlayScene = function(game, stage)
   self.vfield;
   self.hpress;
   self.lpress;
+
+  self.drawh = true;
+  self.drawc = true;
+  self.drawv = true;
+  self.drawp = true;
 
   self.ready = function()
   {
@@ -238,30 +242,12 @@ var GamePlayScene = function(game, stage)
     var x;
     var y;
     var index;
-
+    /*
+    // height map
+    */
     x_space = canv.canvas.width / self.hmap.w;
     y_space = canv.canvas.height / self.hmap.h;
-    for(var i = 0; i < self.hmap.h; i++)
-    {
-      for(var j = 0; j < self.hmap.w; j++)
-      {
-        y = y_space*i;
-        x = x_space*j;
-        index = self.hmap.iFor(j,i);
-        var color = Math.round(self.hmap.data[index]*255);
-        canv.context.fillStyle = "rgba("+color+","+color+","+color+",1)";
-        canv.context.fillRect(x,y,x_space,y_space);
-        //canv.context.strokeStyle = "#ff0000";
-        //canv.context.strokeRect(x,y,x_space,y_space);
-      }
-    }
-
-    var tl;
-    var tr;
-    var bl;
-    var br;
-    canv.context.strokeStyle = "#000000";
-    for(var l = 0; l < 1; l+=0.1)
+    if(self.drawh)
     {
       for(var i = 0; i < self.hmap.h; i++)
       {
@@ -269,33 +255,74 @@ var GamePlayScene = function(game, stage)
         {
           y = y_space*i;
           x = x_space*j;
-          tl = self.hmap.data[self.hmap.iFor(j  ,i  )] < l;
-          tr = self.hmap.data[self.hmap.iFor(j+1,i  )] < l;
-          bl = self.hmap.data[self.hmap.iFor(j  ,i+1)] < l;
-          br = self.hmap.data[self.hmap.iFor(j+1,i+1)] < l;
-          self.squareMarch(tl,tr,bl,br,x+x_space/2,y+y_space/2,x_space,y_space,canv);
+          index = self.hmap.iFor(j,i);
+          var color = Math.round(self.hmap.data[index]*255);
+          canv.context.fillStyle = "rgba("+color+","+color+","+color+",1)";
+          canv.context.fillRect(x,y,x_space,y_space);
+          //canv.context.strokeStyle = "#ff0000";
+          //canv.context.strokeRect(x,y,x_space,y_space);
         }
       }
     }
 
-    x_space = canv.canvas.width / self.vfield.w;
-    y_space = canv.canvas.height / self.vfield.h;
-    for(var i = 0; i < self.vfield.h; i++)
+    var tl;
+    var tr;
+    var bl;
+    var br;
+    /*
+    // contour lines
+    */
+    canv.context.strokeStyle = "#000000";
+    if(self.drawc)
     {
-      for(var j = 0; j < self.vfield.w; j++)
+      for(var l = 0; l < 1; l+=0.1)
       {
-        y = y_space*i+(y_space/2);
-        x = x_space*j+(x_space/2);
-        index = self.vfield.iFor(j,i);
-        canv.context.strokeStyle = "#ff0000";
-        canv.context.strokeRect(x-0.5,y-0.5,1,1);
-        canv.context.strokeStyle = "#000000";
-        canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
+        for(var i = 0; i < self.hmap.h; i++)
+        {
+          for(var j = 0; j < self.hmap.w; j++)
+          {
+            y = y_space*i;
+            x = x_space*j;
+            tl = self.hmap.data[self.hmap.iFor(j  ,i  )] < l;
+            tr = self.hmap.data[self.hmap.iFor(j+1,i  )] < l;
+            bl = self.hmap.data[self.hmap.iFor(j  ,i+1)] < l;
+            br = self.hmap.data[self.hmap.iFor(j+1,i+1)] < l;
+            self.squareMarch(tl,tr,bl,br,x+x_space/2,y+y_space/2,x_space,y_space,canv);
+          }
+        }
       }
     }
 
-    self.hpress.draw(canv);
-    self.lpress.draw(canv);
+    /*
+    // vectors
+    */
+    if(self.drawv)
+    {
+      x_space = canv.canvas.width / self.vfield.w;
+      y_space = canv.canvas.height / self.vfield.h;
+      for(var i = 0; i < self.vfield.h; i++)
+      {
+        for(var j = 0; j < self.vfield.w; j++)
+        {
+          y = y_space*i+(y_space/2);
+          x = x_space*j+(x_space/2);
+          index = self.vfield.iFor(j,i);
+          canv.context.strokeStyle = "#ff0000";
+          canv.context.strokeRect(x-0.5,y-0.5,1,1);
+          canv.context.strokeStyle = "#000000";
+          canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
+        }
+      }
+    }
+
+    /*
+    // pressure systems
+    */
+    if(self.drawp)
+    {
+      self.hpress.draw(canv);
+      self.lpress.draw(canv);
+    }
   };
 
   self.cleanup = function()
