@@ -132,7 +132,6 @@ var GamePlayScene = function(game, stage)
     {
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
-      canv.context.strokeRect(self.x,self.y,self.w,self.h);
     }
   }
 
@@ -145,7 +144,7 @@ var GamePlayScene = function(game, stage)
   {
     stage.drawCanv.context.font = "30px arial";
     self.lowfhmap = new HeightMap(10,10);
-    self.hmap = new HeightMap(60,60);
+    self.hmap = new HeightMap(50,50);
     self.hmap.takeValsFromHmap(self.lowfhmap);
     self.hmap.anneal(1);
     self.hmap.anneal(1);
@@ -158,7 +157,7 @@ var GamePlayScene = function(game, stage)
     self.dragger.register(self.hpress);
     self.dragger.register(self.lpress);
 
-    self.vfield = new VecField2d(20,20);
+    self.vfield = new VecField2d(25,25);
   };
 
   self.ticks = 0;
@@ -200,15 +199,23 @@ var GamePlayScene = function(game, stage)
         var index = self.vfield.iFor(j,i);
         theta = Math.atan2(self.vfield.data[index+1],self.vfield.data[index]);
         if(theta < 0) theta += 2*Math.PI;
-        tl = self.hmap.sample((j-1)/self.vfield.w,(i-1)/self.vfield.h);
-        tr = self.hmap.sample((j+1)/self.vfield.w,(i-1)/self.vfield.h);
-        bl = self.hmap.sample((j-1)/self.vfield.w,(i+1)/self.vfield.h);
-        br = self.hmap.sample((j+1)/self.vfield.w,(i+1)/self.vfield.h);
+        r  = self.hmap.sample((j+1+0.5)/self.vfield.w, (i  +0.5)/self.vfield.h);
+        tr = self.hmap.sample((j+1+0.5)/self.vfield.w, (i-1+0.5)/self.vfield.h);
+        t  = self.hmap.sample((j  +0.5)/self.vfield.w, (i-1+0.5)/self.vfield.h);
+        tl = self.hmap.sample((j-1+0.5)/self.vfield.w, (i-1+0.5)/self.vfield.h);
+        l  = self.hmap.sample((j-1+0.5)/self.vfield.w, (i  +0.5)/self.vfield.h);
+        bl = self.hmap.sample((j-1+0.5)/self.vfield.w, (i+1+0.5)/self.vfield.h);
+        b  = self.hmap.sample((j  +0.5)/self.vfield.w, (i+1+0.5)/self.vfield.h);
+        br = self.hmap.sample((j+1+0.5)/self.vfield.w, (i+1+0.5)/self.vfield.h);
 
-             if(tl <= tl && tl <= tr && tl <= bl && tl <= br) desiredtheta = Math.PI*7/4;
-        else if(tr <= tl && tr <= tr && tr <= bl && tr <= br) desiredtheta = Math.PI*1/4;
-        else if(bl <= tl && bl <= tr && bl <= bl && bl <= br) desiredtheta = Math.PI*5/4;
-        else if(br <= tl && br <= tr && br <= bl && br <= br) desiredtheta = Math.PI*3/4;
+             if(r  <= tl && r  <= t && r  <= tr && r  <= r && r  <= br && r  <= b && r  <= bl && r  <= l) desiredtheta = Math.PI*1/4;
+        else if(tr <= tl && tr <= t && tr <= tr && tr <= r && tr <= br && tr <= b && tr <= bl && tr <= l) desiredtheta = Math.PI*0/4;
+        else if(t  <= tl && t  <= t && t  <= tr && t  <= r && t  <= br && t  <= b && t  <= bl && t  <= l) desiredtheta = Math.PI*7/4;
+        else if(tl <= tl && tl <= t && tl <= tr && tl <= r && tl <= br && tl <= b && tl <= bl && tl <= l) desiredtheta = Math.PI*6/4;
+        else if(l  <= tl && l  <= t && l  <= tr && l  <= r && l  <= br && l  <= b && l  <= bl && l  <= l) desiredtheta = Math.PI*5/4;
+        else if(bl <= tl && bl <= t && bl <= tr && bl <= r && bl <= br && bl <= b && bl <= bl && bl <= l) desiredtheta = Math.PI*4/4;
+        else if(b  <= tl && b  <= t && b  <= tr && b  <= r && b  <= br && b  <= b && b  <= bl && b  <= l) desiredtheta = Math.PI*3/4;
+        else if(br <= tl && br <= t && br <= tr && br <= r && br <= br && br <= b && br <= bl && br <= l) desiredtheta = Math.PI*2/4;
 
         newtheta = lerp(theta,desiredtheta,0.1);
         self.vfield.data[index]   = Math.cos(newtheta)*10;
@@ -244,6 +251,8 @@ var GamePlayScene = function(game, stage)
         var color = Math.round(self.hmap.data[index]*255);
         canv.context.fillStyle = "rgba("+color+","+color+","+color+",1)";
         canv.context.fillRect(x,y,x_space,y_space);
+        //canv.context.strokeStyle = "#ff0000";
+        //canv.context.strokeRect(x,y,x_space,y_space);
       }
     }
 
@@ -251,6 +260,7 @@ var GamePlayScene = function(game, stage)
     var tr;
     var bl;
     var br;
+    canv.context.strokeStyle = "#000000";
     for(var l = 0; l < 1; l+=0.1)
     {
       for(var i = 0; i < self.hmap.h; i++)
