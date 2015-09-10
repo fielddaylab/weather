@@ -109,19 +109,25 @@ var GamePlayScene = function(game, stage)
     self.delta = delta;
     self.xv = .1;
     self.yv = .1;
+    self.dragging = false;
 
     self.dragStart = function(evt)
     {
+      self.dragging = true;
     }
     self.drag = function(evt)
     {
-      self.j = evt.doX/stage.dispCanv.canvas.width*hmap.w;
-      self.i = evt.doY/stage.dispCanv.canvas.height*hmap.h;
-      self.x = (self.j/hmap.w)*stage.dispCanv.canvas.width-10;
-      self.y = (self.i/hmap.h)*stage.dispCanv.canvas.height-10;
+      if(self.dragging)
+      {
+        self.j = evt.doX/stage.dispCanv.canvas.width*hmap.w;
+        self.i = evt.doY/stage.dispCanv.canvas.height*hmap.h;
+        self.x = (self.j/hmap.w)*stage.dispCanv.canvas.width-10;
+        self.y = (self.i/hmap.h)*stage.dispCanv.canvas.height-10;
+      }
     }
     self.dragFinish = function(evt)
     {
+      self.dragging = false;
     }
 
     self.draw = function(canv)
@@ -211,6 +217,7 @@ var GamePlayScene = function(game, stage)
     }
 
     self.dragger.flush();
+    if(self.lpress.dragging) self.hpress.dragging = false;
     self.ticks++;
   };
 
