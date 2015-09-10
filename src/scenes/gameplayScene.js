@@ -96,12 +96,49 @@ var GamePlayScene = function(game, stage)
     }
   }
 
+  var PressureSystem = function(x,y,r,delta,label,color,hmap)
+  {
+    var self = this;
+    self.j = x;
+    self.i = y;
+    self.r = r;
+    self.x = (self.j/hmap.w)*stage.dispCanv.canvas.width-10;
+    self.y = (self.i/hmap.h)*stage.dispCanv.canvas.height-10;
+    self.w = 20;
+    self.h = 20;
+    self.delta = delta;
+    self.xv = .1;
+    self.yv = .1;
+
+    self.dragStart = function(evt)
+    {
+    }
+    self.drag = function(evt)
+    {
+      self.j = evt.doX/stage.dispCanv.canvas.width*hmap.w;
+      self.i = evt.doY/stage.dispCanv.canvas.height*hmap.h;
+      self.x = (self.j/hmap.w)*stage.dispCanv.canvas.width-10;
+      self.y = (self.i/hmap.h)*stage.dispCanv.canvas.height-10;
+    }
+    self.dragFinish = function(evt)
+    {
+    }
+
+    self.draw = function(canv)
+    {
+      canv.context.fillStyle = color;
+      canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
+    }
+  }
+
   self.hmap;
   self.vfield;
-  self.hpressure;
+  self.hpress;
+  self.lpress;
 
   self.ready = function()
   {
+    stage.drawCanv.context.font = "30px arial";
     self.lowfhmap = new HeightMap(10,10);
     self.hmap = new HeightMap(100,100);
     self.hmap.takeValsFromHmap(self.lowfhmap);
@@ -109,16 +146,12 @@ var GamePlayScene = function(game, stage)
     self.hmap.anneal(1);
     self.hmap.anneal(1);
     self.hmap.anneal(1);
-    self.hpressure = {
-      x:20,
-      y:20,
-      r:50,
-      xv:0.1,
-      yv:0.1,
-    };
 
-    var dragobj = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height,dragStart:function(evt){dragobj.drag(evt);},dragFinish:function(){},drag:function(evt){self.hpressure.x = evt.doX/stage.dispCanv.canvas.width*self.hmap.w; self.hpressure.y = evt.doY/stage.dispCanv.canvas.height*self.hmap.h; }};
-    self.dragger.register(dragobj);
+    self.hpress = new PressureSystem(20,20,100,5,"H","#000000",self.hmap);
+    self.lpress = new PressureSystem(60,60,100,-5,"L","#FFFFFF",self.hmap);
+
+    self.dragger.register(self.hpress);
+    self.dragger.register(self.lpress);
 
     self.vfield = new VecField2d(50,50);
   };
@@ -133,10 +166,16 @@ var GamePlayScene = function(game, stage)
       for(var j = 0; j < self.hmap.w; j++)
       {
         var index = self.hmap.iFor(j,i);
-        var xd = j-self.hpressure.x;
-        var yd = i-self.hpressure.y;
-        var r = xd*xd + yd*yd / self.hpressure.r*self.hpressure.r;
-        if(r < 1) self.hmap.data[index] += 1-r;
+
+        var xd = j-self.hpress.j;
+        var yd = i-self.hpress.i;
+        var r = xd*xd + yd*yd / self.hpress.r*self.hpress.r;
+        if(r < 1) self.hmap.data[index] += (1-r)*self.hpress.delta;
+
+        var xd = j-self.lpress.j;
+        var yd = i-self.lpress.i;
+        var r = xd*xd + yd*yd / self.lpress.r*self.lpress.r;
+        if(r < 1) self.hmap.data[index] += (1-r)*self.lpress.delta;
       }
     }
     self.hmap.anneal(1);
@@ -238,7 +277,8 @@ var GamePlayScene = function(game, stage)
       }
     }
 
-
+    self.hpress.draw(canv);
+    self.lpress.draw(canv);
   };
 
   self.cleanup = function()
