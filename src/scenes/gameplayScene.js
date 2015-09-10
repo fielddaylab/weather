@@ -145,7 +145,7 @@ var GamePlayScene = function(game, stage)
   {
     stage.drawCanv.context.font = "30px arial";
     self.lowfhmap = new HeightMap(10,10);
-    self.hmap = new HeightMap(20,20);
+    self.hmap = new HeightMap(60,60);
     self.hmap.takeValsFromHmap(self.lowfhmap);
     self.hmap.anneal(1);
     self.hmap.anneal(1);
@@ -158,7 +158,7 @@ var GamePlayScene = function(game, stage)
     self.dragger.register(self.hpress);
     self.dragger.register(self.lpress);
 
-    self.vfield = new VecField2d(10,10);
+    self.vfield = new VecField2d(20,20);
   };
 
   self.ticks = 0;
@@ -173,18 +173,18 @@ var GamePlayScene = function(game, stage)
         var xd = j-self.hpress.j;
         var yd = i-self.hpress.i;
         var d = xd*xd + yd*yd / self.hpress.r*self.hpress.r;
-        if(d < 1) self.hmap.data[index] += (1-d)*self.hpress.delta;
+        if(d < 1) self.hmap.data[index] += (1-(d*d*d*d))*self.hpress.delta;
 
         var xd = j-self.lpress.j;
         var yd = i-self.lpress.i;
         var d = xd*xd + yd*yd / self.lpress.r*self.lpress.r;
-        if(d < 1) self.hmap.data[index] += (1-d)*self.lpress.delta;
+        if(d < 1) self.hmap.data[index] += (1-(d*d*d*d))*self.lpress.delta;
 
         if(self.hmap.data[index] > 1) self.hmap.data[index] = 1;
         if(self.hmap.data[index] < 0) self.hmap.data[index] = 0;
       }
     }
-    self.hmap.anneal(1);
+    self.hmap.anneal(0.2);
 
     var tl;
     var tr;
@@ -211,8 +211,8 @@ var GamePlayScene = function(game, stage)
         else if(br <= tl && br <= tr && br <= bl && br <= br) desiredtheta = Math.PI*3/4;
 
         newtheta = lerp(theta,desiredtheta,0.1);
-        self.vfield.data[index]   = Math.cos(newtheta)*20;
-        self.vfield.data[index+1] = Math.sin(newtheta)*20;
+        self.vfield.data[index]   = Math.cos(newtheta)*10;
+        self.vfield.data[index+1] = Math.sin(newtheta)*10;
       }
     }
 
@@ -251,7 +251,7 @@ var GamePlayScene = function(game, stage)
     var tr;
     var bl;
     var br;
-    for(var l = 0; l < 1; l+=0.2)
+    for(var l = 0; l < 1; l+=0.1)
     {
       for(var i = 0; i < self.hmap.h; i++)
       {
