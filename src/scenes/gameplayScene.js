@@ -35,6 +35,7 @@ var GamePlayScene = function(game, stage)
         }
       }
       self.buff = (self.buff+1)%2;
+      self.data = self.buffs[self.buff];
     }
     self.sample = function(x,y)
     {
@@ -95,23 +96,44 @@ var GamePlayScene = function(game, stage)
 
   self.hmap;
   self.vfield;
-
+  self.hpressure;
 
   self.ready = function()
   {
     self.lowfhmap = new HeightMap(10,10);
-    self.hmap = new HeightMap(200,200);
+    self.hmap = new HeightMap(100,100);
     self.hmap.takeValsFromHmap(self.lowfhmap);
     self.hmap.anneal(1);
     self.hmap.anneal(1);
     self.hmap.anneal(1);
     self.hmap.anneal(1);
+    self.hpressure = {
+      x:20,
+      y:20,
+      r:50,
+      xv:0.1,
+      yv:0.1,
+    };
 
     self.vfield = new VecField2d(50,50);
   };
 
   self.tick = function()
   {
+    self.hpressure.x += self.hpressure.xv;
+    self.hpressure.y += self.hpressure.yv;
+    for(var i = 0; i < self.hmap.h; i++)
+    {
+      for(var j = 0; j < self.hmap.w; j++)
+      {
+        var index = self.hmap.iFor(j,i);
+        var xd = j-self.hpressure.x;
+        var yd = i-self.hpressure.y;
+        var r = xd*xd + yd*yd / self.hpressure.r*self.hpressure.r;
+        if(r < 1) self.hmap.data[index] += 1-r;
+      }
+    }
+    self.hmap.anneal(1);
   };
 
   self.draw = function()
@@ -162,7 +184,6 @@ var GamePlayScene = function(game, stage)
     }
 
 
-/*
     x_space = canv.canvas.width / self.vfield.w;
     y_space = canv.canvas.height / self.vfield.h;
     for(var i = 0; i < self.vfield.h; i++)
@@ -178,7 +199,6 @@ var GamePlayScene = function(game, stage)
         canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
       }
     }
-*/
 
 
   };
