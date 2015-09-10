@@ -2,6 +2,8 @@ var GamePlayScene = function(game, stage)
 {
   var self = this;
 
+  self.dragger = new Dragger({source:stage.dispCanv.canvas});
+
   var HeightMap = function(w,h)
   {
     var self = this;
@@ -115,13 +117,17 @@ var GamePlayScene = function(game, stage)
       yv:0.1,
     };
 
+    var dragobj = {x:0,y:0,w:stage.dispCanv.canvas.width,h:stage.dispCanv.canvas.height,dragStart:function(evt){dragobj.drag(evt);},dragFinish:function(){},drag:function(evt){self.hpressure.x = evt.doX/stage.dispCanv.canvas.width*self.hmap.w; self.hpressure.y = evt.doY/stage.dispCanv.canvas.height*self.hmap.h; }};
+    self.dragger.register(dragobj);
+
     self.vfield = new VecField2d(50,50);
   };
 
+  self.ticks = 0;
   self.tick = function()
   {
-    self.hpressure.x += self.hpressure.xv;
-    self.hpressure.y += self.hpressure.yv;
+    //self.hpressure.x = (self.hpressure.x+self.hpressure.xv)%self.hmap.w;
+    //self.hpressure.y = (self.hpressure.y+self.hpressure.yv)%self.hmap.h;
     for(var i = 0; i < self.hmap.h; i++)
     {
       for(var j = 0; j < self.hmap.w; j++)
@@ -134,6 +140,39 @@ var GamePlayScene = function(game, stage)
       }
     }
     self.hmap.anneal(1);
+
+    var tl;
+    var tr;
+    var bl;
+    var br;
+    var theta;
+    var desiredtheta;
+    var newtheta;
+    for(var i = 0; i < self.vfield.h; i++)
+    {
+      for(var j = 0; j < self.vfield.w; j++)
+      {
+        var index = self.vfield.iFor(j,i);
+        theta = Math.atan2(self.vfield.data[index+1],self.vfield.data[index]);
+        if(theta < 0) theta += 2*Math.PI;
+        tl = self.hmap.sample((j-1)/self.vfield.w,(i-1)/self.vfield.h);
+        tr = self.hmap.sample((j+1)/self.vfield.w,(i-1)/self.vfield.h);
+        bl = self.hmap.sample((j-1)/self.vfield.w,(i+1)/self.vfield.h);
+        br = self.hmap.sample((j+1)/self.vfield.w,(i+1)/self.vfield.h);
+
+             if(tl <= tl && tl <= tr && tl <= bl && tl <= br) desiredtheta = Math.PI*7/4;
+        else if(tr <= tl && tr <= tr && tr <= bl && tr <= br) desiredtheta = Math.PI*1/4;
+        else if(bl <= tl && bl <= tr && bl <= bl && bl <= br) desiredtheta = Math.PI*5/4;
+        else if(br <= tl && br <= tr && br <= bl && br <= br) desiredtheta = Math.PI*3/4;
+
+        newtheta = lerp(theta,desiredtheta,0.1);
+        self.vfield.data[index]   = Math.cos(newtheta)*5;
+        self.vfield.data[index+1] = Math.sin(newtheta)*5;
+      }
+    }
+
+    self.dragger.flush();
+    self.ticks++;
   };
 
   self.draw = function()
@@ -182,7 +221,6 @@ var GamePlayScene = function(game, stage)
         }
       }
     }
-
 
     x_space = canv.canvas.width / self.vfield.w;
     y_space = canv.canvas.height / self.vfield.h;
