@@ -16,7 +16,7 @@ var GamePlayScene = function(game, stage)
     self.data = self.buffs[self.buff];
 
     self.iFor = function(x,y) { return (y*w)+x; }
-    self.anneal = function()
+    self.anneal = function(t)
     {
       var oldb = self.buff;
       var newb = (self.buff+1)%2;
@@ -31,6 +31,7 @@ var GamePlayScene = function(game, stage)
           self.buffs[newb][index] += self.buffs[oldb][self.iFor(x,((y-1)+h)%h)];
           self.buffs[newb][index] += self.buffs[oldb][self.iFor(x,((y+1)+h)%h)];
           self.buffs[newb][index] /= 5;
+          self.buffs[newb][index] = lerp(self.buffs[oldb][index],self.buffs[newb][index],t);
         }
       }
       self.buff = (self.buff+1)%2;
@@ -101,10 +102,10 @@ var GamePlayScene = function(game, stage)
     self.lowfhmap = new HeightMap(10,10);
     self.hmap = new HeightMap(200,200);
     self.hmap.takeValsFromHmap(self.lowfhmap);
-    self.hmap.anneal();
-    self.hmap.anneal();
-    self.hmap.anneal();
-    self.hmap.anneal();
+    self.hmap.anneal(1);
+    self.hmap.anneal(1);
+    self.hmap.anneal(1);
+    self.hmap.anneal(1);
 
     self.vfield = new VecField2d(50,50);
   };
@@ -139,26 +140,101 @@ var GamePlayScene = function(game, stage)
       }
     }
 
+    var tl;
+    var tr;
+    var bl;
+    var br;
+    for(var l = 0; l < 1; l+=0.2)
+    {
+      for(var i = 0; i < self.hmap.h; i++)
+      {
+        for(var j = 0; j < self.hmap.w; j++)
+        {
+          y = y_space*i;
+          x = x_space*j;
+          tl = self.hmap.data[self.hmap.iFor(j  ,i  )] < l;
+          tr = self.hmap.data[self.hmap.iFor(j+1,i  )] < l;
+          bl = self.hmap.data[self.hmap.iFor(j  ,i+1)] < l;
+          br = self.hmap.data[self.hmap.iFor(j+1,i+1)] < l;
+          self.squareMarch(tl,tr,bl,br,x,y,x_space,y_space,canv);
+        }
+      }
+    }
+
+
+/*
     x_space = canv.canvas.width / self.vfield.w;
     y_space = canv.canvas.height / self.vfield.h;
     for(var i = 0; i < self.vfield.h; i++)
     {
       for(var j = 0; j < self.vfield.w; j++)
       {
-        y = y_space*i;
-        x = x_space*j;
+        y = y_space*i+(y_space/2);
+        x = x_space*j+(x_space/2);
         index = self.vfield.iFor(j,i);
         canv.context.strokeStyle = "#ff0000";
-        canv.context.strokeRect(x-0.5+x_space/2,y-0.5+y_space/2,1,1);
+        canv.context.strokeRect(x-0.5,y-0.5,1,1);
         canv.context.strokeStyle = "#000000";
-        canv.drawLine(x+x_space/2,y+y_space/2,x+self.vfield.data[index]+x_space/2,y+self.vfield.data[index+1]+y_space/2);
+        canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
       }
     }
+*/
+
+
   };
 
   self.cleanup = function()
   {
   };
+
+  //holy ugly
+  self.squareMarch = function(tl,tr,bl,br,x,y,w,h,canv)
+  {
+    if(tl) //reverse all, cuts if's in half
+    {
+      if(!tr && !bl && br) //only non-reversable case
+      {
+        canv.drawLine(x,y+h/2,x+w/2,y); //1001
+        canv.drawLine(x+w/2,y+h,x+w,y+h/2);
+      }
+      tl = !tl;
+      tr = !tr;
+      bl = !bl;
+      br = !br;
+    }
+
+    if(!tr)
+    {
+      if(!bl)
+      {
+        if(!br) {} //0000
+        else canv.drawLine(x+w/2,y+h,x+w,y+h/2); //0001
+      }
+      else
+      {
+        if(!br) canv.drawLine(x,y+h/2,x+w/2,y+h); //0010
+        else    canv.drawLine(x,y+h/2,x+w,y+h/2); //0011
+      }
+    }
+    else
+    {
+      if(!bl)
+      {
+        if(!br) canv.drawLine(x+w/2,y,x+w,y+h/2); //0100
+        else canv.drawLine(x+w/2,y,x+w/2,y+h); //0101
+      }
+      else
+      {
+        if(!br)
+        {
+          canv.drawLine(x+w/2,y,x+w,y+h/2); //0110
+          canv.drawLine(x,y+h/2,x+w/2,y+h);
+        }
+        else canv.drawLine(x,y+h/2,x+w/2,y); //0111
+      }
+    }
+
+  }
 
 };
 
