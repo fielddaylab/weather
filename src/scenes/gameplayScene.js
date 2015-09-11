@@ -300,6 +300,8 @@ var GamePlayScene = function(game, stage)
     */
     if(self.drawv)
     {
+      canv.context.fillStyle = "#555599";
+      canv.context.strokeStyle = "#555599";
       x_space = canv.canvas.width / self.vfield.w;
       y_space = canv.canvas.height / self.vfield.h;
       for(var i = 0; i < self.vfield.h; i++)
@@ -309,9 +311,7 @@ var GamePlayScene = function(game, stage)
           y = y_space*i+(y_space/2);
           x = x_space*j+(x_space/2);
           index = self.vfield.iFor(j,i);
-          canv.context.strokeStyle = "#ff0000";
-          canv.context.strokeRect(x-0.5,y-0.5,1,1);
-          canv.context.strokeStyle = "#000000";
+          canv.context.fillRect(x-0.5,y-0.5,1,1);
           canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
         }
       }
