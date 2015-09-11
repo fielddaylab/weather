@@ -260,7 +260,7 @@ var GamePlayScene = function(game, stage)
           index = self.pmap.iFor(j,i);
           var color = 255-Math.round(self.pmap.data[index]*255);
           canv.context.fillStyle = "rgba("+color+","+color+","+color+",1)";
-          canv.context.fillRect(x,y,x_space,y_space);
+          canv.context.fillRect(x,y,x_space+1,y_space+1);
           //canv.context.strokeStyle = "#ff0000";
           //canv.context.strokeRect(x,y,x_space,y_space);
         }
