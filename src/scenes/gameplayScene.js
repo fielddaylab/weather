@@ -277,45 +277,48 @@ var GamePlayScene = function(game, stage)
 
     self.pmap.anneal(0.2);
 
-/*
-    var tl;
-    var tr;
-    var bl;
-    var br;
-    var theta;
-    var desiredtheta;
-    var newtheta;
     for(var i = 0; i < self.vfield.h; i++)
     {
       for(var j = 0; j < self.vfield.w; j++)
       {
+        var lowest_t = 0;  var lowest_p = 1;
+        var highest_t = 0; var highest_p = 0;
+        var x = (j+0.5)/self.vfield.w;
+        var y = (i+0.5)/self.vfield.h;
+        var d = 0.2;
+        var p = 0;
+        for(var t = 0; t < Math.PI*2; t += 0.1)
+        {
+          p = self.pmap.sample(x+Math.cos(t)*d,y+Math.sin(t)*d);
+          if(p < lowest_p)  { lowest_t  = t; lowest_p  = p; }
+          if(p > highest_p) { highest_t = t; highest_p = p; }
+        }
+
         var index = self.vfield.iFor(j,i);
-        theta = Math.atan2(self.vfield.data[index+1],self.vfield.data[index]);
-        if(theta < 0) theta += 2*Math.PI;
-        r  = self.pmap.sample((j+1+0.5)/self.vfield.w, (i  +0.5)/self.vfield.h);
-        tr = self.pmap.sample((j+1+0.5)/self.vfield.w, (i-1+0.5)/self.vfield.h);
-        t  = self.pmap.sample((j  +0.5)/self.vfield.w, (i-1+0.5)/self.vfield.h);
-        tl = self.pmap.sample((j-1+0.5)/self.vfield.w, (i-1+0.5)/self.vfield.h);
-        l  = self.pmap.sample((j-1+0.5)/self.vfield.w, (i  +0.5)/self.vfield.h);
-        bl = self.pmap.sample((j-1+0.5)/self.vfield.w, (i+1+0.5)/self.vfield.h);
-        b  = self.pmap.sample((j  +0.5)/self.vfield.w, (i+1+0.5)/self.vfield.h);
-        br = self.pmap.sample((j+1+0.5)/self.vfield.w, (i+1+0.5)/self.vfield.h);
+        theta = self.vfield.dir_map.data[index];
 
-             if(r  <= tl && r  <= t && r  <= tr && r  <= r && r  <= br && r  <= b && r  <= bl && r  <= l) desiredtheta = Math.PI*1/4;
-        else if(tr <= tl && tr <= t && tr <= tr && tr <= r && tr <= br && tr <= b && tr <= bl && tr <= l) desiredtheta = Math.PI*0/4;
-        else if(t  <= tl && t  <= t && t  <= tr && t  <= r && t  <= br && t  <= b && t  <= bl && t  <= l) desiredtheta = Math.PI*7/4;
-        else if(tl <= tl && tl <= t && tl <= tr && tl <= r && tl <= br && tl <= b && tl <= bl && tl <= l) desiredtheta = Math.PI*6/4;
-        else if(l  <= tl && l  <= t && l  <= tr && l  <= r && l  <= br && l  <= b && l  <= bl && l  <= l) desiredtheta = Math.PI*5/4;
-        else if(bl <= tl && bl <= t && bl <= tr && bl <= r && bl <= br && bl <= b && bl <= bl && bl <= l) desiredtheta = Math.PI*4/4;
-        else if(b  <= tl && b  <= t && b  <= tr && b  <= r && b  <= br && b  <= b && b  <= bl && b  <= l) desiredtheta = Math.PI*3/4;
-        else if(br <= tl && br <= t && br <= tr && br <= r && br <= br && br <= b && br <= bl && br <= l) desiredtheta = Math.PI*2/4;
+        var t = lerp(lowest_t,highest_t,0.5);
+        var lx = Math.cos(lowest_t);
+        var ly = Math.sin(lowest_t);
+        var x = Math.cos(t);
+        var y = Math.sin(t);
+        if((-lx)*(y-ly) - (-ly)*(x-lx) > 0) t = (t+Math.PI)%(2*Math.PI);
 
-        newtheta = lerp(theta,desiredtheta,0.01);
-        self.vfield.data[index]   = Math.cos(newtheta)*10;
-        self.vfield.data[index+1] = Math.sin(newtheta)*10;
+
+        if(t > theta)
+        {
+          if(t-theta > theta-(t-Math.PI*2))
+            t -= Math.PI*2;
+        }
+        else
+        {
+          if(theta-t > (t+Math.PI*2)-theta)
+            t += Math.PI*2;
+        }
+
+        self.vfield.dir_map.data[index] = lerp(theta,t,0.1)%(Math.PI*2);
       }
     }
-*/
 
     self.dragger.flush();
     if(self.lpsys.dragging) self.hpsys.dragging = false;
@@ -389,7 +392,7 @@ var GamePlayScene = function(game, stage)
     if(self.drawv)
     {
       canv.context.fillStyle = "#555599";
-      canv.context.strokeStyle = "#555599";
+      canv.context.strokeStyle = "#0000FF";
       x_space = canv.canvas.width / self.vfield.w;
       y_space = canv.canvas.height / self.vfield.h;
       for(var i = 0; i < self.vfield.h; i++)
@@ -399,8 +402,8 @@ var GamePlayScene = function(game, stage)
           y = y_space*i+(y_space/2);
           x = x_space*j+(x_space/2);
           index = self.vfield.iFor(j,i);
-          canv.context.fillRect(x-0.5,y-0.5,1,1);
-          //canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
+          canv.context.fillRect(x-1,y-1,2,2);
+          canv.drawLine(x,y,x+Math.cos(self.vfield.dir_map.data[index])*10,y+Math.sin(self.vfield.dir_map.data[index])*10);
         }
       }
     }
