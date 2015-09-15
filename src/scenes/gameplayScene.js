@@ -2,7 +2,7 @@ var GamePlayScene = function(game, stage)
 {
   var self = this;
 
-  self.dragger = new Dragger({source:stage.dispCanv.canvas});
+  self.dragger;
 
   var HeightMap = function(w,h)
   {
@@ -133,12 +133,51 @@ var GamePlayScene = function(game, stage)
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
     }
   }
+  var TempEmitter = function(x,y,r,delta,label,color,tmap)
+  {
+    var self = this;
+    self.j = x;
+    self.i = y;
+    self.r = r;
+    self.x = ((self.j/tmap.w)*stage.dispCanv.canvas.width-10)+(stage.dispCanv.canvas.width/tmap.w)/2;
+    self.y = ((self.i/tmap.h)*stage.dispCanv.canvas.height-10)+(stage.dispCanv.canvas.height/tmap.h)/2;
+    self.w = 20;
+    self.h = 20;
+    self.delta = delta;
+    self.dragging = false;
 
-  self.pmap;
+    self.dragStart = function(evt)
+    {
+      self.dragging = true;
+    }
+    self.drag = function(evt)
+    {
+      if(self.dragging)
+      {
+        self.j = (evt.doX/stage.dispCanv.canvas.width*tmap.w)-0.5;
+        self.i = (evt.doY/stage.dispCanv.canvas.height*tmap.h)-0.5;
+        self.x = ((self.j/tmap.w)*stage.dispCanv.canvas.width-10)+(stage.dispCanv.canvas.width/tmap.w)/2;
+        self.y = ((self.i/tmap.h)*stage.dispCanv.canvas.height-10)+(stage.dispCanv.canvas.height/tmap.h)/2;
+      }
+    }
+    self.dragFinish = function(evt)
+    {
+      self.dragging = false;
+    }
+
+    self.draw = function(canv)
+    {
+      canv.context.fillStyle = color;
+      canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
+    }
+  }
+
   self.tmap;
-  self.vfield;
+  self.temit;
+  self.pmap;
   self.hpsys;
   self.lpsys;
+  self.vfield;
 
   self.drawh = true;
   self.drawc = true;
@@ -147,34 +186,86 @@ var GamePlayScene = function(game, stage)
 
   self.ready = function()
   {
-    stage.drawCanv.context.font = "30px arial";
     var cells_w = 50;
     var cells_h = 50;
-    self.pmap = new HeightMap(cells_w,cells_h);
-    self.pmap.anneal(1);
-    self.pmap.anneal(1);
-    self.pmap.anneal(1);
-    self.pmap.anneal(1);
+
+    stage.drawCanv.context.font = "30px arial";
+    self.dragger = new Dragger({source:stage.dispCanv.canvas});
+
     self.tmap = new HeightMap(cells_w,cells_h);
+    self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
+    self.dragger.register(self.temit);
 
+    self.pmap = new HeightMap(cells_w,cells_h);
     self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,100,5,"H","#FFFFFF",self.pmap);
-    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,100,-5,"L","#000000",self.pmap);
-
     self.dragger.register(self.hpsys);
+    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,100,-5,"L","#000000",self.pmap);
     self.dragger.register(self.lpsys);
 
     self.vfield = new VecField2d(25,25);
+
+    self.pmap.anneal(1);
+    self.pmap.anneal(1);
+    self.pmap.anneal(1);
+    self.pmap.anneal(1);
   };
+
+  function leftw(x,w) { return ((x-1)+w)%w; };
+  function rightw(x,w) { return (x+1)%w; };
+  function upw(y,h) { return (y+1)%h; };
+  function downw(y,h) { return ((y-1)+h)%h; };
 
   self.ticks = 0;
   self.tick = function()
   {
+    var index;
+    var ti;
+    var bi;
+    var li;
+    var ri;
+
+    //Emit Temp
+    index = 0;
+    for(var i = 0; i < self.tmap.h; i++)
+    {
+      for(var j = 0; j < self.tmap.w; j++)
+      {
+        var xd = j-self.temit.j;
+        var yd = i-self.temit.i;
+        var d = xd*xd + yd*yd / self.temit.r*self.temit.r;
+        if(d < 1) self.tmap.data[index] += (1-(d*d*d*d))*self.temit.delta;
+
+        if(self.tmap.data[index] > 1) self.tmap.data[index] = 1;
+        if(self.tmap.data[index] < 0) self.tmap.data[index] = 0;
+
+        index++;
+      }
+    }
+
+    //Flow Temp
+    index = 0;
+    for(var i = 0; i < self.tmap.h; i++)
+    {
+      for(var j = 0; j < self.tmap.w; j++)
+      {
+        ti = self.tmap.iFor(j,upw(i,self.tmap.h));
+        bi = self.tmap.iFor(j,downw(i,self.tmap.h));
+        li = self.tmap.iFor(leftw(j,self.tmap.w),i);
+        ri = self.tmap.iFor(rightw(j,self.tmap.w),i);
+
+        if(self.tmap.data[index] > 1) self.tmap.data[index] = 1;
+        if(self.tmap.data[index] < 0) self.tmap.data[index] = 0;
+
+        index++;
+      }
+    }
+
+    //Emit Pressure
+    index = 0;
     for(var i = 0; i < self.pmap.h; i++)
     {
       for(var j = 0; j < self.pmap.w; j++)
       {
-        var index = self.pmap.iFor(j,i);
-
         var xd = j-self.hpsys.j;
         var yd = i-self.hpsys.i;
         var d = xd*xd + yd*yd / self.hpsys.r*self.hpsys.r;
@@ -187,8 +278,34 @@ var GamePlayScene = function(game, stage)
 
         if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
         if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
+
+        index++;
       }
     }
+
+    //Flow Pressure
+    index = 0;
+    for(var i = 0; i < self.pmap.h; i++)
+    {
+      for(var j = 0; j < self.pmap.w; j++)
+      {
+        ti = self.pmap.iFor(j,upw(i,self.pmap.h));
+        bi = self.pmap.iFor(j,downw(i,self.pmap.h));
+        li = self.pmap.iFor(leftw(j,self.pmap.w),i);
+        ri = self.pmap.iFor(rightw(j,self.pmap.w),i);
+
+        ti = self.pmap.iFor(j,upw(i,self.pmap.h));
+        bi = self.pmap.iFor(j,downw(i,self.pmap.h));
+        li = self.pmap.iFor(leftw(j,self.pmap.w),i);
+        ri = self.pmap.iFor(rightw(j,self.pmap.w),i);
+
+        if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
+        if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
+
+        index++;
+      }
+    }
+
     self.pmap.anneal(0.2);
 
     var tl;
