@@ -101,9 +101,32 @@ var GamePlayScene = function(game, stage)
       var bl = self.data[self.iFor( low_x,high_y)];
       var br = self.data[self.iFor(high_x,high_y)];
 
+///*
+      //concise, easy to read, and incredibly slow
+      //(no compiler means no inlining?)
       var t = clerp(tr,tl,x%1);
       var b = clerp(br,bl,x%1);
       return clerp(t,b,y%1);
+//*/
+
+/*
+      //bloated, complex, hard to read, but doesn't add stack frame?
+
+           if(tl > tr && tl-tr > tr-(tl-Math.PI*2)) tl -= Math.PI*2;
+      else if(tr > tl && tr-tl > (tl+Math.PI*2)-tr) tl += Math.PI*2;
+
+      var t = lerp(tr,tl,x%1)%(Math.PI*2);
+
+           if(bl > br && bl-br > br-(bl-Math.PI*2)) bl -= Math.PI*2;
+      else if(br > bl && br-bl > (bl+Math.PI*2)-br) bl += Math.PI*2;
+
+      var b = lerp(br,bl,x%1)%(Math.PI*2);
+
+           if(b > t && b-t > t-(b-Math.PI*2)) b -= Math.PI*2;
+      else if(t > b && t-b > (b+Math.PI*2)-t) b += Math.PI*2;
+
+      return lerp(t,b,y%1)%(Math.PI*2);
+*/
     }
     self.len_map = new HeightMap(w,h);
     for(var i = 0; i < w*h; i++)
@@ -223,7 +246,7 @@ var GamePlayScene = function(game, stage)
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
     self.vfield = new VecField2d(25,25);
-    self.air = new Air(1000);
+    self.air = new Air(10000);
 
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
