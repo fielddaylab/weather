@@ -12,8 +12,7 @@ var GamePlayScene = function(game, stage)
     self.buffs = [];
     self.buffs[0] = [];
     self.buffs[1] = [];
-    for(var i = 0; i < w*h; i++) self.buffs[0][i] = Math.random();
-    for(var i = 0; i < w*h; i++) self.buffs[1][i] = Math.random();
+    for(var i = 0; i < w*h; i++) self.buffs[0][i] = self.buffs[1][i] = Math.random();
     self.buff = 0;
     self.data = self.buffs[self.buff];
 
@@ -64,7 +63,7 @@ var GamePlayScene = function(game, stage)
         for(var x = 0; x < self.w; x++)
         {
           var index = self.iFor(x,y);
-          self.data[index] = hmap.sample(x/self.w,y/self.h);
+          self.data[index] = hmap.sample((x/self.w)+0.5,(y/self.h)+0.5);
         }
       }
     }
@@ -74,102 +73,72 @@ var GamePlayScene = function(game, stage)
     var self = this;
     self.w = w;
     self.h = h;
-    self.data = [];
-    for(var i = 0; i < w*h*2; i++)
+    self.dir_map = new HeightMap(w,h);
+    self.len_map = new HeightMap(w,h);
+    for(var i = 0; i < w*h; i++)
     {
-      if(i%2)
-        self.data[i] = Math.sin(i/200)*5;
-      else
-        self.data[i] = Math.cos(i/200)*5;
+      self.dir_map.data[i] = Math.random()*2*Math.PI;
+      self.len_map.data[i] = Math.random();
     }
 
-    self.iFor = function(x,y) { return (y*(w*2))+(x*2); }
-    self.applyForce = function(xs,ys,xe,ye)
-    {
-      for(var i = 0; i < h; i++)
-      {
-        for(var j = 0; j < w; j++)
-        {
+    self.iFor = self.dir_map.iFor;
+  }
 
-        }
+  var MapDragger = function(x,y,r,hmap)
+  {
+    var self = this;
+    self.j = x;
+    self.i = y;
+    self.r = r;
+    self.w = (r/hmap.w)*stage.dispCanv.canvas.width;
+    self.h = (r/hmap.h)*stage.dispCanv.canvas.width;
+    self.x = ((self.j/hmap.w)*stage.dispCanv.canvas.width -(self.w/2))+(stage.dispCanv.canvas.width/hmap.w)/2;
+    self.y = ((self.i/hmap.h)*stage.dispCanv.canvas.height-(self.w/2))+(stage.dispCanv.canvas.height/hmap.h)/2;
+    self.dragging = false;
+
+    self.dragStart = function(evt)
+    {
+      self.dragging = true;
+    }
+    self.drag = function(evt)
+    {
+      if(self.dragging)
+      {
+        self.j = (evt.doX/stage.dispCanv.canvas.width*hmap.w)-0.5;
+        self.i = (evt.doY/stage.dispCanv.canvas.height*hmap.h)-0.5;
+        self.x = ((self.j/hmap.w)*stage.dispCanv.canvas.width -(self.w/2))+(stage.dispCanv.canvas.width/hmap.w)/2;
+        self.y = ((self.i/hmap.h)*stage.dispCanv.canvas.height-(self.w/2))+(stage.dispCanv.canvas.height/hmap.h)/2;
       }
+    }
+    self.dragFinish = function(evt)
+    {
+      self.dragging = false;
     }
   }
   var PressureSystem = function(x,y,r,delta,label,color,pmap)
   {
-    var self = this;
-    self.j = x;
-    self.i = y;
-    self.r = r;
-    self.x = ((self.j/pmap.w)*stage.dispCanv.canvas.width-10)+(stage.dispCanv.canvas.width/pmap.w)/2;
-    self.y = ((self.i/pmap.h)*stage.dispCanv.canvas.height-10)+(stage.dispCanv.canvas.height/pmap.h)/2;
-    self.w = 20;
-    self.h = 20;
+    var self = new MapDragger(x,y,r,pmap);
     self.delta = delta;
-    self.dragging = false;
-
-    self.dragStart = function(evt)
-    {
-      self.dragging = true;
-    }
-    self.drag = function(evt)
-    {
-      if(self.dragging)
-      {
-        self.j = (evt.doX/stage.dispCanv.canvas.width*pmap.w)-0.5;
-        self.i = (evt.doY/stage.dispCanv.canvas.height*pmap.h)-0.5;
-        self.x = ((self.j/pmap.w)*stage.dispCanv.canvas.width-10)+(stage.dispCanv.canvas.width/pmap.w)/2;
-        self.y = ((self.i/pmap.h)*stage.dispCanv.canvas.height-10)+(stage.dispCanv.canvas.height/pmap.h)/2;
-      }
-    }
-    self.dragFinish = function(evt)
-    {
-      self.dragging = false;
-    }
 
     self.draw = function(canv)
     {
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
+      canv.context.strokeRect(self.x,self.y,self.w,self.h);
     }
+    return self;
   }
   var TempEmitter = function(x,y,r,delta,label,color,tmap)
   {
-    var self = this;
-    self.j = x;
-    self.i = y;
-    self.r = r;
-    self.x = ((self.j/tmap.w)*stage.dispCanv.canvas.width-10)+(stage.dispCanv.canvas.width/tmap.w)/2;
-    self.y = ((self.i/tmap.h)*stage.dispCanv.canvas.height-10)+(stage.dispCanv.canvas.height/tmap.h)/2;
-    self.w = 20;
-    self.h = 20;
+    var self = new MapDragger(x,y,r,tmap);
     self.delta = delta;
-    self.dragging = false;
-
-    self.dragStart = function(evt)
-    {
-      self.dragging = true;
-    }
-    self.drag = function(evt)
-    {
-      if(self.dragging)
-      {
-        self.j = (evt.doX/stage.dispCanv.canvas.width*tmap.w)-0.5;
-        self.i = (evt.doY/stage.dispCanv.canvas.height*tmap.h)-0.5;
-        self.x = ((self.j/tmap.w)*stage.dispCanv.canvas.width-10)+(stage.dispCanv.canvas.width/tmap.w)/2;
-        self.y = ((self.i/tmap.h)*stage.dispCanv.canvas.height-10)+(stage.dispCanv.canvas.height/tmap.h)/2;
-      }
-    }
-    self.dragFinish = function(evt)
-    {
-      self.dragging = false;
-    }
 
     self.draw = function(canv)
     {
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
     }
+    return self;
   }
 
   self.tmap;
@@ -193,16 +162,16 @@ var GamePlayScene = function(game, stage)
     self.dragger = new Dragger({source:stage.dispCanv.canvas});
 
     self.tmap = new HeightMap(cells_w,cells_h);
+    self.pmap = new HeightMap(cells_w,cells_h);
+    self.vfield = new VecField2d(25,25);
+
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
 
-    self.pmap = new HeightMap(cells_w,cells_h);
-    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,100,5,"H","#FFFFFF",self.pmap);
+    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,4,5,"H","#FFFFFF",self.pmap);
+    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,4,-5,"L","#000000",self.pmap);
     self.dragger.register(self.hpsys);
-    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,100,-5,"L","#000000",self.pmap);
     self.dragger.register(self.lpsys);
-
-    self.vfield = new VecField2d(25,25);
 
     self.pmap.anneal(1);
     self.pmap.anneal(1);
@@ -308,6 +277,7 @@ var GamePlayScene = function(game, stage)
 
     self.pmap.anneal(0.2);
 
+/*
     var tl;
     var tr;
     var bl;
@@ -345,6 +315,7 @@ var GamePlayScene = function(game, stage)
         self.vfield.data[index+1] = Math.sin(newtheta)*10;
       }
     }
+*/
 
     self.dragger.flush();
     if(self.lpsys.dragging) self.hpsys.dragging = false;
@@ -429,7 +400,7 @@ var GamePlayScene = function(game, stage)
           x = x_space*j+(x_space/2);
           index = self.vfield.iFor(j,i);
           canv.context.fillRect(x-0.5,y-0.5,1,1);
-          canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
+          //canv.drawLine(x,y,x+self.vfield.data[index],y+self.vfield.data[index+1]);
         }
       }
     }
