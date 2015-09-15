@@ -211,7 +211,7 @@ var GamePlayScene = function(game, stage)
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
     self.vfield = new VecField2d(25,25);
-    self.air = new Air(1000);
+    self.air = new Air(10000);
 
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
@@ -376,8 +376,8 @@ var GamePlayScene = function(game, stage)
       {
         dir = self.vfield.dir_map.sample(self.air.partxs[i],self.air.partys[i]);
         len = self.vfield.len_map.sample(self.air.partxs[i],self.air.partys[i]);
-        self.air.partxs[i] += Math.cos(dir)*len/100;
-        self.air.partys[i] += Math.sin(dir)*len/100;
+        self.air.partxs[i] += Math.cos(dir)*len/100 + ((Math.random()-0.5)/200);
+        self.air.partys[i] += Math.sin(dir)*len/100 + ((Math.random()-0.5)/200);
         if(self.air.partxs[i] < 0 || self.air.partxs[i] > 1) self.air.partts[i] = 0;
         if(self.air.partys[i] < 0 || self.air.partys[i] > 1) self.air.partts[i] = 0;
       }
@@ -419,6 +419,16 @@ var GamePlayScene = function(game, stage)
           //canv.context.strokeRect(x,y,x_space,y_space);
         }
       }
+    }
+
+    /*
+    // air
+    */
+    if(self.drawa)
+    {
+      canv.context.fillStyle = "#FFFFFF";
+      for(var i = 0; i < self.air.n; i++)
+        canv.context.fillRect(self.air.partxs[i]*canv.canvas.width-1,self.air.partys[i]*canv.canvas.height-1,2,2);
     }
 
     var tl;
@@ -471,15 +481,6 @@ var GamePlayScene = function(game, stage)
       }
     }
 
-    /*
-    // air
-    */
-    if(self.drawa)
-    {
-      canv.context.fillStyle = "#FFFFFF";
-      for(var i = 0; i < self.air.n; i++)
-        canv.context.fillRect(self.air.partxs[i]*canv.canvas.width-1,self.air.partys[i]*canv.canvas.height-1,2,2);
-    }
 
     /*
     // pressure systems
