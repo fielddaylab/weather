@@ -74,6 +74,37 @@ var GamePlayScene = function(game, stage)
     self.w = w;
     self.h = h;
     self.dir_map = new HeightMap(w,h);
+    var dm = self.dir_map;
+    self.dir_map.sample = function(x,y) //overwrite to slerp (er, 'clerp'...)
+    {
+      var self = dm;
+      x = x*self.w;
+      y = y*self.h;
+      var low_x  = Math.floor(x-0.5+self.w)%self.w;
+      var high_x = Math.ceil( x-0.5+self.w)%self.w;
+      var low_y  = Math.floor(y-0.5+self.h)%self.h;
+      var high_y = Math.ceil( y-0.5+self.h)%self.h;
+
+      var tl = self.data[self.iFor( low_x, low_y)];
+      var tr = self.data[self.iFor(high_x, low_y)];
+      var bl = self.data[self.iFor( low_x,high_y)];
+      var br = self.data[self.iFor(high_x,high_y)];
+
+           if(tl > tr && tl-tr > tr-(tl-Math.PI*2)) tl -= Math.PI*2;
+      else if(tr > tl && tr-tl > (tl+Math.PI*2)-tr) tl += Math.PI*2;
+
+      var t = (lerp(tr,tl,(x+.5)%1))%(Math.PI*2);
+
+           if(bl > br && bl-br > br-(bl-Math.PI*2)) bl -= Math.PI*2;
+      else if(br > bl && br-bl > (bl+Math.PI*2)-br) bl += Math.PI*2;
+
+      var b = (lerp(br,bl,(x+.5)%1))%(Math.PI*2);
+
+           if(b > t && b-t > t-(b-Math.PI*2)) b -= Math.PI*2;
+      else if(t > b && t-b > (b+Math.PI*2)-t) b += Math.PI*2;
+
+      return (lerp(t,b,(y+.5)%1))%(Math.PI*2);
+    }
     self.len_map = new HeightMap(w,h);
     for(var i = 0; i < w*h; i++)
     {
@@ -82,6 +113,20 @@ var GamePlayScene = function(game, stage)
     }
 
     self.iFor = self.dir_map.iFor;
+  }
+  var Air = function(n)
+  {
+    var self = this;
+    self.partxs = [];
+    self.partys = [];
+    self.partts = [];
+    self.n = n;
+    for(var i = 0; i < self.n; i++)
+    {
+      self.partxs[i] = Math.random();
+      self.partys[i] = Math.random();
+      self.partts[i] = Math.random();
+    }
   }
 
   var MapDragger = function(x,y,r,hmap)
@@ -147,11 +192,13 @@ var GamePlayScene = function(game, stage)
   self.hpsys;
   self.lpsys;
   self.vfield;
+  self.air;
 
   self.drawh = true;
   self.drawc = true;
   self.drawv = true;
   self.drawp = true;
+  self.drawa = true;
 
   self.ready = function()
   {
@@ -164,6 +211,7 @@ var GamePlayScene = function(game, stage)
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
     self.vfield = new VecField2d(25,25);
+    self.air = new Air(1000);
 
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
@@ -274,9 +322,9 @@ var GamePlayScene = function(game, stage)
         index++;
       }
     }
-
     self.pmap.anneal(0.2);
 
+    //calculate wind
     for(var i = 0; i < self.vfield.h; i++)
     {
       for(var j = 0; j < self.vfield.w; j++)
@@ -309,6 +357,29 @@ var GamePlayScene = function(game, stage)
 
         self.vfield.dir_map.data[index] = lerp(theta,t,0.1)%(Math.PI*2);
         self.vfield.len_map.data[index] = Math.abs(highest_p-lowest_p)*(1-lowest_p)*5;
+      }
+    }
+
+    //update parts
+    var dir;
+    var len;
+    for(var i = 0; i < self.air.n; i++)
+    {
+      self.air.partts[i] -= 0.01;
+      if(self.air.partts[i] <= 0)
+      {
+        self.air.partts[i] = 1;
+        self.air.partxs[i] = Math.random();
+        self.air.partys[i] = Math.random();
+      }
+      else
+      {
+        dir = self.vfield.dir_map.sample(self.air.partxs[i],self.air.partys[i]);
+        len = self.vfield.len_map.sample(self.air.partxs[i],self.air.partys[i]);
+        self.air.partxs[i] += Math.cos(dir)*len/100;
+        self.air.partys[i] += Math.sin(dir)*len/100;
+        if(self.air.partxs[i] < 0 || self.air.partxs[i] > 1) self.air.partts[i] = 0;
+        if(self.air.partys[i] < 0 || self.air.partys[i] > 1) self.air.partts[i] = 0;
       }
     }
 
@@ -398,6 +469,16 @@ var GamePlayScene = function(game, stage)
           canv.drawLine(x,y,x+Math.cos(self.vfield.dir_map.data[index])*self.vfield.len_map.data[index]*10,y+Math.sin(self.vfield.dir_map.data[index])*self.vfield.len_map.data[index]*10);
         }
       }
+    }
+
+    /*
+    // air
+    */
+    if(self.drawa)
+    {
+      canv.context.fillStyle = "#FFFFFF";
+      for(var i = 0; i < self.air.n; i++)
+        canv.context.fillRect(self.air.partxs[i]*canv.canvas.width-1,self.air.partys[i]*canv.canvas.height-1,2,2);
     }
 
     /*
