@@ -58,6 +58,14 @@ function invlerp(s,e,v)
   return (v-s)/(e-s);
 }
 
+function clerp(s,e,t)
+{
+       if(e > s && e-s > s-(e-Math.PI*2)) e -= Math.PI*2;
+  else if(s > e && s-e > (e+Math.PI*2)-s) e += Math.PI*2;
+
+  return lerp(s,e,t)%(Math.PI*2);
+}
+
 function mapPt(from,to,pt)
 {
   pt.x = ((pt.x-from.x)/from.w)*to.w+to.x;

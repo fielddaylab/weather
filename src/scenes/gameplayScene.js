@@ -5,6 +5,16 @@ var GamePlayScene = function(game, stage)
   self.dragger;
   self.presser;
 
+  //index:  0 refers to first, 1 refers to second, 0.5 refers to "the value between first and second"
+  //sample: both 0 AND 1 refer to, identically, "the value between last and first", 0.5 refers to "the value between first and last"
+  function indexToSample (i,n) { return   (i+0.5)/n;       }
+  function indexToSampleW(i,n) { return (((i+0.5)/n)+1)%1; }
+  function sampleToIndex (s,n) { return   (s*n)-0.5;       }
+  function sampleToIndexW(s,n) { return (((s*n)-0.5)+n)%n; }
+
+  function decw(i,n) { return ((i-1)+n)%n; };
+  function incw(i,n) { return (i+1)%n; };
+
   var HeightMap = function(w,h)
   {
     var self = this;
@@ -41,21 +51,21 @@ var GamePlayScene = function(game, stage)
     }
     self.sample = function(x,y)
     {
-      x = x*self.w;
-      y = y*self.h;
-      var low_x  = Math.floor(x-0.5+self.w)%self.w;
-      var high_x = Math.ceil( x-0.5+self.w)%self.w;
-      var low_y  = Math.floor(y-0.5+self.h)%self.h;
-      var high_y = Math.ceil( y-0.5+self.h)%self.h;
+      x = sampleToIndexW(x,self.w);
+      y = sampleToIndexW(y,self.h);
+      var low_x  = Math.floor(x);
+      var high_x = Math.ceil (x);
+      var low_y  = Math.floor(y);
+      var high_y = Math.ceil (y);
 
       var tl = self.data[self.iFor( low_x, low_y)];
       var tr = self.data[self.iFor(high_x, low_y)];
       var bl = self.data[self.iFor( low_x,high_y)];
       var br = self.data[self.iFor(high_x,high_y)];
-      var t = lerp(tl,tr,(x+.5)%1);
-      var b = lerp(bl,br,(x+.5)%1);
 
-      return lerp(t,b,(y+.5)%1);
+      var t = lerp(tl,tr,x%1);
+      var b = lerp(bl,br,x%1);
+      return lerp(t,b,y%1);
     }
     self.takeValsFromHmap = function(hmap)
     {
@@ -79,38 +89,27 @@ var GamePlayScene = function(game, stage)
     self.dir_map.sample = function(x,y) //overwrite to slerp (er, 'clerp'...)
     {
       var self = dm;
-      x = x*self.w;
-      y = y*self.h;
-      var low_x  = Math.floor(x-0.5+self.w)%self.w;
-      var high_x = Math.ceil( x-0.5+self.w)%self.w;
-      var low_y  = Math.floor(y-0.5+self.h)%self.h;
-      var high_y = Math.ceil( y-0.5+self.h)%self.h;
+      x = sampleToIndexW(x,self.w);
+      y = sampleToIndexW(y,self.h);
+      var low_x  = Math.floor(x);
+      var high_x = Math.ceil (x);
+      var low_y  = Math.floor(y);
+      var high_y = Math.ceil (y);
 
       var tl = self.data[self.iFor( low_x, low_y)];
       var tr = self.data[self.iFor(high_x, low_y)];
       var bl = self.data[self.iFor( low_x,high_y)];
       var br = self.data[self.iFor(high_x,high_y)];
 
-           if(tl > tr && tl-tr > tr-(tl-Math.PI*2)) tl -= Math.PI*2;
-      else if(tr > tl && tr-tl > (tl+Math.PI*2)-tr) tl += Math.PI*2;
-
-      var t = (lerp(tr,tl,(x+.5)%1))%(Math.PI*2);
-
-           if(bl > br && bl-br > br-(bl-Math.PI*2)) bl -= Math.PI*2;
-      else if(br > bl && br-bl > (bl+Math.PI*2)-br) bl += Math.PI*2;
-
-      var b = (lerp(br,bl,(x+.5)%1))%(Math.PI*2);
-
-           if(b > t && b-t > t-(b-Math.PI*2)) b -= Math.PI*2;
-      else if(t > b && t-b > (b+Math.PI*2)-t) b += Math.PI*2;
-
-      return (lerp(t,b,(y+.5)%1))%(Math.PI*2);
+      var t = clerp(tr,tl,x%1);
+      var b = clerp(br,bl,x%1);
+      return clerp(t,b,y%1);
     }
     self.len_map = new HeightMap(w,h);
     for(var i = 0; i < w*h; i++)
     {
-      self.dir_map.data[i] = Math.random()*2*Math.PI;
-      self.len_map.data[i] = Math.random();
+      self.dir_map.data[i] = 0;
+      self.len_map.data[i] = 1;
     }
 
     self.iFor = self.dir_map.iFor;
@@ -133,13 +132,13 @@ var GamePlayScene = function(game, stage)
   var MapDragger = function(x,y,r,hmap)
   {
     var self = this;
-    self.j = x;
-    self.i = y;
+    self.sx = indexToSample(x,hmap.w);
+    self.sy = indexToSample(y,hmap.h);
     self.r = r;
-    self.w = (r/hmap.w)*stage.dispCanv.canvas.width;
-    self.h = (r/hmap.h)*stage.dispCanv.canvas.width;
-    self.x = ((self.j/hmap.w)*stage.dispCanv.canvas.width -(self.w/2))+(stage.dispCanv.canvas.width/hmap.w)/2;
-    self.y = ((self.i/hmap.h)*stage.dispCanv.canvas.height-(self.w/2))+(stage.dispCanv.canvas.height/hmap.h)/2;
+    self.w = r*stage.dispCanv.canvas.width;
+    self.h = r*stage.dispCanv.canvas.height;
+    self.x = self.sx*stage.dispCanv.canvas.width-(self.w/2);
+    self.y = self.sy*stage.dispCanv.canvas.height-(self.h/2);
     self.dragging = false;
 
     self.dragStart = function(evt)
@@ -150,10 +149,10 @@ var GamePlayScene = function(game, stage)
     {
       if(self.dragging)
       {
-        self.j = (evt.doX/stage.dispCanv.canvas.width*hmap.w)-0.5;
-        self.i = (evt.doY/stage.dispCanv.canvas.height*hmap.h)-0.5;
-        self.x = ((self.j/hmap.w)*stage.dispCanv.canvas.width -(self.w/2))+(stage.dispCanv.canvas.width/hmap.w)/2;
-        self.y = ((self.i/hmap.h)*stage.dispCanv.canvas.height-(self.w/2))+(stage.dispCanv.canvas.height/hmap.h)/2;
+        self.sx = evt.doX/stage.dispCanv.canvas.width;
+        self.sy = evt.doY/stage.dispCanv.canvas.height;
+        self.x = evt.doX-(self.w/2);
+        self.y = evt.doY-(self.h/2);
       }
     }
     self.dragFinish = function(evt)
@@ -170,7 +169,7 @@ var GamePlayScene = function(game, stage)
     {
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
-      //canv.context.strokeRect(self.x,self.y,self.w,self.h);
+      canv.context.strokeRect(self.x,self.y,self.w,self.h);
     }
     return self;
   }
@@ -224,13 +223,13 @@ var GamePlayScene = function(game, stage)
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
     self.vfield = new VecField2d(25,25);
-    self.air = new Air(10000);
+    self.air = new Air(1000);
 
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
 
-    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,4,5,"H","#FFFFFF",self.pmap);
-    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,4,-5,"L","#000000",self.pmap);
+    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,0.1, 0.01,"H","#FFFFFF",self.pmap);
+    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,0.1,-0.01,"L","#000000",self.pmap);
     self.dragger.register(self.hpsys);
     self.dragger.register(self.lpsys);
 
@@ -239,11 +238,6 @@ var GamePlayScene = function(game, stage)
     self.pmap.anneal(1);
     self.pmap.anneal(1);
   };
-
-  function leftw(x,w) { return ((x-1)+w)%w; };
-  function rightw(x,w) { return (x+1)%w; };
-  function upw(y,h) { return (y+1)%h; };
-  function downw(y,h) { return ((y-1)+h)%h; };
 
   self.ticks = 0;
   self.tick = function()
@@ -260,13 +254,16 @@ var GamePlayScene = function(game, stage)
     {
       for(var j = 0; j < self.tmap.w; j++)
       {
-        var xd = j-self.temit.j;
-        var yd = i-self.temit.i;
-        var d = xd*xd + yd*yd / self.temit.r*self.temit.r;
-        if(d < 1) self.tmap.data[index] += (1-(d*d*d*d))*self.temit.delta;
+        var xd = (j/self.tmap.w)-self.temit.sx;
+        var yd = (i/self.tmap.h)-self.temit.sy;
+        var d = (xd*xd + yd*yd) / (self.temit.r*self.temit.r);
+        if(d < 1)
+        {
+          self.tmap.data[index] += (1-(d*d*d*d))*self.temit.delta;
 
-        if(self.tmap.data[index] > 1) self.tmap.data[index] = 1;
-        if(self.tmap.data[index] < 0) self.tmap.data[index] = 0;
+          if(self.tmap.data[index] > 1) self.tmap.data[index] = 1;
+          if(self.tmap.data[index] < 0) self.tmap.data[index] = 0;
+        }
 
         index++;
       }
@@ -278,10 +275,10 @@ var GamePlayScene = function(game, stage)
     {
       for(var j = 0; j < self.tmap.w; j++)
       {
-        ti = self.tmap.iFor(j,upw(i,self.tmap.h));
-        bi = self.tmap.iFor(j,downw(i,self.tmap.h));
-        li = self.tmap.iFor(leftw(j,self.tmap.w),i);
-        ri = self.tmap.iFor(rightw(j,self.tmap.w),i);
+        ti = self.tmap.iFor(j,incw(i,self.tmap.h));
+        bi = self.tmap.iFor(j,decw(i,self.tmap.h));
+        li = self.tmap.iFor(decw(j,self.tmap.w),i);
+        ri = self.tmap.iFor(incw(j,self.tmap.w),i);
 
         if(self.tmap.data[index] > 1) self.tmap.data[index] = 1;
         if(self.tmap.data[index] < 0) self.tmap.data[index] = 0;
@@ -296,14 +293,14 @@ var GamePlayScene = function(game, stage)
     {
       for(var j = 0; j < self.pmap.w; j++)
       {
-        var xd = j-self.hpsys.j;
-        var yd = i-self.hpsys.i;
-        var d = xd*xd + yd*yd / self.hpsys.r*self.hpsys.r;
+        var xd = (j/self.pmap.w)-self.hpsys.sx;
+        var yd = (i/self.pmap.h)-self.hpsys.sy;
+        var d = (xd*xd + yd*yd) / (self.hpsys.r*self.hpsys.r);
         if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.hpsys.delta;
 
-        var xd = j-self.lpsys.j;
-        var yd = i-self.lpsys.i;
-        var d = xd*xd + yd*yd / self.lpsys.r*self.lpsys.r;
+        var xd = (j/self.pmap.w)-self.lpsys.sx;
+        var yd = (i/self.pmap.h)-self.lpsys.sy;
+        var d = (xd*xd + yd*yd) / (self.lpsys.r*self.lpsys.r);
         if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.lpsys.delta;
 
         if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
@@ -319,15 +316,10 @@ var GamePlayScene = function(game, stage)
     {
       for(var j = 0; j < self.pmap.w; j++)
       {
-        ti = self.pmap.iFor(j,upw(i,self.pmap.h));
-        bi = self.pmap.iFor(j,downw(i,self.pmap.h));
-        li = self.pmap.iFor(leftw(j,self.pmap.w),i);
-        ri = self.pmap.iFor(rightw(j,self.pmap.w),i);
-
-        ti = self.pmap.iFor(j,upw(i,self.pmap.h));
-        bi = self.pmap.iFor(j,downw(i,self.pmap.h));
-        li = self.pmap.iFor(leftw(j,self.pmap.w),i);
-        ri = self.pmap.iFor(rightw(j,self.pmap.w),i);
+        ti = self.pmap.iFor(j,incw(i,self.pmap.h));
+        bi = self.pmap.iFor(j,decw(i,self.pmap.h));
+        li = self.pmap.iFor(decw(j,self.pmap.w),i);
+        ri = self.pmap.iFor(incw(j,self.pmap.w),i);
 
         if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
         if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
@@ -342,10 +334,10 @@ var GamePlayScene = function(game, stage)
     {
       for(var j = 0; j < self.vfield.w; j++)
       {
-        var lowest_t = 0;  var lowest_p = 1;
+        var lowest_t  = 0; var lowest_p  = 1;
         var highest_t = 0; var highest_p = 0;
-        var x = (j+0.5)/self.vfield.w;
-        var y = (i+0.5)/self.vfield.h;
+        var x = indexToSampleW(j,self.vfield.w);
+        var y = indexToSampleW(i,self.vfield.h);
         var d = 0.05;
         var p = 0;
         for(var t = 0; t < Math.PI*2; t += 0.1)
@@ -365,10 +357,7 @@ var GamePlayScene = function(game, stage)
         var y = Math.sin(t);
         if((-lx)*(y-ly) - (-ly)*(x-lx) > 0) t = (t+Math.PI)%(2*Math.PI);
 
-             if(t > theta && t-theta > theta-(t-Math.PI*2)) t -= Math.PI*2;
-        else if(theta > t && theta-t > (t+Math.PI*2)-theta) t += Math.PI*2;
-
-        self.vfield.dir_map.data[index] = lerp(theta,t,0.1)%(Math.PI*2);
+        self.vfield.dir_map.data[index] = clerp(theta,t,0.1);
         self.vfield.len_map.data[index] = Math.abs(highest_p-lowest_p)*(1-lowest_p)*5;
       }
     }
