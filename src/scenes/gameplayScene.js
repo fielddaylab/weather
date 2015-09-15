@@ -124,7 +124,7 @@ var GamePlayScene = function(game, stage)
     {
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
-      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+      //canv.context.strokeRect(self.x,self.y,self.w,self.h);
     }
     return self;
   }
@@ -285,7 +285,7 @@ var GamePlayScene = function(game, stage)
         var highest_t = 0; var highest_p = 0;
         var x = (j+0.5)/self.vfield.w;
         var y = (i+0.5)/self.vfield.h;
-        var d = 0.2;
+        var d = 0.05;
         var p = 0;
         for(var t = 0; t < Math.PI*2; t += 0.1)
         {
@@ -304,19 +304,11 @@ var GamePlayScene = function(game, stage)
         var y = Math.sin(t);
         if((-lx)*(y-ly) - (-ly)*(x-lx) > 0) t = (t+Math.PI)%(2*Math.PI);
 
-
-        if(t > theta)
-        {
-          if(t-theta > theta-(t-Math.PI*2))
-            t -= Math.PI*2;
-        }
-        else
-        {
-          if(theta-t > (t+Math.PI*2)-theta)
-            t += Math.PI*2;
-        }
+             if(t > theta && t-theta > theta-(t-Math.PI*2)) t -= Math.PI*2;
+        else if(theta > t && theta-t > (t+Math.PI*2)-theta) t += Math.PI*2;
 
         self.vfield.dir_map.data[index] = lerp(theta,t,0.1)%(Math.PI*2);
+        self.vfield.len_map.data[index] = Math.abs(highest_p-lowest_p)*(1-lowest_p)*5;
       }
     }
 
@@ -403,7 +395,7 @@ var GamePlayScene = function(game, stage)
           x = x_space*j+(x_space/2);
           index = self.vfield.iFor(j,i);
           canv.context.fillRect(x-1,y-1,2,2);
-          canv.drawLine(x,y,x+Math.cos(self.vfield.dir_map.data[index])*10,y+Math.sin(self.vfield.dir_map.data[index])*10);
+          canv.drawLine(x,y,x+Math.cos(self.vfield.dir_map.data[index])*self.vfield.len_map.data[index]*10,y+Math.sin(self.vfield.dir_map.data[index])*self.vfield.len_map.data[index]*10);
         }
       }
     }
