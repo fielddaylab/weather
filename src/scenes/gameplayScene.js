@@ -3,6 +3,7 @@ var GamePlayScene = function(game, stage)
   var self = this;
 
   self.dragger;
+  self.presser;
 
   var HeightMap = function(w,h)
   {
@@ -194,11 +195,11 @@ var GamePlayScene = function(game, stage)
   self.vfield;
   self.air;
 
-  self.drawh = true;
-  self.drawc = true;
-  self.drawv = true;
-  self.drawp = true;
-  self.drawa = true;
+  self.drawh;
+  self.drawc;
+  self.drawv;
+  self.drawp;
+  self.drawa;
 
   self.ready = function()
   {
@@ -207,6 +208,18 @@ var GamePlayScene = function(game, stage)
 
     stage.drawCanv.context.font = "30px arial";
     self.dragger = new Dragger({source:stage.dispCanv.canvas});
+    self.presser = new Presser({source:stage.dispCanv.canvas});
+
+    self.drawh = true; self.drawht = new ToggleBox(10, 10,20,20,1,function(o){ self.drawh = o; });
+    self.drawc = true; self.drawct = new ToggleBox(10, 40,20,20,1,function(o){ self.drawc = o; });
+    self.drawv = true; self.drawvt = new ToggleBox(10, 70,20,20,1,function(o){ self.drawv = o; });
+    self.drawp = true; self.drawpt = new ToggleBox(10,100,20,20,1,function(o){ self.drawp = o; });
+    self.drawa = true; self.drawat = new ToggleBox(10,130,20,20,1,function(o){ self.drawa = o; });
+    self.presser.register(self.drawht);
+    self.presser.register(self.drawct);
+    self.presser.register(self.drawvt);
+    self.presser.register(self.drawpt);
+    self.presser.register(self.drawat);
 
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
@@ -384,6 +397,7 @@ var GamePlayScene = function(game, stage)
     }
 
     self.dragger.flush();
+    self.presser.flush();
     if(self.lpsys.dragging) self.hpsys.dragging = false;
     self.ticks++;
   };
@@ -490,6 +504,12 @@ var GamePlayScene = function(game, stage)
       self.hpsys.draw(canv);
       self.lpsys.draw(canv);
     }
+
+    self.drawht.draw(canv);
+    self.drawct.draw(canv);
+    self.drawvt.draw(canv);
+    self.drawpt.draw(canv);
+    self.drawat.draw(canv);
   };
 
   self.cleanup = function()
