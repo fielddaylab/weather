@@ -218,11 +218,17 @@ var GamePlayScene = function(game, stage)
   self.vfield;
   self.air;
 
-  self.drawh;
-  self.drawc;
-  self.drawv;
-  self.drawp;
-  self.drawa;
+  self.draw_pressure_map;
+  self.draw_pressure_contour;
+  self.draw_wind_vectors;
+  self.draw_pressure_systems;
+  self.draw_air_particles;
+
+  self.tick_pressure_map;
+  self.tick_pressure_contour;
+  self.tick_wind_vectors;
+  self.tick_pressure_systems;
+  self.tick_air_particles;
 
   self.ready = function()
   {
@@ -233,16 +239,27 @@ var GamePlayScene = function(game, stage)
     self.dragger = new Dragger({source:stage.dispCanv.canvas});
     self.presser = new Presser({source:stage.dispCanv.canvas});
 
-    self.drawh = true; self.drawht = new ToggleBox(10, 10,20,20,1,function(o){ self.drawh = o; });
-    self.drawc = true; self.drawct = new ToggleBox(10, 40,20,20,1,function(o){ self.drawc = o; });
-    self.drawv = true; self.drawvt = new ToggleBox(10, 70,20,20,1,function(o){ self.drawv = o; });
-    self.drawp = true; self.drawpt = new ToggleBox(10,100,20,20,1,function(o){ self.drawp = o; });
-    self.drawa = true; self.drawat = new ToggleBox(10,130,20,20,1,function(o){ self.drawa = o; });
-    self.presser.register(self.drawht);
-    self.presser.register(self.drawct);
-    self.presser.register(self.drawvt);
-    self.presser.register(self.drawpt);
-    self.presser.register(self.drawat);
+    self.draw_pressure_map = true; self.draw_pressure_map_t = new ToggleBox(10, 10,20,20,1,function(o){ self.draw_pressure_map = o; });
+    self.draw_pressure_contour = true; self.draw_pressure_contour_t = new ToggleBox(10, 40,20,20,1,function(o){ self.draw_pressure_contour = o; });
+    self.draw_wind_vectors = true; self.draw_wind_vectors_t = new ToggleBox(10, 70,20,20,1,function(o){ self.draw_wind_vectors = o; });
+    self.draw_pressure_systems = true; self.draw_pressure_systems_t = new ToggleBox(10,100,20,20,1,function(o){ self.draw_pressure_systems = o; });
+    self.draw_air_particles = true; self.draw_air_particles_t = new ToggleBox(10,130,20,20,1,function(o){ self.draw_air_particles = o; });
+    self.presser.register(self.draw_pressure_map_t);
+    self.presser.register(self.draw_pressure_contour_t);
+    self.presser.register(self.draw_wind_vectors_t);
+    self.presser.register(self.draw_pressure_systems_t);
+    self.presser.register(self.draw_air_particles_t);
+
+    self.tick_pressure_map = true; self.tick_pressure_map_t = new ToggleBox(40, 10,20,20,1,function(o){ self.tick_pressure_map = o; });
+    self.tick_pressure_contour = true; self.tick_pressure_contour_t = new ToggleBox(40, 40,20,20,1,function(o){ self.tick_pressure_contour = o; });
+    self.tick_wind_vectors = true; self.tick_wind_vectors_t = new ToggleBox(40, 70,20,20,1,function(o){ self.tick_wind_vectors = o; });
+    self.tick_pressure_systems = true; self.tick_pressure_systems_t = new ToggleBox(40,100,20,20,1,function(o){ self.tick_pressure_systems = o; });
+    self.tick_air_particles = true; self.tick_air_particles_t = new ToggleBox(40,130,20,20,1,function(o){ self.tick_air_particles = o; });
+    self.presser.register(self.tick_pressure_map_t);
+    self.presser.register(self.tick_pressure_contour_t);
+    self.presser.register(self.tick_wind_vectors_t);
+    self.presser.register(self.tick_pressure_systems_t);
+    self.presser.register(self.tick_air_particles_t);
 
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
@@ -272,6 +289,7 @@ var GamePlayScene = function(game, stage)
     var li;
     var ri;
 
+/*
     //Emit Temp
     index = 0;
     for(var i = 0; i < self.tmap.h; i++)
@@ -310,106 +328,121 @@ var GamePlayScene = function(game, stage)
         index++;
       }
     }
+*/
 
     //Emit Pressure
-    index = 0;
-    for(var i = 0; i < self.pmap.h; i++)
+    if(self.tick_pressure_systems)
     {
-      for(var j = 0; j < self.pmap.w; j++)
+      index = 0;
+      for(var i = 0; i < self.pmap.h; i++)
       {
-        var xd = (j/self.pmap.w)-self.hpsys.sx;
-        var yd = (i/self.pmap.h)-self.hpsys.sy;
-        var d = (xd*xd + yd*yd) / (self.hpsys.r*self.hpsys.r);
-        if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.hpsys.delta;
+        for(var j = 0; j < self.pmap.w; j++)
+        {
+          var xd = (j/self.pmap.w)-self.hpsys.sx;
+          var yd = (i/self.pmap.h)-self.hpsys.sy;
+          var d = (xd*xd + yd*yd) / (self.hpsys.r*self.hpsys.r);
+          if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.hpsys.delta;
 
-        var xd = (j/self.pmap.w)-self.lpsys.sx;
-        var yd = (i/self.pmap.h)-self.lpsys.sy;
-        var d = (xd*xd + yd*yd) / (self.lpsys.r*self.lpsys.r);
-        if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.lpsys.delta;
+          var xd = (j/self.pmap.w)-self.lpsys.sx;
+          var yd = (i/self.pmap.h)-self.lpsys.sy;
+          var d = (xd*xd + yd*yd) / (self.lpsys.r*self.lpsys.r);
+          if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.lpsys.delta;
 
-        if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
-        if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
+          if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
+          if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
 
-        index++;
+          index++;
+        }
       }
     }
 
-    //Flow Pressure
-    index = 0;
-    for(var i = 0; i < self.pmap.h; i++)
+    if(self.tick_pressure_map)
     {
-      for(var j = 0; j < self.pmap.w; j++)
+  /*
+      //Flow Pressure
+      index = 0;
+      for(var i = 0; i < self.pmap.h; i++)
       {
-        ti = self.pmap.iFor(j,incw(i,self.pmap.h));
-        bi = self.pmap.iFor(j,decw(i,self.pmap.h));
-        li = self.pmap.iFor(decw(j,self.pmap.w),i);
-        ri = self.pmap.iFor(incw(j,self.pmap.w),i);
+        for(var j = 0; j < self.pmap.w; j++)
+        {
+          ti = self.pmap.iFor(j,incw(i,self.pmap.h));
+          bi = self.pmap.iFor(j,decw(i,self.pmap.h));
+          li = self.pmap.iFor(decw(j,self.pmap.w),i);
+          ri = self.pmap.iFor(incw(j,self.pmap.w),i);
 
-        if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
-        if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
+          if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
+          if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
 
-        index++;
+          index++;
+        }
       }
+  */
+      self.pmap.anneal(0.2);
     }
-    self.pmap.anneal(0.2);
 
     //calculate wind
-    for(var i = 0; i < self.vfield.h; i++)
+    if(self.tick_wind_vectors)
     {
-      for(var j = 0; j < self.vfield.w; j++)
+      for(var i = 0; i < self.vfield.h; i++)
       {
-        var lowest_t  = 0; var lowest_p  = 1;
-        var highest_t = 0; var highest_p = 0;
-        var x = indexToSampleW(j,self.vfield.w);
-        var y = indexToSampleW(i,self.vfield.h);
-        var d = 0.05;
-        var p = 0;
-        for(var t = 0; t < Math.PI*2; t += 0.1)
+        for(var j = 0; j < self.vfield.w; j++)
         {
-          p = self.pmap.sample(x+Math.cos(t)*d,y+Math.sin(t)*d);
-          if(p < lowest_p)  { lowest_t  = t; lowest_p  = p; }
-          if(p > highest_p) { highest_t = t; highest_p = p; }
+          var lowest_t  = 0; var lowest_p  = 1;
+          var highest_t = 0; var highest_p = 0;
+          var x = indexToSampleW(j,self.vfield.w);
+          var y = indexToSampleW(i,self.vfield.h);
+          var d = 0.05;
+          var p = 0;
+          for(var t = 0; t < Math.PI*2; t += 0.1)
+          {
+            p = self.pmap.sample(x+Math.cos(t)*d,y+Math.sin(t)*d);
+            if(p < lowest_p)  { lowest_t  = t; lowest_p  = p; }
+            if(p > highest_p) { highest_t = t; highest_p = p; }
+          }
+
+          var index = self.vfield.iFor(j,i);
+          theta = self.vfield.dir_map.data[index];
+
+          //var t = lerp(lowest_t,highest_t,0.5);
+          lerps = lowest_t; lerpe = highest_t; lerpt = 0.5; lerpr = lerps+((lerpe-lerps)*lerpt);
+          var t = lerpr;
+          var lx = Math.cos(lowest_t);
+          var ly = Math.sin(lowest_t);
+          var x = Math.cos(t);
+          var y = Math.sin(t);
+          if((-lx)*(y-ly) - (-ly)*(x-lx) > 0) t = (t+Math.PI)%(2*Math.PI);
+
+          //self.vfield.dir_map.data[index] = clerp(theta,t,0.1);
+          clerps = theta; clerpe = t; clerpt = 0.1; if(clerpe > clerps && clerpe-clerps > clerps-(clerpe-Math.PI*2)) clerpe -= Math.PI*2; else if(clerps > clerpe && clerps-clerpe > (clerpe+Math.PI*2)-clerps) clerpe += Math.PI*2; clerpr = (clerps+((clerpe-clerps)*clerpt))%(Math.PI*2);
+          self.vfield.dir_map.data[index] = clerpr;
+          self.vfield.len_map.data[index] = Math.abs(highest_p-lowest_p)*(1-lowest_p)*5;
         }
-
-        var index = self.vfield.iFor(j,i);
-        theta = self.vfield.dir_map.data[index];
-
-        //var t = lerp(lowest_t,highest_t,0.5);
-        lerps = lowest_t; lerpe = highest_t; lerpt = 0.5; lerpr = lerps+((lerpe-lerps)*lerpt);
-        var t = lerpr;
-        var lx = Math.cos(lowest_t);
-        var ly = Math.sin(lowest_t);
-        var x = Math.cos(t);
-        var y = Math.sin(t);
-        if((-lx)*(y-ly) - (-ly)*(x-lx) > 0) t = (t+Math.PI)%(2*Math.PI);
-
-        //self.vfield.dir_map.data[index] = clerp(theta,t,0.1);
-        clerps = theta; clerpe = t; clerpt = 0.1; if(clerpe > clerps && clerpe-clerps > clerps-(clerpe-Math.PI*2)) clerpe -= Math.PI*2; else if(clerps > clerpe && clerps-clerpe > (clerpe+Math.PI*2)-clerps) clerpe += Math.PI*2; clerpr = (clerps+((clerpe-clerps)*clerpt))%(Math.PI*2);
-        self.vfield.dir_map.data[index] = clerpr;
-        self.vfield.len_map.data[index] = Math.abs(highest_p-lowest_p)*(1-lowest_p)*5;
       }
     }
 
     //update parts
     var dir;
     var len;
-    for(var i = 0; i < self.air.n; i++)
+    if(self.tick_air_particles)
     {
-      self.air.partts[i] -= 0.01;
-      if(self.air.partts[i] <= 0)
+      for(var i = 0; i < self.air.n; i++)
       {
-        self.air.partts[i] = 1;
-        self.air.partxs[i] = Math.random();
-        self.air.partys[i] = Math.random();
-      }
-      else
-      {
-        dir = self.vfield.dir_map.sample(self.air.partxs[i],self.air.partys[i]);
-        len = self.vfield.len_map.sample(self.air.partxs[i],self.air.partys[i]);
-        self.air.partxs[i] += Math.cos(dir)*len/100 + ((Math.random()-0.5)/200);
-        self.air.partys[i] += Math.sin(dir)*len/100 + ((Math.random()-0.5)/200);
-        if(self.air.partxs[i] < 0 || self.air.partxs[i] > 1) self.air.partts[i] = 0;
-        if(self.air.partys[i] < 0 || self.air.partys[i] > 1) self.air.partts[i] = 0;
+        self.air.partts[i] -= 0.01;
+        if(self.air.partts[i] <= 0)
+        {
+          self.air.partts[i] = 1;
+          self.air.partxs[i] = Math.random();
+          self.air.partys[i] = Math.random();
+        }
+        else
+        {
+          dir = self.vfield.dir_map.sample(self.air.partxs[i],self.air.partys[i]);
+          len = self.vfield.len_map.sample(self.air.partxs[i],self.air.partys[i]);
+          self.air.partxs[i] += Math.cos(dir)*len/100 + ((Math.random()-0.5)/200);
+          self.air.partys[i] += Math.sin(dir)*len/100 + ((Math.random()-0.5)/200);
+          if(self.air.partxs[i] < 0 || self.air.partxs[i] > 1) self.air.partts[i] = 0;
+          if(self.air.partys[i] < 0 || self.air.partys[i] > 1) self.air.partts[i] = 0;
+        }
       }
     }
 
@@ -430,11 +463,11 @@ var GamePlayScene = function(game, stage)
     var y;
     var index;
     /*
-    // height map
+    // pressure height map
     */
     x_space = canv.canvas.width / self.pmap.w;
     y_space = canv.canvas.height / self.pmap.h;
-    if(self.drawh)
+    if(self.draw_pressure_map)
     {
       for(var i = 0; i < self.pmap.h; i++)
       {
@@ -455,7 +488,7 @@ var GamePlayScene = function(game, stage)
     /*
     // air
     */
-    if(self.drawa)
+    if(self.draw_air_particles)
     {
       canv.context.fillStyle = "#FFFFFF";
       for(var i = 0; i < self.air.n; i++)
@@ -470,7 +503,7 @@ var GamePlayScene = function(game, stage)
     // contour lines
     */
     canv.context.strokeStyle = "#000000";
-    if(self.drawc)
+    if(self.draw_pressure_contour)
     {
       for(var l = 0; l < 1; l+=0.1)
       {
@@ -493,7 +526,7 @@ var GamePlayScene = function(game, stage)
     /*
     // vectors
     */
-    if(self.drawv)
+    if(self.draw_wind_vectors)
     {
       canv.context.fillStyle = "#555599";
       canv.context.strokeStyle = "#0000FF";
@@ -516,17 +549,23 @@ var GamePlayScene = function(game, stage)
     /*
     // pressure systems
     */
-    if(self.drawp)
+    if(self.draw_pressure_systems)
     {
       self.hpsys.draw(canv);
       self.lpsys.draw(canv);
     }
 
-    self.drawht.draw(canv);
-    self.drawct.draw(canv);
-    self.drawvt.draw(canv);
-    self.drawpt.draw(canv);
-    self.drawat.draw(canv);
+    self.draw_pressure_map_t.draw(canv);
+    self.draw_pressure_contour_t.draw(canv);
+    self.draw_wind_vectors_t.draw(canv);
+    self.draw_pressure_systems_t.draw(canv);
+    self.draw_air_particles_t.draw(canv);
+
+    self.tick_pressure_map_t.draw(canv);
+    self.tick_pressure_contour_t.draw(canv);
+    self.tick_wind_vectors_t.draw(canv);
+    self.tick_pressure_systems_t.draw(canv);
+    self.tick_air_particles_t.draw(canv);
   };
 
   self.cleanup = function()
