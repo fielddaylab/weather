@@ -269,8 +269,8 @@ var GamePlayScene = function(game, stage)
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
 
-    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,0.1, 0.01,"H","#FFFFFF",self.pmap);
-    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,0.1,-0.01,"L","#000000",self.pmap);
+    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,0.1, 0.03,"H","#FFFFFF",self.pmap);
+    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,0.1,-0.03,"L","#000000",self.pmap);
     self.dragger.register(self.hpsys);
     self.dragger.register(self.lpsys);
 
