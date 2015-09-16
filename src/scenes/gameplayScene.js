@@ -187,6 +187,18 @@ var GamePlayScene = function(game, stage)
     return self;
   }
 
+  var Flag = function(x,y,t,l,color)
+  {
+    var self = this;
+    self.x = x;
+    self.y = y;
+    self.goal_t = t;
+    self.goal_l = l;
+    self.color = color;
+    self.t = 0;
+    self.l = 0;
+  }
+
   self.tmap;
   self.temit;
   self.pmap;
@@ -194,6 +206,8 @@ var GamePlayScene = function(game, stage)
   self.lpsys;
   self.vfield;
   self.air;
+
+  self.flags = [];
 
   self.draw_pressure_map;
   self.draw_pressure_contour;
@@ -249,6 +263,17 @@ var GamePlayScene = function(game, stage)
     self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,0.1,-0.03,"L","#FFFFFF",self.pmap);
     self.dragger.register(self.hpsys);
     self.dragger.register(self.lpsys);
+
+    var colors = [];
+    colors[0] = "#0000FF";
+    colors[1] = "#00FF00";
+    colors[2] = "#00FFFF";
+    colors[3] = "#FF0000";
+    colors[4] = "#FF00FF";
+    colors[5] = "#FFFF00";
+    colors[6] = "#FFFFFF";
+    for(var i = 0; i < 1; i++)
+      self.flags[i] = new Flag(0.2+(Math.random()*0.6),0.2+(Math.random()*0.6),Math.random()*2*Math.PI,1,colors[i%colors.length]);
 
     self.pmap.anneal(1);
     self.pmap.anneal(1);
@@ -422,6 +447,18 @@ var GamePlayScene = function(game, stage)
       }
     }
 
+    /*
+    // flags
+    */
+    var x;
+    var y;
+    for(var i = 0; i < self.flags.length; i++)
+    {
+      var f = self.flags[i];
+      f.t = self.vfield.dir_map.sample(f.x,f.y);
+      f.l = self.vfield.len_map.sample(f.x,f.y);
+    }
+
     self.dragger.flush();
     self.presser.flush();
     if(self.lpsys.dragging) self.hpsys.dragging = false;
@@ -530,6 +567,26 @@ var GamePlayScene = function(game, stage)
       self.lpsys.draw(canv);
     }
 
+    /*
+    // flags
+    */
+    var x;
+    var y;
+    canv.context.lineWidth = 3;
+    for(var i = 0; i < self.flags.length; i++)
+    {
+      var f = self.flags[i];
+      x = f.x * canv.canvas.width;
+      y = f.y * canv.canvas.height;
+
+      canv.context.strokeStyle= f.color;
+      var len = f.l*10;
+      if(len < 10) len = 10;
+      canv.drawLine(x,y,x+Math.cos(f.t)*len,y+Math.sin(f.t)*len);
+      canv.context.fillRect(x-3,y-3,6,6);
+    }
+
+    canv.context.lineWidth = 1;
     self.draw_pressure_map_t.draw(canv);
     self.draw_pressure_contour_t.draw(canv);
     self.draw_wind_vectors_t.draw(canv);
