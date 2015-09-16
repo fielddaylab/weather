@@ -403,6 +403,10 @@ var GamePlayScene = function(game, stage)
           var index = self.vfield.iFor(j,i);
           theta = self.vfield.dir_map.data[index];
 
+          //rotate slightly ccw
+          lowest_t -= 0.4;
+          highest_t -= 0.4;
+
           //var t = lerp(lowest_t,highest_t,0.5);
           lerps = lowest_t; lerpe = highest_t; lerpt = 0.5; lerpr = lerps+((lerpe-lerps)*lerpt);
           var t = lerpr;
@@ -544,7 +548,6 @@ var GamePlayScene = function(game, stage)
         }
       }
     }
-
 
     /*
     // pressure systems
