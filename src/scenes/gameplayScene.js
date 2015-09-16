@@ -254,7 +254,7 @@ var GamePlayScene = function(game, stage)
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
     self.vfield = new VecField2d(25,25);
-    self.air = new Air(10000);
+    self.air = new Air(5000);
 
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
@@ -265,15 +265,16 @@ var GamePlayScene = function(game, stage)
     self.dragger.register(self.lpsys);
 
     var colors = [];
-    colors[0] = "#0000FF";
-    colors[1] = "#00FF00";
-    colors[2] = "#00FFFF";
-    colors[3] = "#FF0000";
-    colors[4] = "#FF00FF";
-    colors[5] = "#FFFF00";
-    colors[6] = "#FFFFFF";
-    for(var i = 0; i < 1; i++)
-      self.flags[i] = new Flag(0.2+(Math.random()*0.6),0.2+(Math.random()*0.6),Math.random()*2*Math.PI,1,colors[i%colors.length]);
+    var i = 0;
+    colors[i] = "#0000FF"; i++;
+    //colors[i] = "#00FF00"; i++; //green too similar to goal state
+    colors[i] = "#00FFFF"; i++;
+    colors[i] = "#FF0000"; i++;
+    colors[i] = "#FF00FF"; i++;
+    colors[i] = "#FFFF00"; i++;
+    colors[i] = "#FFFFFF"; i++;
+    for(var i = 0; i < 10; i++)
+      self.flags[i] = new Flag(0.2+(Math.random()*0.6),0.2+(Math.random()*0.6),Math.random()*2*Math.PI,1+Math.random(),colors[i%colors.length]);
 
     self.pmap.anneal(1);
     self.pmap.anneal(1);
@@ -572,18 +573,41 @@ var GamePlayScene = function(game, stage)
     */
     var x;
     var y;
+    var goal_met_y = 10;
+    var goal_met;
     canv.context.lineWidth = 3;
     for(var i = 0; i < self.flags.length; i++)
     {
       var f = self.flags[i];
+      goal_met = (f.l >= f.goal_l && f.t > f.goal_t-0.4 && f.t < f.goal_t+0.4);
+
       x = f.x * canv.canvas.width;
       y = f.y * canv.canvas.height;
 
-      canv.context.strokeStyle= f.color;
+      //goal state
+      if(self.ticks%20 < 10)
+      {
+        canv.context.strokeStyle = "#22FF55";
+        var len = f.goal_l*10;
+        canv.drawLine(x,y,x+Math.cos(f.goal_t)*len,y+Math.sin(f.goal_t)*len);
+        canv.context.fillRect(x-3,y-3,6,6);
+      }
+
+      //current state
+      if(goal_met) canv.context.strokeStyle = "#22FF55";
+      else         canv.context.strokeStyle = f.color;
       var len = f.l*10;
       if(len < 10) len = 10;
       canv.drawLine(x,y,x+Math.cos(f.t)*len,y+Math.sin(f.t)*len);
       canv.context.fillRect(x-3,y-3,6,6);
+
+      //goal marker
+      if(goal_met) canv.context.strokeStyle = "#22FF55";
+      else         canv.context.strokeStyle = "#000000";
+      canv.context.fillStyle = f.color;
+      canv.context.fillRect(canv.canvas.width-30,goal_met_y,20,20);
+      canv.context.strokeRect(canv.canvas.width-30,goal_met_y,20,20);
+      goal_met_y += 30;
     }
 
     canv.context.lineWidth = 1;
