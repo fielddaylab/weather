@@ -167,9 +167,9 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
+      stage.drawCanv.context.font = "30px arial";
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
-      canv.context.strokeRect(self.x,self.y,self.w,self.h);
     }
     return self;
   }
@@ -180,6 +180,7 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
+      stage.drawCanv.context.font = "30px arial";
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
     }
@@ -211,7 +212,6 @@ var GamePlayScene = function(game, stage)
     var cells_w = 50;
     var cells_h = 50;
 
-    stage.drawCanv.context.font = "30px arial";
     self.dragger = new Dragger({source:stage.dispCanv.canvas});
     self.presser = new Presser({source:stage.dispCanv.canvas});
 
@@ -245,8 +245,8 @@ var GamePlayScene = function(game, stage)
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
 
-    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,0.1, 0.03,"H","#FFFFFF",self.pmap);
-    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,0.1,-0.03,"L","#000000",self.pmap);
+    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,0.1, 0.03,"H","#000000",self.pmap);
+    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,0.1,-0.03,"L","#FFFFFF",self.pmap);
     self.dragger.register(self.hpsys);
     self.dragger.register(self.lpsys);
 
@@ -452,7 +452,7 @@ var GamePlayScene = function(game, stage)
           y = y_space*i;
           x = x_space*j;
           index = self.pmap.iFor(j,i);
-          var color = 255-Math.round(self.pmap.data[index]*255);
+          var color = Math.round(self.pmap.data[index]*255);
           canv.context.fillStyle = "rgba("+color+","+color+","+color+",1)";
           canv.context.fillRect(x,y,x_space+1,y_space+1);
           //canv.context.strokeStyle = "#ff0000";
@@ -466,7 +466,7 @@ var GamePlayScene = function(game, stage)
     */
     if(self.draw_air_particles)
     {
-      canv.context.fillStyle = "#FFFFFF";
+      canv.context.fillStyle = "#8888FF";
       for(var i = 0; i < self.air.n; i++)
         canv.context.fillRect(self.air.partxs[i]*canv.canvas.width-1,self.air.partys[i]*canv.canvas.height-1,2,2);
     }
@@ -541,6 +541,36 @@ var GamePlayScene = function(game, stage)
     self.tick_wind_vectors_t.draw(canv);
     self.tick_pressure_systems_t.draw(canv);
     self.tick_air_particles_t.draw(canv);
+
+    canv.context.font = "12px arial";
+    canv.context.fillStyle = "#000000";
+    canv.context.fillText("pressure map",      69, 29);
+    canv.context.fillText("pressure contours", 69, 59);
+    canv.context.fillText("wind vectors",      69, 89);
+    canv.context.fillText("pressure systems",  69,119);
+    canv.context.fillText("air particles",     69,149);
+    canv.context.fillText("pressure map",      71, 29);
+    canv.context.fillText("pressure contours", 71, 59);
+    canv.context.fillText("wind vectors",      71, 89);
+    canv.context.fillText("pressure systems",  71,119);
+    canv.context.fillText("air particles",     71,149);
+    canv.context.fillText("pressure map",      71, 31);
+    canv.context.fillText("pressure contours", 71, 61);
+    canv.context.fillText("wind vectors",      71, 91);
+    canv.context.fillText("pressure systems",  71,121);
+    canv.context.fillText("air particles",     71,151);
+    canv.context.fillText("pressure map",      69, 31);
+    canv.context.fillText("pressure contours", 69, 61);
+    canv.context.fillText("wind vectors",      69, 91);
+    canv.context.fillText("pressure systems",  69,121);
+    canv.context.fillText("air particles",     69,151);
+    canv.context.font = "12px arial";
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.fillText("pressure map",      70, 30);
+    canv.context.fillText("pressure contours", 70, 60);
+    canv.context.fillText("wind vectors",      70, 90);
+    canv.context.fillText("pressure systems",  70,120);
+    canv.context.fillText("air particles",     70,150);
   };
 
   self.cleanup = function()
