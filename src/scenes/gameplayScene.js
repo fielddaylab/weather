@@ -132,8 +132,8 @@ var GamePlayScene = function(game, stage)
   var MapDragger = function(x,y,r,hmap)
   {
     var self = this;
-    self.sx = indexToSample(x,hmap.w);
-    self.sy = indexToSample(y,hmap.h);
+    self.sx = x;
+    self.sy = y;
     self.r = r;
     self.w = r*stage.dispCanv.canvas.width;
     self.h = r*stage.dispCanv.canvas.height;
@@ -187,6 +187,20 @@ var GamePlayScene = function(game, stage)
     return self;
   }
 
+  var PressureCooker = function()
+  {
+    var self = this;
+    self.delta;
+    self.r;
+    self.cook = function(map,sys,drag)
+    {
+      var color = self.delta > 0 ? "#000000" : "#FFFFFF";
+      var label = self.delta > 0 ? "H" : "L";
+      sys[sys.length] = new PressureSystem(.5, .5, self.r, self.delta, label, color, map);
+      drag.register(sys[sys.length-1]);
+    }
+  }
+
   var Flag = function(x,y,t,l,color)
   {
     var self = this;
@@ -202,11 +216,10 @@ var GamePlayScene = function(game, stage)
   self.tmap;
   self.temit;
   self.pmap;
-  self.hpsys;
-  self.lpsys;
   self.vfield;
   self.air;
 
+  self.psys = [];
   self.flags = [];
 
   self.draw_pressure_map;
@@ -251,6 +264,14 @@ var GamePlayScene = function(game, stage)
     self.presser.register(self.tick_pressure_systems_t);
     self.presser.register(self.tick_air_particles_t);
 
+    self.pcooker = new PressureCooker();
+    self.pcooker.r = 0.1;
+    self.pcooker.delta = 0.03;
+    self.pcooker.cook(self.pmap, self.psys, self.dragger);
+    self.pcooker.delta = -0.03;
+    self.pcooker.cook(self.pmap, self.psys, self.dragger);
+    console.log(self.psys);
+
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
     self.vfield = new VecField2d(25,25);
@@ -258,11 +279,6 @@ var GamePlayScene = function(game, stage)
 
     self.temit = new TempEmitter(self.tmap.w*.2,self.tmap.h*.2,100,5,"T","#FF3333",self.tmap);
     self.dragger.register(self.temit);
-
-    self.hpsys = new PressureSystem(self.pmap.w*.2,self.pmap.h*.2,0.1, 0.03,"H","#000000",self.pmap);
-    self.lpsys = new PressureSystem(self.pmap.w*.6,self.pmap.h*.6,0.1,-0.03,"L","#FFFFFF",self.pmap);
-    self.dragger.register(self.hpsys);
-    self.dragger.register(self.lpsys);
 
     var colors = [];
     var i = 0;
@@ -340,15 +356,13 @@ var GamePlayScene = function(game, stage)
       {
         for(var j = 0; j < self.pmap.w; j++)
         {
-          var xd = (j/self.pmap.w)-self.hpsys.sx;
-          var yd = (i/self.pmap.h)-self.hpsys.sy;
-          var d = (xd*xd + yd*yd) / (self.hpsys.r*self.hpsys.r);
-          if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.hpsys.delta;
-
-          var xd = (j/self.pmap.w)-self.lpsys.sx;
-          var yd = (i/self.pmap.h)-self.lpsys.sy;
-          var d = (xd*xd + yd*yd) / (self.lpsys.r*self.lpsys.r);
-          if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.lpsys.delta;
+          for(var k = 0; k < self.psys.length; k++)
+          {
+            var xd = (j/self.pmap.w)-self.psys[k].sx;
+            var yd = (i/self.pmap.h)-self.psys[k].sy;
+            var d = (xd*xd + yd*yd) / (self.psys[k].r*self.psys[k].r);
+            if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.psys[k].delta;
+          }
 
           if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
           if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
@@ -462,7 +476,12 @@ var GamePlayScene = function(game, stage)
 
     self.dragger.flush();
     self.presser.flush();
-    if(self.lpsys.dragging) self.hpsys.dragging = false;
+    var any_dragging = false;
+    for(var i = 0; i < self.psys.length; i++)
+    {
+      if(any_dragging) self.psys[i].dragging = false;
+      if(self.psys[i].dragging) any_dragging = true;
+    }
     self.ticks++;
   };
 
@@ -564,8 +583,8 @@ var GamePlayScene = function(game, stage)
     */
     if(self.draw_pressure_systems)
     {
-      self.hpsys.draw(canv);
-      self.lpsys.draw(canv);
+      for(var i = 0; i < self.psys.length; i++)
+        self.psys[i].draw(canv);
     }
 
     /*
