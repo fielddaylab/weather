@@ -1,4 +1,5 @@
 function NumberBox(x,y,w,h,val,delta,callback)
+//register to keyer, dragger, blurer
 {
   var self = this;
   self.x = x;
@@ -136,7 +137,51 @@ function NumberBox(x,y,w,h,val,delta,callback)
   }
 }
 
+function ButtonBox(x,y,w,h,callback)
+//register to presser
+{
+  var self = this;
+  self.x = x;
+  self.y = y;
+  self.w = w;
+  self.h = h;
+
+  self.down = false;
+
+  self.press = function(evt)
+  {
+    self.down = true;
+  }
+  self.unpress = function(evt)
+  {
+    self.down = false;
+    if(ptWithinObj(evt.doX, evt.doY, self)) self.hit();
+  }
+
+  self.hit = function()
+  {
+    callback(self.on);
+  }
+
+  self.draw = function(canv)
+  {
+    if(self.down) canv.context.strokeStyle = "#00F400";
+    else          canv.context.strokeStyle = "#000000";
+
+    canv.context.fillStyle = "#00F400";
+
+    canv.context.fillRect(self.x,self.y,self.w,self.h);
+    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+  }
+
+  self.print = function()
+  {
+    console.log("("+self.x+","+self.y+","+self.w+","+self.h+") d:"+self.down+" "+"");
+  }
+}
+
 function ToggleBox(x,y,w,h,val,callback)
+//register to presser
 {
   var self = this;
   self.x = x;

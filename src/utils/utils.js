@@ -52,9 +52,6 @@ function lerp(s,e,t)
 {
   return s+((e-s)*t);
 }
-//'inline'
-var lerps; var lerpe; var lerpt; var lerpr;
-//lerps = 0; lerpe = 0; lerpt = 0; lerpr = lerps+((lerpe-lerps)*lerpt);
 
 function invlerp(s,e,v)
 {
@@ -68,9 +65,6 @@ function clerp(s,e,t)
 
   return lerp(s,e,t)%(Math.PI*2);
 }
-//'inline'
-var clerps; var clerpe; var clerpt; var clerpr;
-//clerps = 0; clerpe = 0; clerpt = 0; if(clerpe > clerps && clerpe-clerps > clerps-(clerpe-Math.PI*2)) clerpe -= Math.PI*2; else if(clerps > clerpe && clerps-clerpe > (clerpe+Math.PI*2)-clerps) clerpe += Math.PI*2; clerpr = (clerps+((clerpe-clerps)*clerpt))%(Math.PI*2);
 
 function mapPt(from,to,pt)
 {
