@@ -43,7 +43,9 @@ var GamePlayScene = function(game, stage)
           self.buffs[newb][index] += self.buffs[oldb][self.iFor(x,((y-1)+h)%h)];
           self.buffs[newb][index] += self.buffs[oldb][self.iFor(x,((y+1)+h)%h)];
           self.buffs[newb][index] /= 5;
-          self.buffs[newb][index] = lerp(self.buffs[oldb][index],self.buffs[newb][index],t);
+          //self.buffs[newb][index] = lerp(self.buffs[oldb][index],self.buffs[newb][index],t);
+          lerps = self.buffs[oldb][index]; lerpe = self.buffs[newb][index]; lerpt = t; lerpr = lerps+((lerpe-lerps)*lerpt);
+          self.buffs[newb][index] = lerpr;
         }
       }
       self.buff = (self.buff+1)%2;
@@ -63,9 +65,18 @@ var GamePlayScene = function(game, stage)
       var bl = self.data[self.iFor( low_x,high_y)];
       var br = self.data[self.iFor(high_x,high_y)];
 
+/*
       var t = lerp(tl,tr,x%1);
       var b = lerp(bl,br,x%1);
       return lerp(t,b,y%1);
+*/
+
+      lerps = tl; lerpe = tr; lerpt = x%1; lerpr = lerps+((lerpe-lerps)*lerpt);
+      var t = lerpr;
+      lerps = bl; lerpe = br; lerpt = x%1; lerpr = lerps+((lerpe-lerps)*lerpt);
+      var b = lerpr;
+      lerps = t; lerpe = b; lerpt = y%1; lerpr = lerps+((lerpe-lerps)*lerpt);
+      return lerpr;
     }
     self.takeValsFromHmap = function(hmap)
     {
@@ -101,32 +112,22 @@ var GamePlayScene = function(game, stage)
       var bl = self.data[self.iFor( low_x,high_y)];
       var br = self.data[self.iFor(high_x,high_y)];
 
-///*
+/*
       //concise, easy to read, and incredibly slow
       //(no compiler means no inlining?)
       var t = clerp(tr,tl,x%1);
       var b = clerp(br,bl,x%1);
       return clerp(t,b,y%1);
-//*/
-
-/*
-      //bloated, complex, hard to read, but doesn't add stack frame?
-
-           if(tl > tr && tl-tr > tr-(tl-Math.PI*2)) tl -= Math.PI*2;
-      else if(tr > tl && tr-tl > (tl+Math.PI*2)-tr) tl += Math.PI*2;
-
-      var t = lerp(tr,tl,x%1)%(Math.PI*2);
-
-           if(bl > br && bl-br > br-(bl-Math.PI*2)) bl -= Math.PI*2;
-      else if(br > bl && br-bl > (bl+Math.PI*2)-br) bl += Math.PI*2;
-
-      var b = lerp(br,bl,x%1)%(Math.PI*2);
-
-           if(b > t && b-t > t-(b-Math.PI*2)) b -= Math.PI*2;
-      else if(t > b && t-b > (b+Math.PI*2)-t) b += Math.PI*2;
-
-      return lerp(t,b,y%1)%(Math.PI*2);
 */
+
+///*
+      clerps = tr; clerpe = tl; clerpt = x%1; if(clerpe > clerps && clerpe-clerps > clerps-(clerpe-Math.PI*2)) clerpe -= Math.PI*2; else if(clerps > clerpe && clerps-clerpe > (clerpe+Math.PI*2)-clerps) clerpe += Math.PI*2; clerpr = (clerps+((clerpe-clerps)*clerpt))%(Math.PI*2);
+      var t = clerpr;
+      clerps = br; clerpe = bl; clerpt = x%1; if(clerpe > clerps && clerpe-clerps > clerps-(clerpe-Math.PI*2)) clerpe -= Math.PI*2; else if(clerps > clerpe && clerps-clerpe > (clerpe+Math.PI*2)-clerps) clerpe += Math.PI*2; clerpr = (clerps+((clerpe-clerps)*clerpt))%(Math.PI*2);
+      var b = clerpr;
+      clerps = t; clerpe = b; clerpt = y%1; if(clerpe > clerps && clerpe-clerps > clerps-(clerpe-Math.PI*2)) clerpe -= Math.PI*2; else if(clerps > clerpe && clerps-clerpe > (clerpe+Math.PI*2)-clerps) clerpe += Math.PI*2; clerpr = (clerps+((clerpe-clerps)*clerpt))%(Math.PI*2);
+      return clerpr;
+//*/
     }
     self.len_map = new HeightMap(w,h);
     for(var i = 0; i < w*h; i++)
@@ -373,14 +374,18 @@ var GamePlayScene = function(game, stage)
         var index = self.vfield.iFor(j,i);
         theta = self.vfield.dir_map.data[index];
 
-        var t = lerp(lowest_t,highest_t,0.5);
+        //var t = lerp(lowest_t,highest_t,0.5);
+        lerps = lowest_t; lerpe = highest_t; lerpt = 0.5; lerpr = lerps+((lerpe-lerps)*lerpt);
+        var t = lerpr;
         var lx = Math.cos(lowest_t);
         var ly = Math.sin(lowest_t);
         var x = Math.cos(t);
         var y = Math.sin(t);
         if((-lx)*(y-ly) - (-ly)*(x-lx) > 0) t = (t+Math.PI)%(2*Math.PI);
 
-        self.vfield.dir_map.data[index] = clerp(theta,t,0.1);
+        //self.vfield.dir_map.data[index] = clerp(theta,t,0.1);
+        clerps = theta; clerpe = t; clerpt = 0.1; if(clerpe > clerps && clerpe-clerps > clerps-(clerpe-Math.PI*2)) clerpe -= Math.PI*2; else if(clerps > clerpe && clerps-clerpe > (clerpe+Math.PI*2)-clerps) clerpe += Math.PI*2; clerpr = (clerps+((clerpe-clerps)*clerpt))%(Math.PI*2);
+        self.vfield.dir_map.data[index] = clerpr;
         self.vfield.len_map.data[index] = Math.abs(highest_p-lowest_p)*(1-lowest_p)*5;
       }
     }
