@@ -467,8 +467,15 @@ var GamePlayScene = function(game, stage)
     self.levels[level].push(new Flag(0.5,0.5,0,2,colors[self.levels[level].length%colors.length]));
     level++;
     self.levels[level] = [];
+    self.levels[level].push(new Flag(0.3,0.5,Math.PI/2,2,colors[self.levels[level].length%colors.length]));
+    self.levels[level].push(new Flag(0.7,0.5,3*Math.PI/2,2,colors[self.levels[level].length%colors.length]));
+    /*
+    //copy and paste to add new level
+    level++;
+    self.levels[level] = [];
     self.levels[level].push(new Flag(0.2,0.5,Math.PI/2,2,colors[self.levels[level].length%colors.length]));
     self.levels[level].push(new Flag(0.8,0.5,3*Math.PI/2,2,colors[self.levels[level].length%colors.length]));
+    */
 
     self.pmap.anneal(1);
     self.pmap.anneal(1);
