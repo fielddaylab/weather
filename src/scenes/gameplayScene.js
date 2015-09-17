@@ -781,7 +781,7 @@ var GamePlayScene = function(game, stage)
     for(var i = 0; i < self.levels[self.current_level].length; i++)
     {
       var f = self.levels[self.current_level][i];
-      goal_met = (f.l >= f.goal_l && cdist(f.t,f.goal_t < 0.4));
+      goal_met = (f.l >= f.goal_l && cdist(f.t,f.goal_t) < 0.4);
       if(goal_met) f.goal_ticks++;
       else         f.goal_ticks = 0;
       if(needed_goal_ticks - f.goal_ticks > most_ticks_needed) most_ticks_needed = needed_goal_ticks-f.goal_ticks;
@@ -790,7 +790,7 @@ var GamePlayScene = function(game, stage)
       y = f.y * canv.canvas.height;
 
       //goal state
-      if(self.ticks%20 < 10)
+      if(self.ticks%10 < 5)
       {
         canv.context.strokeStyle = "#22FF55";
         var len = f.goal_l*20;
