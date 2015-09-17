@@ -435,9 +435,9 @@ var GamePlayScene = function(game, stage)
 
     self.pcooker = new PressureCooker();
     self.pcooker.r = 0.1*100;
-    self.pcooker.delta = 0.03*1000;
-    self.pcooker.cook(self.pmap, self.psys, self.dragger);
-    self.pcooker.delta = -0.03*1000;
+    //self.pcooker.delta = 0.03*1000;
+    //self.pcooker.cook(self.pmap, self.psys, self.dragger);
+    self.pcooker.delta = -0.01*1000;
     self.pcooker.cook(self.pmap, self.psys, self.dragger);
 
     self.tmap = new HeightMap(cells_w,cells_h);
@@ -457,7 +457,7 @@ var GamePlayScene = function(game, stage)
     colors[i] = "#FF00FF"; i++;
     colors[i] = "#FFFF00"; i++;
     colors[i] = "#FFFFFF"; i++;
-    for(var i = 0; i < 10; i++)
+    for(var i = 0; i < 3; i++)
       self.flags[i] = new Flag(0.2+(Math.random()*0.6),0.2+(Math.random()*0.6),Math.random()*2*Math.PI,1+Math.random(),colors[i%colors.length]);
 
     self.pmap.anneal(1);
