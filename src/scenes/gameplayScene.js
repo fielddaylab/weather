@@ -333,15 +333,18 @@ var GamePlayScene = function(game, stage)
   var PressureCooker = function()
   {
     var self = this;
-    self.delta;
-    self.r;
-    self.cook = function(map,sys,drag)
+
+    self.cook = function(type,strength,radius,map,sys,drag)
     {
+      if(type)     self.delta = 0.005; else self.delta = -0.005;
+      if(strength) self.delta *= 5;
+      if(radius)   self.r = 0.2;       else self.r = 0.1;
+
       if(self.r < 0) self.r *= -1;
       var color_in  = self.delta > 0 ? "#000000" : "#FFFFFF";
       var color_out = self.delta > 0 ? "#FFFFFF" : "#000000";
       var label = self.delta > 0 ? "H" : "L";
-      var p = new PressureSystem(.5, .5, self.r/100, self.delta/1000, label, color_in, color_out, map,
+      var p = new PressureSystem(.5, .5, self.r, self.delta, label, color_in, color_out, map,
         function()
         {
           drag.unregister(p);
@@ -423,23 +426,44 @@ var GamePlayScene = function(game, stage)
     self.presser.register(self.tick_pressure_systems_t);
     self.presser.register(self.tick_air_particles_t);
 
-    self.p_r_nb     = new NumberBox(10,200,50,20,10,1,function(n){ self.pcooker.r = n; });
-    self.p_delta_nb = new NumberBox(10,230,50,20,10,1,function(n){ self.pcooker.delta = n; });
-    self.p_cook_b   = new ButtonBox(10,260,20,20,function() { self.pcooker.cook(self.pmap, self.psys, self.dragger); });
-    self.keyer.register(self.p_r_nb);
-    self.dragger.register(self.p_r_nb);
-    self.blurer.register(self.p_r_nb);
-    self.keyer.register(self.p_delta_nb);
-    self.dragger.register(self.p_delta_nb);
-    self.blurer.register(self.p_delta_nb);
+    self.p_type = 0;
+    self.p_type_b_t = new ToggleBox(10,200,20,20,1, function(o) { self.p_type = !o; self.p_type_s_t.on = self.p_type; });
+    self.p_type_b_t.on = !self.p_type;
+    self.p_type_s_t = new ToggleBox(40,200,20,20,1, function(o) { self.p_type = o; self.p_type_b_t.on = !self.p_type; });
+    self.p_type_s_t.on = self.p_type;
+    self.presser.register(self.p_type_b_t)
+    self.presser.register(self.p_type_s_t)
+
+    self.p_delta = 0;
+    self.p_delta_b_t = new ToggleBox(10,230,20,20,1, function(o) { self.p_delta = !o; self.p_delta_s_t.on = self.p_delta; });
+    self.p_delta_b_t.on = !self.p_delta;
+    self.p_delta_s_t = new ToggleBox(40,230,20,20,1, function(o) { self.p_delta = o; self.p_delta_b_t.on = !self.p_delta; });
+    self.p_delta_s_t.on = self.p_delta;
+    self.presser.register(self.p_delta_b_t)
+    self.presser.register(self.p_delta_s_t)
+
+    self.p_r = 0;
+    self.p_r_b_t = new ToggleBox(10,260,20,20,1, function(o) { self.p_r = !o; self.p_r_s_t.on = self.p_r; });
+    self.p_r_b_t.on = !self.p_r;
+    self.p_r_s_t = new ToggleBox(40,260,20,20,1, function(o) { self.p_r = o; self.p_r_b_t.on = !self.p_r; });
+    self.p_r_s_t.on = self.p_r;
+    self.presser.register(self.p_r_b_t)
+    self.presser.register(self.p_r_s_t)
+
+    //self.p_r_nb     = new NumberBox(10,200,50,20,10,1,function(n){ self.pcooker.r = n; });
+    //self.p_delta_nb = new NumberBox(10,230,50,20,10,1,function(n){ self.pcooker.delta = n; });
+    //self.keyer.register(self.p_r_nb);
+    //self.dragger.register(self.p_r_nb);
+    //self.blurer.register(self.p_r_nb);
+    //self.keyer.register(self.p_delta_nb);
+    //self.dragger.register(self.p_delta_nb);
+    //self.blurer.register(self.p_delta_nb);
+
+    self.p_cook_b   = new ButtonBox(10,290,20,20,function() { self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger); });
     self.presser.register(self.p_cook_b);
 
     self.pcooker = new PressureCooker();
-    self.pcooker.r = 0.1*100;
-    //self.pcooker.delta = 0.03*1000;
-    //self.pcooker.cook(self.pmap, self.psys, self.dragger);
-    self.pcooker.delta = -0.01*1000;
-    self.pcooker.cook(self.pmap, self.psys, self.dragger);
+    self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger);
 
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
@@ -840,8 +864,14 @@ var GamePlayScene = function(game, stage)
     self.tick_air_particles_t.draw(canv);
 
     stage.drawCanv.context.font = "15px arial";
-    self.p_r_nb.draw(canv);
-    self.p_delta_nb.draw(canv);
+    //self.p_r_nb.draw(canv);
+    //self.p_delta_nb.draw(canv);
+    self.p_r_b_t.draw(canv);
+    self.p_r_s_t.draw(canv);
+    self.p_delta_b_t.draw(canv);
+    self.p_delta_s_t.draw(canv);
+    self.p_type_b_t.draw(canv);
+    self.p_type_s_t.draw(canv);
     self.p_cook_b.draw(canv);
 
     canv.context.font = "12px arial";
@@ -853,12 +883,12 @@ var GamePlayScene = function(game, stage)
     canv.outlineText("pressure systems",  70,135);
     canv.outlineText("air particles",     70,165);
 
-    canv.outlineText("pressure system",   10,190);
-    canv.outlineText("radius",            70,220);
-    canv.outlineText("strength",          70,250);
-    canv.outlineText("create new",        70,280);
-    canv.outlineText("drag to destroy",   70,310);
-    canv.context.strokeRect(10,290,20,20);
+    canv.outlineText("pressure system", 10,190);
+    canv.outlineText("type",            70,220);
+    canv.outlineText("strength",        70,250);
+    canv.outlineText("radius",          70,280);
+    canv.outlineText("create new (drag to destroy)", 70,310);
+    canv.context.strokeRect(40,290,20,20);
 
     canv.outlineText("Blow the colored flags in the indicated speed+direction", canv.canvas.width-300, canv.canvas.height-5);
   };
