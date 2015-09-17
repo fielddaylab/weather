@@ -451,7 +451,7 @@ var GamePlayScene = function(game, stage)
 
     var colors = [];
     var i = 0;
-    colors[i] = "#0000FF"; i++;
+    //colors[i] = "#0000FF"; i++; //blue too similar to vectors/particles
     //colors[i] = "#00FF00"; i++; //green too similar to goal state
     colors[i] = "#00FFFF"; i++;
     colors[i] = "#FF0000"; i++;
@@ -793,7 +793,7 @@ var GamePlayScene = function(game, stage)
       if(self.ticks%20 < 10)
       {
         canv.context.strokeStyle = "#22FF55";
-        var len = f.goal_l*10;
+        var len = f.goal_l*20;
         canv.drawLine(x,y,x+Math.cos(f.goal_t)*len,y+Math.sin(f.goal_t)*len);
         canv.context.fillRect(x-3,y-3,6,6);
       }
@@ -801,8 +801,8 @@ var GamePlayScene = function(game, stage)
       //current state
       if(goal_met) canv.context.strokeStyle = "#22FF55";
       else         canv.context.strokeStyle = f.color;
-      var len = f.l*10;
-      if(len < 10) len = 10;
+      var len = f.l*20;
+      if(len < 20) len = 20;
       canv.drawLine(x,y,x+Math.cos(f.t)*len,y+Math.sin(f.t)*len);
       canv.context.fillRect(x-3,y-3,6,6);
 
@@ -850,6 +850,8 @@ var GamePlayScene = function(game, stage)
     canv.outlineText("create new",        70,280);
     canv.outlineText("drag to destroy",   70,310);
     canv.context.strokeRect(10,290,20,20);
+
+    canv.outlineText("Blow the colored flags in the indicated speed+direction", canv.canvas.width-300, canv.canvas.height-5);
   };
 
   self.cleanup = function()
