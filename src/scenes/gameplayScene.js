@@ -401,22 +401,22 @@ var GamePlayScene = function(game, stage)
     self.keyer = new Keyer({source:stage.dispCanv.canvas});
     self.blurer = new Blurer({source:stage.dispCanv.canvas});
 
-    self.draw_pressure_map = true; self.draw_pressure_map_t = new ToggleBox(10, 10,20,20,1,function(o){ self.draw_pressure_map = o; });
-    self.draw_pressure_contour = true; self.draw_pressure_contour_t = new ToggleBox(10, 40,20,20,1,function(o){ self.draw_pressure_contour = o; });
-    self.draw_wind_vectors = true; self.draw_wind_vectors_t = new ToggleBox(10, 70,20,20,1,function(o){ self.draw_wind_vectors = o; });
-    self.draw_pressure_systems = true; self.draw_pressure_systems_t = new ToggleBox(10,100,20,20,1,function(o){ self.draw_pressure_systems = o; });
-    self.draw_air_particles = true; self.draw_air_particles_t = new ToggleBox(10,130,20,20,1,function(o){ self.draw_air_particles = o; });
+    self.draw_pressure_map     = true; self.draw_pressure_map_t     = new ToggleBox(10, 25,20,20,1,function(o){ self.draw_pressure_map = o; });
+    self.draw_pressure_contour = true; self.draw_pressure_contour_t = new ToggleBox(10, 55,20,20,1,function(o){ self.draw_pressure_contour = o; });
+    self.draw_wind_vectors     = true; self.draw_wind_vectors_t     = new ToggleBox(10, 85,20,20,1,function(o){ self.draw_wind_vectors = o; });
+    self.draw_pressure_systems = true; self.draw_pressure_systems_t = new ToggleBox(10,115,20,20,1,function(o){ self.draw_pressure_systems = o; });
+    self.draw_air_particles    = true; self.draw_air_particles_t    = new ToggleBox(10,145,20,20,1,function(o){ self.draw_air_particles = o; });
     self.presser.register(self.draw_pressure_map_t);
     self.presser.register(self.draw_pressure_contour_t);
     self.presser.register(self.draw_wind_vectors_t);
     self.presser.register(self.draw_pressure_systems_t);
     self.presser.register(self.draw_air_particles_t);
 
-    self.tick_pressure_map     = true; self.tick_pressure_map_t     = new ToggleBox(40, 10,20,20,1,function(o){ self.tick_pressure_map = o; });
-    self.tick_pressure_contour = true; self.tick_pressure_contour_t = new ToggleBox(40, 40,20,20,1,function(o){ self.tick_pressure_contour = o; });
-    self.tick_wind_vectors     = true; self.tick_wind_vectors_t     = new ToggleBox(40, 70,20,20,1,function(o){ self.tick_wind_vectors = o; });
-    self.tick_pressure_systems = true; self.tick_pressure_systems_t = new ToggleBox(40,100,20,20,1,function(o){ self.tick_pressure_systems = o; });
-    self.tick_air_particles    = true; self.tick_air_particles_t    = new ToggleBox(40,130,20,20,1,function(o){ self.tick_air_particles = o; });
+    self.tick_pressure_map     = true; self.tick_pressure_map_t     = new ToggleBox(40, 25,20,20,1,function(o){ self.tick_pressure_map = o; });
+    self.tick_pressure_contour = true; self.tick_pressure_contour_t = new ToggleBox(40, 55,20,20,1,function(o){ self.tick_pressure_contour = o; });
+    self.tick_wind_vectors     = true; self.tick_wind_vectors_t     = new ToggleBox(40, 85,20,20,1,function(o){ self.tick_wind_vectors = o; });
+    self.tick_pressure_systems = true; self.tick_pressure_systems_t = new ToggleBox(40,115,20,20,1,function(o){ self.tick_pressure_systems = o; });
+    self.tick_air_particles    = true; self.tick_air_particles_t    = new ToggleBox(40,145,20,20,1,function(o){ self.tick_air_particles = o; });
     self.presser.register(self.tick_pressure_map_t);
     self.presser.register(self.tick_pressure_contour_t);
     self.presser.register(self.tick_wind_vectors_t);
@@ -838,11 +838,13 @@ var GamePlayScene = function(game, stage)
     self.p_cook_b.draw(canv);
 
     canv.context.font = "12px arial";
-    canv.outlineText("pressure map",      70, 30);
-    canv.outlineText("pressure contours", 70, 60);
-    canv.outlineText("wind vectors",      70, 90);
-    canv.outlineText("pressure systems",  70,120);
-    canv.outlineText("air particles",     70,150);
+    canv.outlineText("draw",               8, 20);
+    canv.outlineText("sim",               42, 20);
+    canv.outlineText("pressure map",      70, 45);
+    canv.outlineText("pressure contours", 70, 75);
+    canv.outlineText("wind vectors",      70,105);
+    canv.outlineText("pressure systems",  70,135);
+    canv.outlineText("air particles",     70,165);
 
     canv.outlineText("pressure system",   10,190);
     canv.outlineText("radius",            70,220);
