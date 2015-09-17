@@ -96,4 +96,28 @@ Canv.prototype.drawGrid = function(center_x, center_y, unit_x, unit_y)
     t = invlerp(0,ca.height,y);
   }
 }
+Canv.prototype.outlineText = function(text,x,y,max_w)
+{
+  var self = this;
+  if(max_w)
+  {
+    self.context.fillStyle = "#000000";
+    self.context.fillText(text,x-1,y-1,max_w);
+    self.context.fillText(text,x+1,y-1,max_w);
+    self.context.fillText(text,x-1,y+1,max_w);
+    self.context.fillText(text,x+1,y+1,max_w);
+    self.context.fillStyle = "#FFFFFF";
+    self.context.fillText(text,x  ,y  ,max_w);
+  }
+  else
+  {
+    self.context.fillStyle = "#000000";
+    self.context.fillText(text,x-1,y-1);
+    self.context.fillText(text,x+1,y-1);
+    self.context.fillText(text,x-1,y+1);
+    self.context.fillText(text,x+1,y+1);
+    self.context.fillStyle = "#FFFFFF";
+    self.context.fillText(text,x  ,y  );
+  }
+}
 

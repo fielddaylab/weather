@@ -17,6 +17,144 @@ var GamePlayScene = function(game, stage)
   function decw(i,n) { return ((i-1)+n)%n; };
   function incw(i,n) { return (i+1)%n; };
 
+  function NumberBox(x,y,w,h,val,delta,callback)
+  //register to keyer, dragger, blurer
+  {
+    var self = this;
+    self.x = x;
+    self.y = y;
+    self.w = w;
+    self.h = h;
+
+    self.number = val;
+
+    self.value = ""+val;
+    self.focused = false;
+    self.highlit = false;
+    self.down = false;
+
+    self.ref_x = 0;
+    self.delta = delta;
+
+    var validateNum = function(n)
+    {
+      if(!isNaN(parseFloat(n)) && isFinite(n)) return parseFloat(n);
+      else return self.number;
+    }
+
+    self.key = function(evt)
+    {
+    }
+    self.key_letter = function(k)
+    {
+      if(self.focused)
+      {
+        if(self.value == "0") self.value = "";
+        if(self.highlit) self.value = ""+k;
+        else             self.value = self.value+k;
+        self.number = validateNum(self.value);
+        self.highlit = false;
+        callback(self.number);
+      }
+    }
+    self.key_down = function(evt)
+    {
+      if(evt.keyCode == 13) //enter
+      {
+        if(self.focused)
+          self.blur();
+      }
+      if(evt.keyCode == 8) //delete
+      {
+        if(self.highlit)
+        {
+          self.number = 0;
+          self.value = "0";
+          self.highlit = false;
+          callback(self.number);
+        }
+        else if(self.focused)
+        {
+          self.value = self.value.substring(0,self.value.length-1);
+          self.number = validateNum(self.value);
+          callback(self.number);
+        }
+      }
+    }
+    self.key_up = function(evt)
+    {
+    }
+
+    //nice in smooth dragging
+    self.offX = 0;
+    self.offY = 0;
+    self.dragStart = function(evt)
+    {
+      self.focused = true;
+      self.down = true;
+
+      self.offX = evt.doX-self.x;
+      self.offY = evt.doY-self.y;
+    }
+    self.drag = function(evt)
+    {
+      self.deltaX = ((evt.doX-self.x)-self.offX);
+      self.deltaY = ((evt.doY-self.y)-self.offY);
+      self.offX = evt.doX - self.x;
+      self.offY = evt.doY - self.y;
+      self.number = validateNum(self.number + self.deltaX*self.delta);
+      self.value = ""+self.number;
+
+      self.down = ptWithinObj(evt.doX, evt.doY, self);
+      callback(self.number);
+    }
+    self.dragFinish = function()
+    {
+      if(self.down) self.highlit = !self.highlit;
+      self.down = false;
+    }
+
+    self.blur = function()
+    {
+      self.focused = false;
+      self.highlit = false;
+      self.value = ""+self.number;
+      callback(self.number);
+    }
+    self.focus = function()
+    {
+      self.focused = true;
+      self.highlit = true;
+    }
+    self.set = function(n)
+    {
+      self.number = validateNum(n);
+      callback(self.number);
+    }
+
+    self.draw = function(canv)
+    {
+      if(self.highlit)
+      {
+        canv.context.fillStyle = "#8899FF";
+        canv.context.fillRect(self.x,self.y,self.w,self.h);
+      }
+           if(self.down)    canv.context.strokeStyle = "#00F400";
+      else if(self.focused) canv.context.strokeStyle = "#F40000";
+      else                  canv.context.strokeStyle = "#0000F4";
+      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+      if(self.value.length < 5)
+        canv.outlineText(self.value,self.x+4,self.y+self.h*3/4,self.w-4);
+      else
+        canv.outlineText(self.value.substring(0,5)+"...",self.x+4,self.y+self.h*3/4,self.w-4);
+    }
+
+    self.print = function()
+    {
+      console.log("("+self.x+","+self.y+","+self.w+","+self.h+") n:"+self.number+" v:"+self.value+" f:"+self.focused+" h:"+self.highlit+" d:"+self.down+" "+"");
+    }
+  }
+
   var HeightMap = function(w,h)
   {
     var self = this;
@@ -681,34 +819,11 @@ var GamePlayScene = function(game, stage)
     self.p_cook_b.draw(canv);
 
     canv.context.font = "12px arial";
-    canv.context.fillStyle = "#000000";
-    canv.context.fillText("pressure map",      69, 29);
-    canv.context.fillText("pressure contours", 69, 59);
-    canv.context.fillText("wind vectors",      69, 89);
-    canv.context.fillText("pressure systems",  69,119);
-    canv.context.fillText("air particles",     69,149);
-    canv.context.fillText("pressure map",      71, 29);
-    canv.context.fillText("pressure contours", 71, 59);
-    canv.context.fillText("wind vectors",      71, 89);
-    canv.context.fillText("pressure systems",  71,119);
-    canv.context.fillText("air particles",     71,149);
-    canv.context.fillText("pressure map",      71, 31);
-    canv.context.fillText("pressure contours", 71, 61);
-    canv.context.fillText("wind vectors",      71, 91);
-    canv.context.fillText("pressure systems",  71,121);
-    canv.context.fillText("air particles",     71,151);
-    canv.context.fillText("pressure map",      69, 31);
-    canv.context.fillText("pressure contours", 69, 61);
-    canv.context.fillText("wind vectors",      69, 91);
-    canv.context.fillText("pressure systems",  69,121);
-    canv.context.fillText("air particles",     69,151);
-    canv.context.font = "12px arial";
-    canv.context.fillStyle = "#FFFFFF";
-    canv.context.fillText("pressure map",      70, 30);
-    canv.context.fillText("pressure contours", 70, 60);
-    canv.context.fillText("wind vectors",      70, 90);
-    canv.context.fillText("pressure systems",  70,120);
-    canv.context.fillText("air particles",     70,150);
+    canv.outlineText("pressure map",      70, 30);
+    canv.outlineText("pressure contours", 70, 60);
+    canv.outlineText("wind vectors",      70, 90);
+    canv.outlineText("pressure systems",  70,120);
+    canv.outlineText("air particles",     70,150);
   };
 
   self.cleanup = function()
