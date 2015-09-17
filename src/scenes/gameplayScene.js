@@ -160,11 +160,6 @@ var GamePlayScene = function(game, stage)
     self.dragFinish = function(evt)
     {
       self.dragging = false;
-      if(self.sx < 0.1 && self.sy > 0.9) self.killSelf();
-    }
-    self.killSelf = function()
-    {
-      console.log('oh no');
     }
   }
   var PressureSystem = function(x,y,r,delta,label,color,pmap,killCallback)
@@ -178,9 +173,10 @@ var GamePlayScene = function(game, stage)
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
     }
-    self.killSelf = function()
+    self.dragFinish = function(evt)
     {
-      killCallback();
+      self.dragging = false;
+      if(self.sx < 0.1 && self.sy > 0.9) killCallback();
     }
     return self;
   }

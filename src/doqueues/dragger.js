@@ -53,9 +53,16 @@ var Dragger = function(init)
     {
       if(ptWithinObj(evt.doX, evt.doY, draggables[i]))
       {
-        dragging.push(draggables[i]);
-        callbackQueue.push(draggables[i].dragStart);
-        evtQueue.push(evt);
+        var already_dragging = false;
+        for(var j = 0; j < dragging.length; j++)
+          if(draggables[i] == dragging[j]) already_dragging = true;
+
+        if(!already_dragging)
+        {
+          dragging.push(draggables[i]);
+          callbackQueue.push(draggables[i].dragStart);
+          evtQueue.push(evt);
+        }
       }
     }
   }
