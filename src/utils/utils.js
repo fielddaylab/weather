@@ -60,10 +60,23 @@ function invlerp(s,e,v)
 
 function clerp(s,e,t)
 {
+  while(s < 0) s += Math.PI*2;
+  while(e < 0) e += Math.PI*2;
+
        if(e > s && e-s > s-(e-Math.PI*2)) e -= Math.PI*2;
   else if(s > e && s-e > (e+Math.PI*2)-s) e += Math.PI*2;
 
   return lerp(s,e,t)%(Math.PI*2);
+}
+
+function cdist(a,b)
+{
+  while(a < 0) a += Math.PI*2;
+  while(b < 0) b += Math.PI*2;
+  var dist = Math.abs(a-b);
+  if(dist > Math.PI) dist = Math.PI*2-dist;
+
+  return dist;
 }
 
 function mapPt(from,to,pt)

@@ -376,7 +376,8 @@ var GamePlayScene = function(game, stage)
   self.air;
 
   self.psys = [];
-  self.flags = [];
+  self.levels = [];
+  self.current_level;
 
   self.draw_pressure_map;
   self.draw_pressure_contour;
@@ -459,7 +460,15 @@ var GamePlayScene = function(game, stage)
     colors[i] = "#FFFFFF"; i++;
     //for(var i = 0; i < 3; i++)
       //self.flags[i] = new Flag(0.2+(Math.random()*0.6),0.2+(Math.random()*0.6),Math.random()*2*Math.PI,1+Math.random(),colors[i%colors.length]);
-    self.flags.push(new Flag(0.5,0.5,0,2,colors[self.flags.length%colors.length]));
+
+    self.current_level = 0;
+    var level = 0;
+    self.levels[level] = [];
+    self.levels[level].push(new Flag(0.5,0.5,0,2,colors[self.levels[level].length%colors.length]));
+    level++;
+    self.levels[level] = [];
+    self.levels[level].push(new Flag(0.2,0.5,Math.PI/2,2,colors[self.levels[level].length%colors.length]));
+    self.levels[level].push(new Flag(0.8,0.5,3*Math.PI/2,2,colors[self.levels[level].length%colors.length]));
 
     self.pmap.anneal(1);
     self.pmap.anneal(1);
@@ -636,9 +645,9 @@ var GamePlayScene = function(game, stage)
     */
     var x;
     var y;
-    for(var i = 0; i < self.flags.length; i++)
+    for(var i = 0; i < self.levels[self.current_level].length; i++)
     {
-      var f = self.flags[i];
+      var f = self.levels[self.current_level][i];
       f.t = self.vfield.dir_map.sample(f.x,f.y);
       f.l = self.vfield.len_map.sample(f.x,f.y);
     }
@@ -769,10 +778,10 @@ var GamePlayScene = function(game, stage)
     var needed_goal_ticks = 40;
     var most_ticks_needed = 0;
     canv.context.lineWidth = 3;
-    for(var i = 0; i < self.flags.length; i++)
+    for(var i = 0; i < self.levels[self.current_level].length; i++)
     {
-      var f = self.flags[i];
-      goal_met = (f.l >= f.goal_l && f.t > f.goal_t-0.4 && f.t < f.goal_t+0.4);
+      var f = self.levels[self.current_level][i];
+      goal_met = (f.l >= f.goal_l && cdist(f.t,f.goal_t < 0.4));
       if(goal_met) f.goal_ticks++;
       else         f.goal_ticks = 0;
       if(needed_goal_ticks - f.goal_ticks > most_ticks_needed) most_ticks_needed = needed_goal_ticks-f.goal_ticks;
@@ -808,6 +817,7 @@ var GamePlayScene = function(game, stage)
     }
     stage.drawCanv.context.font = "15px arial";
     if(most_ticks_needed < needed_goal_ticks) canv.outlineText(Math.ceil(3*(most_ticks_needed/needed_goal_ticks))+"...",canv.canvas.width-55,goal_marker_y-15);
+    if(most_ticks_needed <= 0) { self.current_level = (self.current_level+1)%self.levels.length; console.log(self.current_level); }
 
     canv.context.lineWidth = 1;
     self.draw_pressure_map_t.draw(canv);
