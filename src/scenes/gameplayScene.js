@@ -366,7 +366,6 @@ var GamePlayScene = function(game, stage)
     self.color = color;
     self.t = 0;
     self.l = 0;
-    self.complete = 0;
     self.goal_ticks = 0;
   }
 
@@ -768,6 +767,7 @@ var GamePlayScene = function(game, stage)
     var goal_marker_y = 10;
     var goal_met;
     var needed_goal_ticks = 40;
+    var most_ticks_needed = 0;
     canv.context.lineWidth = 3;
     for(var i = 0; i < self.flags.length; i++)
     {
@@ -775,7 +775,7 @@ var GamePlayScene = function(game, stage)
       goal_met = (f.l >= f.goal_l && f.t > f.goal_t-0.4 && f.t < f.goal_t+0.4);
       if(goal_met) f.goal_ticks++;
       else         f.goal_ticks = 0;
-      if(f.goal_ticks > needed_goal_ticks) f.complete = 1;
+      if(needed_goal_ticks - f.goal_ticks > most_ticks_needed) most_ticks_needed = needed_goal_ticks-f.goal_ticks;
 
       x = f.x * canv.canvas.width;
       y = f.y * canv.canvas.height;
@@ -805,10 +805,9 @@ var GamePlayScene = function(game, stage)
       canv.context.strokeRect(canv.canvas.width-30,goal_marker_y,20,20);
       goal_marker_y += 30;
 
-      stage.drawCanv.context.font = "15px arial";
-      if(f.complete)    canv.outlineText("x",canv.canvas.width-25,goal_marker_y-15);
-      else if(goal_met) canv.outlineText(Math.ceil(3*(1-(f.goal_ticks/needed_goal_ticks)))+"...",canv.canvas.width-55,goal_marker_y-15);
     }
+    stage.drawCanv.context.font = "15px arial";
+    if(most_ticks_needed < needed_goal_ticks) canv.outlineText(Math.ceil(3*(most_ticks_needed/needed_goal_ticks))+"...",canv.canvas.width-55,goal_marker_y-15);
 
     canv.context.lineWidth = 1;
     self.draw_pressure_map_t.draw(canv);
