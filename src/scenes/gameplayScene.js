@@ -160,9 +160,14 @@ var GamePlayScene = function(game, stage)
     self.dragFinish = function(evt)
     {
       self.dragging = false;
+      if(self.sx < 0.1 && self.sy > 0.9) self.killSelf();
+    }
+    self.killSelf = function()
+    {
+      console.log('oh no');
     }
   }
-  var PressureSystem = function(x,y,r,delta,label,color,pmap)
+  var PressureSystem = function(x,y,r,delta,label,color,pmap,killCallback)
   {
     var self = new MapDragger(x,y,r,pmap);
     self.delta = delta;
@@ -172,6 +177,10 @@ var GamePlayScene = function(game, stage)
       stage.drawCanv.context.font = "30px arial";
       canv.context.fillStyle = color;
       canv.context.fillText(label,self.x+self.w/2-10,self.y+self.h/2+10);
+    }
+    self.killSelf = function()
+    {
+      killCallback();
     }
     return self;
   }
@@ -199,8 +208,18 @@ var GamePlayScene = function(game, stage)
       if(self.r < 0) self.r *= -1;
       var color = self.delta > 0 ? "#000000" : "#FFFFFF";
       var label = self.delta > 0 ? "H" : "L";
-      sys[sys.length] = new PressureSystem(.5, .5, self.r/100, self.delta/1000, label, color, map);
-      drag.register(sys[sys.length-1]);
+      var p = new PressureSystem(.5, .5, self.r/100, self.delta/1000, label, color, map,
+        function()
+        {
+          drag.unregister(p);
+          sys[p.index] = sys[sys.length-1];
+          sys[p.index].index = p.index;
+          sys.pop();
+        }
+      );
+      p.index = sys.length;
+      sys[sys.length] = p;
+      drag.register(p);
     }
   }
 

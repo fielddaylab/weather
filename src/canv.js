@@ -18,6 +18,8 @@ var Canv = function(init)
   self.canvas = document.createElement('canvas');
   self.canvas.setAttribute('width', init.width);
   self.canvas.setAttribute('height',init.height);
+  self.canvas.addEventListener('mousedown',function(evt){ evt.preventDefault(); },false);
+  self.canvas.addEventListener('touchstart',function(evt){ evt.preventDefault(); },false);
 
   self.context = self.canvas.getContext('2d');
 
