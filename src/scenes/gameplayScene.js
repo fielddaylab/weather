@@ -422,9 +422,9 @@ var GamePlayScene = function(game, stage)
     self.presser.register(self.tick_pressure_systems_t);
     self.presser.register(self.tick_air_particles_t);
 
-    self.p_r_nb     = new NumberBox(10,160,50,20,10,1,function(n){ self.pcooker.r = n; });
-    self.p_delta_nb = new NumberBox(10,190,50,20,10,1,function(n){ self.pcooker.delta = n; });
-    self.p_cook_b   = new ButtonBox(10,220,20,20,function() { self.pcooker.cook(self.pmap, self.psys, self.dragger); });
+    self.p_r_nb     = new NumberBox(10,200,50,20,10,1,function(n){ self.pcooker.r = n; });
+    self.p_delta_nb = new NumberBox(10,230,50,20,10,1,function(n){ self.pcooker.delta = n; });
+    self.p_cook_b   = new ButtonBox(10,260,20,20,function() { self.pcooker.cook(self.pmap, self.psys, self.dragger); });
     self.keyer.register(self.p_r_nb);
     self.dragger.register(self.p_r_nb);
     self.blurer.register(self.p_r_nb);
@@ -824,6 +824,13 @@ var GamePlayScene = function(game, stage)
     canv.outlineText("wind vectors",      70, 90);
     canv.outlineText("pressure systems",  70,120);
     canv.outlineText("air particles",     70,150);
+
+    canv.outlineText("pressure system",   10,190);
+    canv.outlineText("radius",            70,220);
+    canv.outlineText("strength",          70,250);
+    canv.outlineText("create new",        70,280);
+    canv.outlineText("drag to destroy",   70,310);
+    canv.context.strokeRect(10,290,20,20);
   };
 
   self.cleanup = function()
