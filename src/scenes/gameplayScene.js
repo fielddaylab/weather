@@ -3,6 +3,7 @@ var GamePlayScene = function(game, stage)
   var self = this;
 
   self.dragger;
+  self.hoverer;
   self.presser;
   self.keyer;
   self.blurer;
@@ -280,7 +281,16 @@ var GamePlayScene = function(game, stage)
     self.x = self.sx*stage.dispCanv.canvas.width-(self.w/2);
     self.y = self.sy*stage.dispCanv.canvas.height-(self.h/2);
     self.dragging = false;
+    self.hovering = false;
 
+    self.hover = function()
+    {
+      self.hovering = true;
+    }
+    self.unhover = function()
+    {
+      self.hovering = false;
+    }
     self.dragStart = function(evt)
     {
       self.dragging = true;
@@ -309,6 +319,13 @@ var GamePlayScene = function(game, stage)
     {
       stage.drawCanv.context.font = "30px arial";
       canv.outlineText(label,self.x+self.w/2-10,self.y+self.h/2+10,color_in,color_out);
+
+      if(self.hovering || self.dragging)
+      {
+        canv.context.lineWidth = 3;
+        canv.context.strokeStyle = color_in;
+        canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
+      }
     }
     self.dragFinish = function(evt)
     {
@@ -334,7 +351,7 @@ var GamePlayScene = function(game, stage)
   {
     var self = this;
 
-    self.cook = function(type,strength,radius,map,sys,drag)
+    self.cook = function(type,strength,radius,map,sys,drag,hover)
     {
       if(type)     self.delta = 0.005; else self.delta = -0.005;
       if(strength) self.delta *= 5;
@@ -348,6 +365,7 @@ var GamePlayScene = function(game, stage)
         function()
         {
           drag.unregister(p);
+          hover.unregister(p);
           sys[p.index] = sys[sys.length-1];
           sys[p.index].index = p.index;
           sys.pop();
@@ -356,6 +374,7 @@ var GamePlayScene = function(game, stage)
       p.index = sys.length;
       sys[sys.length] = p;
       drag.register(p);
+      hover.register(p);
     }
   }
 
@@ -402,6 +421,7 @@ var GamePlayScene = function(game, stage)
     var cells_h = 50;
 
     self.dragger = new Dragger({source:stage.dispCanv.canvas});
+    self.hoverer = new Hoverer({source:stage.dispCanv.canvas});
     self.presser = new Presser({source:stage.dispCanv.canvas});
     self.keyer = new Keyer({source:stage.dispCanv.canvas});
     self.blurer = new Blurer({source:stage.dispCanv.canvas});
@@ -461,14 +481,14 @@ var GamePlayScene = function(game, stage)
     //self.dragger.register(self.p_delta_nb);
     //self.blurer.register(self.p_delta_nb);
 
-    self.p_cook_b = new ButtonBox(10,290,20,20,function() { self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger); });
+    self.p_cook_b = new ButtonBox(10,290,20,20,function() { self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger, self.hoverer); });
     self.presser.register(self.p_cook_b);
 
     self.p_begin_b = new ButtonBox(stage.drawCanv.canvas.width-30,stage.drawCanv.canvas.height-30,20,20, function() { if(self.current_level == 0) self.current_level++; });
     self.presser.register(self.p_begin_b);
 
     self.pcooker = new PressureCooker();
-    self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger);
+    self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger, self.hoverer);
 
     self.tmap = new HeightMap(cells_w,cells_h);
     self.pmap = new HeightMap(cells_w,cells_h);
@@ -712,6 +732,7 @@ var GamePlayScene = function(game, stage)
       if(any_dragging) self.psys[i].dragging = false;
       if(self.psys[i].dragging) any_dragging = true;
     }
+    self.hoverer.flush();
     self.presser.flush();
     self.keyer.flush();
     self.blurer.flush();
