@@ -163,7 +163,7 @@ var GamePlayScene = function(game, stage)
     self.buffs = [];
     self.buffs[0] = [];
     self.buffs[1] = [];
-    for(var i = 0; i < w*h; i++) self.buffs[0][i] = self.buffs[1][i] = 0.6+Math.random()*0.4;
+    for(var i = 0; i < w*h; i++) self.buffs[0][i] = self.buffs[1][i] = 0.5+Math.random()*0.5;
     self.buff = 0;
     self.data = self.buffs[self.buff];
 
@@ -908,7 +908,7 @@ var GamePlayScene = function(game, stage)
     else
     {
       canv.context.font = "12px arial";
-      canv.outlineText("Blow the colored flags in the indicated speed+direction", canv.canvas.width-300, canv.canvas.height-5);
+      canv.outlineText("Blow the colored flags in the indicated speed+direction", canv.canvas.width-300, canv.canvas.height-10);
     }
 
     canv.context.font = "12px arial";
