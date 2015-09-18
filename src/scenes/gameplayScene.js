@@ -493,6 +493,9 @@ var GamePlayScene = function(game, stage)
     self.levels[level] = []; //level 0 is nothing
     level++;
     self.levels[level] = [];
+    self.levels[level].push(new Flag(0.7,0.5,3*Math.PI/2,1,colors[self.levels[level].length%colors.length]));
+    level++;
+    self.levels[level] = [];
     self.levels[level].push(new Flag(0.5,0.5,0,2,colors[self.levels[level].length%colors.length]));
     level++;
     self.levels[level] = [];
