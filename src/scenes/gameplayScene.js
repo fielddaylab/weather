@@ -891,6 +891,15 @@ var GamePlayScene = function(game, stage)
     canv.context.strokeRect(40,290,20,20);
 
     canv.outlineText("Blow the colored flags in the indicated speed+direction", canv.canvas.width-300, canv.canvas.height-5);
+
+    canv.context.font = "12px arial";
+    canv.outlineText("L", 16,215);
+    canv.outlineText("H", 46,215);
+    canv.outlineText("weak",    5,245);
+    canv.outlineText("strong", 33,245);
+    canv.outlineText("small",  5,275);
+    canv.outlineText("big",   42,275);
+
   };
 
   self.cleanup = function()
