@@ -380,6 +380,8 @@ var GamePlayScene = function(game, stage)
 
   self.psys = [];
   self.levels = [];
+  self.known_level;
+  self.ticks_on_level;
   self.current_level;
 
   self.draw_pressure_map;
@@ -488,12 +490,14 @@ var GamePlayScene = function(game, stage)
     //for(var i = 0; i < 3; i++)
       //self.flags[i] = new Flag(0.2+(Math.random()*0.6),0.2+(Math.random()*0.6),Math.random()*2*Math.PI,1+Math.random(),colors[i%colors.length]);
 
+    self.known_level = 0;
+    self.ticks_on_level = 0;
     self.current_level = 0;
     var level = 0;
     self.levels[level] = []; //level 0 is nothing
     level++;
     self.levels[level] = [];
-    self.levels[level].push(new Flag(0.7,0.5,3*Math.PI/2,1,colors[self.levels[level].length%colors.length]));
+    self.levels[level].push(new Flag(0.7,0.5,3*Math.PI/2,1.5,colors[self.levels[level].length%colors.length]));
     level++;
     self.levels[level] = [];
     self.levels[level].push(new Flag(0.5,0.5,0,2,colors[self.levels[level].length%colors.length]));
@@ -501,6 +505,10 @@ var GamePlayScene = function(game, stage)
     self.levels[level] = [];
     self.levels[level].push(new Flag(0.4,0.5,Math.PI/2,2,colors[self.levels[level].length%colors.length]));
     self.levels[level].push(new Flag(0.6,0.5,3*Math.PI/2,2,colors[self.levels[level].length%colors.length]));
+    level++;
+    self.levels[level] = [];
+    self.levels[level].push(new Flag(0.5,0.4,0,2,colors[self.levels[level].length%colors.length]));
+    self.levels[level].push(new Flag(0.5,0.6,Math.PI,2,colors[self.levels[level].length%colors.length]));
     /*
     //copy and paste to add new level
     level++;
@@ -518,6 +526,12 @@ var GamePlayScene = function(game, stage)
   self.ticks = 0;
   self.tick = function()
   {
+    if(self.current_level != self.known_level)
+    {
+      self.known_level = self.current_level;
+      self.ticks_on_level = 0;
+    }
+
     var index;
     var ti;
     var bi;
@@ -703,6 +717,7 @@ var GamePlayScene = function(game, stage)
     self.blurer.flush();
 
     self.ticks++;
+    self.ticks_on_level++;
   };
 
   self.draw = function()
