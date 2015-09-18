@@ -163,7 +163,7 @@ var GamePlayScene = function(game, stage)
     self.buffs = [];
     self.buffs[0] = [];
     self.buffs[1] = [];
-    for(var i = 0; i < w*h; i++) self.buffs[0][i] = self.buffs[1][i] = Math.random();
+    for(var i = 0; i < w*h; i++) self.buffs[0][i] = self.buffs[1][i] = 0.6+Math.random()*0.4;
     self.buff = 0;
     self.data = self.buffs[self.buff];
 
@@ -459,8 +459,11 @@ var GamePlayScene = function(game, stage)
     //self.dragger.register(self.p_delta_nb);
     //self.blurer.register(self.p_delta_nb);
 
-    self.p_cook_b   = new ButtonBox(10,290,20,20,function() { self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger); });
+    self.p_cook_b = new ButtonBox(10,290,20,20,function() { self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger); });
     self.presser.register(self.p_cook_b);
+
+    self.p_begin_b = new ButtonBox(stage.drawCanv.canvas.width-30,stage.drawCanv.canvas.height-30,20,20, function() { if(self.current_level == 0) self.current_level++; });
+    self.presser.register(self.p_begin_b);
 
     self.pcooker = new PressureCooker();
     self.pcooker.cook(self.p_type, self.p_delta, self.p_r, self.pmap, self.psys, self.dragger);
@@ -487,12 +490,14 @@ var GamePlayScene = function(game, stage)
 
     self.current_level = 0;
     var level = 0;
+    self.levels[level] = []; //level 0 is nothing
+    level++;
     self.levels[level] = [];
     self.levels[level].push(new Flag(0.5,0.5,0,2,colors[self.levels[level].length%colors.length]));
     level++;
     self.levels[level] = [];
-    self.levels[level].push(new Flag(0.3,0.5,Math.PI/2,2,colors[self.levels[level].length%colors.length]));
-    self.levels[level].push(new Flag(0.7,0.5,3*Math.PI/2,2,colors[self.levels[level].length%colors.length]));
+    self.levels[level].push(new Flag(0.4,0.5,Math.PI/2,2,colors[self.levels[level].length%colors.length]));
+    self.levels[level].push(new Flag(0.6,0.5,3*Math.PI/2,2,colors[self.levels[level].length%colors.length]));
     /*
     //copy and paste to add new level
     level++;
@@ -802,53 +807,56 @@ var GamePlayScene = function(game, stage)
     /*
     // flags
     */
-    var x;
-    var y;
-    var goal_marker_y = 10;
-    var goal_met;
-    var needed_goal_ticks = 40;
-    var most_ticks_needed = 0;
-    canv.context.lineWidth = 3;
-    for(var i = 0; i < self.levels[self.current_level].length; i++)
+    if(self.current_level > 0)
     {
-      var f = self.levels[self.current_level][i];
-      goal_met = (f.l >= f.goal_l && cdist(f.t,f.goal_t) < 0.4);
-      if(goal_met) f.goal_ticks++;
-      else         f.goal_ticks = 0;
-      if(needed_goal_ticks - f.goal_ticks > most_ticks_needed) most_ticks_needed = needed_goal_ticks-f.goal_ticks;
-
-      x = f.x * canv.canvas.width;
-      y = f.y * canv.canvas.height;
-
-      //goal state
-      if(self.ticks%10 < 5)
+      var x;
+      var y;
+      var goal_marker_y = 10;
+      var goal_met;
+      var needed_goal_ticks = 40;
+      var most_ticks_needed = 0;
+      canv.context.lineWidth = 3;
+      for(var i = 0; i < self.levels[self.current_level].length; i++)
       {
-        canv.context.strokeStyle = "#22FF55";
-        var len = f.goal_l*20;
-        canv.drawLine(x,y,x+Math.cos(f.goal_t)*len,y+Math.sin(f.goal_t)*len);
+        var f = self.levels[self.current_level][i];
+        goal_met = (f.l >= f.goal_l && cdist(f.t,f.goal_t) < 0.4);
+        if(goal_met) f.goal_ticks++;
+        else         f.goal_ticks = 0;
+        if(needed_goal_ticks - f.goal_ticks > most_ticks_needed) most_ticks_needed = needed_goal_ticks-f.goal_ticks;
+
+        x = f.x * canv.canvas.width;
+        y = f.y * canv.canvas.height;
+
+        //goal state
+        if(self.ticks%10 < 5)
+        {
+          canv.context.strokeStyle = "#22FF55";
+          var len = f.goal_l*20;
+          canv.drawLine(x,y,x+Math.cos(f.goal_t)*len,y+Math.sin(f.goal_t)*len);
+          canv.context.fillRect(x-3,y-3,6,6);
+        }
+
+        //current state
+        if(goal_met) canv.context.strokeStyle = "#22FF55";
+        else         canv.context.strokeStyle = f.color;
+        var len = f.l*20;
+        if(len < 20) len = 20;
+        canv.drawLine(x,y,x+Math.cos(f.t)*len,y+Math.sin(f.t)*len);
         canv.context.fillRect(x-3,y-3,6,6);
+
+        //goal marker
+        if(goal_met) canv.context.strokeStyle = "#22FF55";
+        else         canv.context.strokeStyle = "#000000";
+        canv.context.fillStyle = f.color;
+        canv.context.fillRect(canv.canvas.width-30,goal_marker_y,20,20);
+        canv.context.strokeRect(canv.canvas.width-30,goal_marker_y,20,20);
+        goal_marker_y += 30;
+
       }
-
-      //current state
-      if(goal_met) canv.context.strokeStyle = "#22FF55";
-      else         canv.context.strokeStyle = f.color;
-      var len = f.l*20;
-      if(len < 20) len = 20;
-      canv.drawLine(x,y,x+Math.cos(f.t)*len,y+Math.sin(f.t)*len);
-      canv.context.fillRect(x-3,y-3,6,6);
-
-      //goal marker
-      if(goal_met) canv.context.strokeStyle = "#22FF55";
-      else         canv.context.strokeStyle = "#000000";
-      canv.context.fillStyle = f.color;
-      canv.context.fillRect(canv.canvas.width-30,goal_marker_y,20,20);
-      canv.context.strokeRect(canv.canvas.width-30,goal_marker_y,20,20);
-      goal_marker_y += 30;
-
+      stage.drawCanv.context.font = "15px arial";
+      if(most_ticks_needed < needed_goal_ticks) canv.outlineText(Math.ceil(3*(most_ticks_needed/needed_goal_ticks))+"...",canv.canvas.width-55,goal_marker_y-15);
+      if(most_ticks_needed <= 0) { self.current_level = (self.current_level+1)%self.levels.length; console.log(self.current_level); }
     }
-    stage.drawCanv.context.font = "15px arial";
-    if(most_ticks_needed < needed_goal_ticks) canv.outlineText(Math.ceil(3*(most_ticks_needed/needed_goal_ticks))+"...",canv.canvas.width-55,goal_marker_y-15);
-    if(most_ticks_needed <= 0) { self.current_level = (self.current_level+1)%self.levels.length; console.log(self.current_level); }
 
     canv.context.lineWidth = 1;
     self.draw_pressure_map_t.draw(canv);
@@ -890,7 +898,18 @@ var GamePlayScene = function(game, stage)
     canv.outlineText("create new (drag to destroy)", 70,310);
     canv.context.strokeRect(40,290,20,20);
 
-    canv.outlineText("Blow the colored flags in the indicated speed+direction", canv.canvas.width-300, canv.canvas.height-5);
+    if(self.current_level == 0)
+    {
+      canv.context.font = "16px arial";
+      canv.outlineText("Blow the colored flags in the indicated speed+direction", canv.canvas.width-398, canv.canvas.height-40);
+      canv.outlineText("Begin", canv.canvas.width-80, canv.canvas.height-15);
+      self.p_begin_b.draw(canv);
+    }
+    else
+    {
+      canv.context.font = "12px arial";
+      canv.outlineText("Blow the colored flags in the indicated speed+direction", canv.canvas.width-300, canv.canvas.height-5);
+    }
 
     canv.context.font = "12px arial";
     canv.outlineText("L", 16,215);
@@ -899,7 +918,6 @@ var GamePlayScene = function(game, stage)
     canv.outlineText("strong", 33,245);
     canv.outlineText("small",  5,275);
     canv.outlineText("big",   42,275);
-
   };
 
   self.cleanup = function()
