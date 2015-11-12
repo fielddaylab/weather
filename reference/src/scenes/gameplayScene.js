@@ -41,10 +41,10 @@ var GamePlayScene = function(game, stage)
         {
           var index = self.iFor(x,y);
           self.buffs[newb][index] = self.buffs[oldb][index];
-          self.buffs[newb][index] += self.buffs[oldb][self.iFor(((x-1)+w)%w,y)];
-          self.buffs[newb][index] += self.buffs[oldb][self.iFor(((x+1)+w)%w,y)];
-          self.buffs[newb][index] += self.buffs[oldb][self.iFor(x,((y-1)+h)%h)];
-          self.buffs[newb][index] += self.buffs[oldb][self.iFor(x,((y+1)+h)%h)];
+          self.buffs[newb][index] += self.buffs[oldb][self.iFor(decw(x,w),y)];
+          self.buffs[newb][index] += self.buffs[oldb][self.iFor(incw(x,w),y)];
+          self.buffs[newb][index] += self.buffs[oldb][self.iFor(x,decw(y,h))];
+          self.buffs[newb][index] += self.buffs[oldb][self.iFor(x,incw(y,h))];
           self.buffs[newb][index] /= 5;
           self.buffs[newb][index] = lerp(self.buffs[oldb][index],self.buffs[newb][index],t);
         }
@@ -103,7 +103,10 @@ var GamePlayScene = function(game, stage)
       ret.len = Math.sqrt(x_val*x_val+y_val*y_val);
       x_val /= ret.len;
       y_val /= ret.len;
-      ret.dir = Math.atan2(y_val,x_val);
+      if(ret.len < 0.001)
+        ret.dir = 0;
+      else
+        ret.dir = Math.atan2(y_val,x_val);
 
       return ret;
     }
@@ -116,7 +119,10 @@ var GamePlayScene = function(game, stage)
       ret.len = Math.sqrt(x_val*x_val+y_val*y_val);
       x_val /= ret.len;
       y_val /= ret.len;
-      ret.dir = Math.atan2(y_val,x_val);
+      if(ret.len < 0.001)
+        ret.dir = 0;
+      else
+        ret.dir = Math.atan2(y_val,x_val);
 
       return ret;
     }
@@ -424,28 +430,7 @@ var GamePlayScene = function(game, stage)
     }
 
     if(self.tick_pressure_map)
-    {
-  /*
-      //Flow Pressure
-      index = 0;
-      for(var i = 0; i < self.pmap.h; i++)
-      {
-        for(var j = 0; j < self.pmap.w; j++)
-        {
-          ti = self.pmap.iFor(j,incw(i,self.pmap.h));
-          bi = self.pmap.iFor(j,decw(i,self.pmap.h));
-          li = self.pmap.iFor(decw(j,self.pmap.w),i);
-          ri = self.pmap.iFor(incw(j,self.pmap.w),i);
-
-          if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
-          if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
-
-          index++;
-        }
-      }
-  */
       self.pmap.anneal(0.2);
-    }
 
     //calculate wind
     if(self.tick_wind_vectors)
