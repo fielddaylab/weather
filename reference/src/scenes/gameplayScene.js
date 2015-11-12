@@ -96,27 +96,27 @@ var GamePlayScene = function(game, stage)
     }
     self.samplePolar = function(x,y)
     {
-      var x = self.x_map.sample(x,y);
-      var y = self.y_map.sample(x,y);
+      var x_val = self.x_map.sample(x,y);
+      var y_val = self.y_map.sample(x,y);
 
       var ret = {dir:0,len:0};
-      ret.len = Math.sqrt(x*x+y*y);
-      x /= l;
-      y /= l;
-      ret.dir = Math.atan2(y,x);
+      ret.len = Math.sqrt(x_val*x_val+y_val*y_val);
+      x_val /= ret.len;
+      y_val /= ret.len;
+      ret.dir = Math.atan2(y_val,x_val);
 
       return ret;
     }
     self.polarAtIndex = function(i)
     {
-      var x = self.x_map.data[i];
-      var y = self.y_map.data[i];
+      var x_val = self.x_map.data[i];
+      var y_val = self.y_map.data[i];
 
       var ret = {dir:0,len:0};
-      ret.len = Math.sqrt(x*x+y*y);
-      x /= ret.len;
-      y /= ret.len;
-      ret.dir = Math.atan2(y,x);
+      ret.len = Math.sqrt(x_val*x_val+y_val*y_val);
+      x_val /= ret.len;
+      y_val /= ret.len;
+      ret.dir = Math.atan2(y_val,x_val);
 
       return ret;
     }
@@ -528,6 +528,7 @@ var GamePlayScene = function(game, stage)
 
       f.t = polar.dir;
       f.l = polar.len;
+      console.log(f.t+","+f.l);
     }
 
     self.dragger.flush();
