@@ -14,7 +14,6 @@ function NumberBox(x,y,w,h,val,delta,callback)
   self.highlit = false;
   self.down = false;
 
-  self.ref_x = 0;
   self.delta = delta;
 
   var validateNum = function(n)
@@ -138,7 +137,7 @@ function NumberBox(x,y,w,h,val,delta,callback)
 }
 
 function ButtonBox(x,y,w,h,callback)
-//register to presser
+//register to presser *or* clicker
 {
   var self = this;
   self.x = x;
@@ -155,12 +154,16 @@ function ButtonBox(x,y,w,h,callback)
   self.unpress = function(evt)
   {
     self.down = false;
+  }
+
+  self.click = function(evt)
+  {
     if(ptWithinObj(evt.doX, evt.doY, self)) self.hit();
   }
 
   self.hit = function()
   {
-    callback(self.on);
+    callback(self.down);
   }
 
   self.draw = function(canv)
@@ -171,7 +174,7 @@ function ButtonBox(x,y,w,h,callback)
     canv.context.fillStyle = "#00F400";
 
     canv.context.fillRect(self.x,self.y,self.w,self.h);
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.strokeRect(self.x+0.5,self.y+0.5,self.w,self.h);
   }
 
   self.print = function()
@@ -181,7 +184,7 @@ function ButtonBox(x,y,w,h,callback)
 }
 
 function ToggleBox(x,y,w,h,val,callback)
-//register to presser
+//register to presser *or* clicker
 {
   var self = this;
   self.x = x;
@@ -199,6 +202,10 @@ function ToggleBox(x,y,w,h,val,callback)
   self.unpress = function(evt)
   {
     self.down = false;
+  }
+
+  self.click = function(evt)
+  {
     if(ptWithinObj(evt.doX, evt.doY, self)) self.toggle();
   }
 
@@ -222,12 +229,253 @@ function ToggleBox(x,y,w,h,val,callback)
     else        canv.context.fillStyle = "#FFFFFF";
 
     canv.context.fillRect(self.x,self.y,self.w,self.h);
-    canv.context.strokeRect(self.x,self.y,self.w,self.h);
+    canv.context.strokeRect(self.x+0.5,self.y+0.5,self.w,self.h);
   }
 
   self.print = function()
   {
     console.log("("+self.x+","+self.y+","+self.w+","+self.h+") o:"+self.on+" d:"+self.down+" "+"");
+  }
+}
+
+function SliderBox(x,y,w,h,min_val,max_val,val,callback)
+//register to dragger
+{
+  var self = this;
+  self.x = x;
+  self.y = y;
+  self.w = w;
+  self.h = h;
+
+  self.slit_x = Math.round(self.x + self.w/20);
+  self.slit_w = Math.round(self.w - self.w/10);
+
+  self.min_val = min_val;
+  self.max_val = max_val;
+  self.val = val;
+
+  self.dragging = false;
+  self.dragStart = function(evt)
+  {
+    self.dragging = true;
+    self.drag(evt);
+  }
+  self.drag = function(evt)
+  {
+    if(evt.doX < self.slit_x) evt.doX = self.slit_x;
+    if(evt.doX > self.slit_x+self.maxPixel()) evt.doX = self.slit_x+self.maxPixel();
+    self.val = self.valAtPixel(evt.doX-self.slit_x);
+    callback(self.val);
+  }
+  self.dragFinish = function()
+  {
+    self.dragging = false;
+  }
+  self.set = function(n)
+  {
+    self.val = n;
+    callback(self.val);
+  }
+
+  self.maxPixel = function()
+  {
+    return self.slit_w;
+  }
+  self.valAtPixel = function(p)
+  {
+    var r = self.min_val+(self.max_val-self.min_val)*(p/self.slit_w);
+    if(r < self.min_val) r = self.min_val;
+    if(r > self.max_val) r = self.max_val;
+    return r;
+  }
+  self.pixelAtVal = function(v)
+  {
+    var r = ((v-self.min_val)/(self.max_val-self.min_val))*self.slit_w;
+    if(r < 0) r = 0;
+    if(r > self.w) r = self.w-1;
+    return r;
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.fillStyle = "#333333";
+    canv.context.fillRect(self.slit_x,self.y+self.h/3,self.slit_w,self.h/3);
+    canv.context.fillStyle = "#000000";
+    var switch_x = self.slit_x+(((self.val-self.min_val)/(self.max_val-self.min_val))*self.slit_w);
+    canv.context.strokeRect(switch_x-(self.w/20)+0.5,self.y+0.5,(self.w/10),self.h);
+  }
+
+  self.print = function()
+  {
+    console.log("("+self.x+","+self.y+","+self.w+","+self.h+") min:"+self.min_val+" max:"+self.max_val+" v:"+self.val+" "+"");
+  }
+}
+
+function SmoothSliderBox(x,y,w,h,min_val,max_val,val,callback)
+//register to dragger, ticker
+{
+  var self = this;
+  self.x = x;
+  self.y = y;
+  self.w = w;
+  self.h = h;
+
+  self.slit_x = self.x + self.w/20;
+  self.slit_w = self.w - self.w/10;
+
+  self.min_val = min_val;
+  self.max_val = max_val;
+  self.desired_val = val;
+  self.val = val;
+
+  self.dragging = false;
+  self.dragStart = function(evt)
+  {
+    self.dragging = true;
+    self.drag(evt);
+  }
+  self.drag = function(evt)
+  {
+    if(evt.doX < self.slit_x) evt.doX = self.slit_x;
+    if(evt.doX > self.slit_x+self.maxPixel()) evt.doX = self.slit_x+self.maxPixel();
+    self.desired_val = self.valAtPixel(evt.doX-self.slit_x);
+  }
+  self.dragFinish = function()
+  {
+    self.dragging = false;
+  }
+  self.set = function(n)
+  {
+    self.desired_val = n;
+  }
+
+  self.maxPixel = function()
+  {
+    return self.slit_w;
+  }
+  self.valAtPixel = function(p)
+  {
+    var r = self.min_val+(self.max_val-self.min_val)*(p/self.slit_w);
+    if(r < self.min_val) r = self.min_val;
+    if(r > self.max_val) r = self.max_val;
+    return r;
+  }
+  self.pixelAtVal = function(v)
+  {
+    var r = ((v-self.min_val)/(self.max_val-self.min_val))*self.slit_w;
+    if(r < 0) r = 0;
+    if(r > self.w) r = self.w-1;
+    return r;
+  }
+
+  self.tick = function()
+  {
+    if(self.val == self.desired_val) return;
+    if(Math.abs(self.val-self.desired_val) < 0.001)
+      self.val = self.desired_val;
+    else
+      self.val = self.val+(self.desired_val-self.val)/3;
+    callback(self.val);
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.fillStyle = "#333333";
+    canv.context.fillRect(self.slit_x,self.y+self.h/3,self.slit_w,self.h/3);
+    canv.context.fillStyle = "#000000";
+    var switch_x = self.slit_x+(((self.val-self.min_val)/(self.max_val-self.min_val))*self.slit_w);
+    canv.context.strokeRect(switch_x-(self.w/20)+0.5,self.y+0.5,(self.w/10),self.h);
+  }
+
+  self.print = function()
+  {
+    console.log("("+self.x+","+self.y+","+self.w+","+self.h+") min:"+self.min_val+" max:"+self.max_val+" v:"+self.val+" "+"");
+  }
+}
+
+function SmoothSliderSqrtBox(x,y,w,h,min_val,max_val,val,callback)
+//register to dragger, ticker
+{
+  var self = this;
+  self.x = x;
+  self.y = y;
+  self.w = w;
+  self.h = h;
+
+  self.slit_x = self.x + self.w/20;
+  self.slit_w = self.w - self.w/10;
+
+  self.min_val = min_val;
+  self.max_val = max_val;
+  self.desired_val = val;
+  self.val = val;
+
+  self.dragging = false;
+  self.dragStart = function(evt)
+  {
+    self.dragging = true;
+    self.drag(evt);
+  }
+  self.drag = function(evt)
+  {
+    if(evt.doX < self.slit_x) evt.doX = self.slit_x;
+    if(evt.doX > self.slit_x+self.maxPixel()) evt.doX = self.slit_x+self.maxPixel();
+    self.desired_val = self.valAtPixel(evt.doX-self.slit_x);
+  }
+  self.dragFinish = function()
+  {
+    self.dragging = false;
+  }
+  self.set = function(n)
+  {
+    self.desired_val = n;
+  }
+
+  self.maxPixel = function()
+  {
+    return self.slit_w;
+  }
+  self.valAtPixel = function(p)
+  {
+    var t = (p/self.slit_w)*(p/self.slit_w);
+    var r = self.min_val+(self.max_val-self.min_val)*t;
+    if(r < self.min_val) r = self.min_val;
+    if(r > self.max_val) r = self.max_val;
+    return r;
+  }
+  self.pixelAtVal = function(v)
+  {
+    var t = (v-self.min_val)/(self.max_val-self.min_val);
+    var r = Math.sqrt(t)*self.slit_w;
+    if(r < 0) r = 0;
+    if(r > self.w) r = self.w-1;
+    return r;
+  }
+
+  self.tick = function()
+  {
+    if(self.val == self.desired_val) return;
+    if(Math.abs(self.val-self.desired_val) < 0.001)
+      self.val = self.desired_val;
+    else
+      self.val = self.val+(self.desired_val-self.val)/3;
+    callback(self.val);
+  }
+
+  self.draw = function(canv)
+  {
+    canv.context.fillStyle = "#333333";
+    canv.context.fillRect(self.slit_x,self.y+self.h/3,self.slit_w,self.h/3);
+    canv.context.fillStyle = "#000000";
+    var t = (self.val-self.min_val)/(self.max_val-self.min_val);
+    t = Math.sqrt(t);
+    var switch_x = self.slit_x+(t*self.slit_w);
+    canv.context.strokeRect(switch_x-(self.w/20)+0.5,self.y+0.5,(self.w/10),self.h);
+  }
+
+  self.print = function()
+  {
+    console.log("("+self.x+","+self.y+","+self.w+","+self.h+") min:"+self.min_val+" max:"+self.max_val+" v:"+self.val+" "+"");
   }
 }
 
