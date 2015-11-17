@@ -107,6 +107,10 @@ var objWithinObj = function(obja, objb)
   console.log("not done!");
   return false;
 }
+var objIntersectsObj = function(obja, objb)
+{
+  return ptWithin(objb.x+objb.w/2, objb.y+objb.h/2, obja.x-objb.w/2, obja.y-objb.h/2, obja.w+objb.w, obja.h+objb.h);
+  }
 var ptNear = function(ptx, pty, x, y, r)
 {
   var w2 = (ptx-x)*(ptx-x);

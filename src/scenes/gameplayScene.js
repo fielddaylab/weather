@@ -102,6 +102,12 @@ var GamePlayScene = function(game, stage)
     {
       return {x:self.x_map.sample(x,y),y:self.y_map.sample(x,y)};
     }
+    self.sampleFill = function(x,y,obj)
+    {
+      obj.x = self.x_map.sample(x,y);
+      obj.y = self.y_map.sample(x,y);
+      return obj;
+    }
     self.samplePolar = function(x,y)
     {
       var x_val = self.x_map.sample(x,y);
@@ -116,6 +122,19 @@ var GamePlayScene = function(game, stage)
 
       return ret;
     }
+    self.samplePolarFill = function(x,y,obj)
+    {
+      var x_val = self.x_map.sample(x,y);
+      var y_val = self.y_map.sample(x,y);
+
+      obj.len = Math.sqrt(x_val*x_val+y_val*y_val);
+      x_val /= obj.len;
+      y_val /= obj.len;
+      if(obj.len < 0.001) obj.dir = 0;
+      else obj.dir = Math.atan2(y_val,x_val);
+
+      return obj;
+    }
     self.polarAtIndex = function(i)
     {
       var x_val = self.x_map.data[i];
@@ -129,6 +148,19 @@ var GamePlayScene = function(game, stage)
       else ret.dir = Math.atan2(y_val,x_val);
 
       return ret;
+    }
+    self.polarAtIndexFill = function(i,obj)
+    {
+      var x_val = self.x_map.data[i];
+      var y_val = self.y_map.data[i];
+
+      obj.len = Math.sqrt(x_val*x_val+y_val*y_val);
+      x_val /= obj.len;
+      y_val /= obj.len;
+      if(obj.len < 0.001) obj.dir = 0;
+      else obj.dir = Math.atan2(y_val,x_val);
+
+      return obj;
     }
 
     self.iFor = self.x_map.iFor;
@@ -152,8 +184,11 @@ var GamePlayScene = function(game, stage)
     var self = this;
     self.x = 0.2;
     self.y = 0.2;
-    self.w = 20;
-    self.h = 20;
+    self.w = 0.02;
+    self.h = 0.02;
+
+    self.cache_w = self.w*stage.drawCanv.canvas.width;
+    self.cache_h = self.h*stage.drawCanv.canvas.height;
   }
   var Brush = function(w,h, scene)
   {
@@ -293,6 +328,8 @@ var GamePlayScene = function(game, stage)
     self.cache_y = 0;
     self.cache_w = 0;
     self.cache_h = 0;
+
+    self.met = false;
   }
   var Flag = function(x,y,xd,yd)
   {
@@ -311,6 +348,13 @@ var GamePlayScene = function(game, stage)
     self.cache_y = 0;
     self.goal_cache_xd = 0;
     self.goal_cache_yd = 0;
+
+    self.cache_t = 0;
+    self.cache_l = 0;
+    self.goal_cache_t = 0;
+    self.goal_cache_l = 0;
+
+    self.met = false;
   }
   var Level = function()
   {
@@ -323,6 +367,8 @@ var GamePlayScene = function(game, stage)
 
     //L_TYPE_FLAG
     self.flags = [];
+
+    self.complete = false;
   }
 
   self.cur_level;
@@ -437,18 +483,18 @@ var GamePlayScene = function(game, stage)
     }
 
 
-    //LEVELS
+    //MYLEVELS
     var l;
-
-    l = new Level();
-    l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.5,0.5,0.1,0.1));
-    self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_BALLOON;
     l.start = new Checkpoint(0.1,0.1,0.1,0.1);
     l.checkpoints.push(new Checkpoint(0.5,0.5,0.1,0.1));
+    self.levels.push(l);
+
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.5,0.5,0.1,0.1));
     self.levels.push(l);
 
 
@@ -468,8 +514,8 @@ var GamePlayScene = function(game, stage)
         c = l.checkpoints[i];
         c.cache_w = c.w*stage.drawCanv.canvas.width;
         c.cache_h = c.h*stage.drawCanv.canvas.height;
-        c.cache_x = c.x*stage.drawCanv.canvas.width-c.cache_w/2;
-        c.cache_y = c.y*stage.drawCanv.canvas.height-c.cache_h/2;
+        c.cache_x = c.x*stage.drawCanv.canvas.width;
+        c.cache_y = c.y*stage.drawCanv.canvas.height;
       }
     }
     if(l.type == L_TYPE_FLAG)
@@ -482,6 +528,9 @@ var GamePlayScene = function(game, stage)
         f.cache_y = f.y*stage.drawCanv.canvas.height;
         f.goal_cache_xd = f.goal_xd*stage.drawCanv.canvas.width+f.cache_x;
         f.goal_cache_yd = f.goal_yd*stage.drawCanv.canvas.height+f.cache_y;
+
+        f.goal_cache_l = Math.sqrt(f.goal_xd*f.goal_xd+f.goal_yd*f.goal_yd);
+        f.goal_cache_t = Math.atan2(f.goal_yd/f.goal_cache_l,f.goal_xd/f.goal_cache_l);
       }
     }
   }
@@ -596,23 +645,56 @@ var GamePlayScene = function(game, stage)
     }
 
     /*
-    // balloon
+    // game objs
     */
-    if(self.levels[self.cur_level].type == L_TYPE_BALLOON)
+    var l = self.levels[self.cur_level];
+    if(l.type == L_TYPE_BALLOON)
     {
+      //balloon
       x = self.vfield.x_map.sample(self.balloon.x,self.balloon.y);
       y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
       self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
       self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
+      //checkpoints
+      var c;
+      for(var i = 0; i < l.checkpoints.length; i++)
+      {
+        c = l.checkpoints[i];
+        if(objIntersectsObj(self.balloon,c))
+          c.met = true;
+        else c.met = false;
+      }
+    }
+    if(l.type == L_TYPE_FLAG)
+    {
+      //flags
+      var cart = {x:0,y:0};
+      var polar = {dir:0,len:0};
+      var f;
+      for(var i = 0; i < l.flags.length; i++)
+      {
+        f = l.flags[i];
+        self.vfield.sampleFill(f.x,f.y,cart);
+        f.xd = cart.x/10;
+        f.yd = cart.y/10;
+        self.vfield.samplePolarFill(f.x,f.y,polar);
+        if(f.goal_cache_l < polar.len && Math.abs(f.goal_cache_t-polar.dir) < 0.1)
+          f.met = true;
+        else f.met = false;
+      }
     }
 
     self.ticks++;
   };
 
+  var USA = new Image();
+  USA.src = "assets/usa.png";
   self.draw = function()
   {
     var canv = stage.drawCanv;
     canv.context.lineWidth = 0.5;
+
+    canv.context.drawImage(USA,0,0,canv.canvas.width,canv.canvas.height);
 
     var x_space;
     var y_space;
@@ -631,11 +713,11 @@ var GamePlayScene = function(game, stage)
         y = y_space*i;
         x = x_space*j;
         index = self.pmap.iFor(j,i);
-        var color = Math.round(self.pmap.data[index]*255);
-        canv.context.fillStyle = "rgba("+color+","+color+","+color+",1)";
-        canv.context.fillRect(x,y,x_space+1,y_space+1);
-        //canv.context.strokeStyle = "#ff0000";
-        //canv.context.strokeRect(x,y,x_space,y_space);
+        //var color = Math.round(self.pmap.data[index]*255);
+        //canv.context.fillStyle = "rgba("+color+","+color+","+color+",0.2)";
+        var color = .8-(self.pmap.data[index]*.8);
+        canv.context.fillStyle = "rgba(0,0,0,"+color+")";
+        canv.context.fillRect(x,y,x_space,y_space);
       }
     }
 
@@ -680,34 +762,47 @@ var GamePlayScene = function(game, stage)
     var l = self.levels[self.cur_level];
     if(l.type == L_TYPE_BALLOON)
     {
+      //checkpoints
+      var c;
+      for(var i = 0; i < l.checkpoints.length; i++)
+      {
+        c = l.checkpoints[i];
+        if(c.met)
+        canv.context.fillStyle = "#00FF00";
+        else
+        canv.context.fillStyle = "#FF0000";
+        canv.context.fillRect(c.cache_x,c.cache_y,c.cache_w,c.cache_h);
+      }
       //balloon
       canv.context.fillStyle = "#FF0000";
-      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.h/2),self.balloon.w,self.balloon.h);
-      //checkpoints
-      canv.context.fillStyle = "#00FF00";
-      for(var i = 0; i < l.checkpoints.length; i++)
-        canv.context.fillRect(l.checkpoints[i].cache_x,l.checkpoints[i].cache_y,l.checkpoints[i].cache_w,l.checkpoints[i].cache_h);
+      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
     }
     if(l.type == L_TYPE_FLAG)
     {
       //flags
       canv.context.lineWidth = 2;
+      var f;
         //goal
       canv.context.strokeStyle = "#00FF00";
       for(var i = 0; i < l.flags.length; i++)
       {
+        f = l.flags[i];
         canv.context.beginPath();
-        canv.context.moveTo(l.flags[i].cache_x,l.flags[i].cache_y);
-        canv.context.lineTo(l.flags[i].goal_cache_xd,l.flags[i].goal_cache_yd);
+        canv.context.moveTo(f.cache_x,f.cache_y);
+        canv.context.lineTo(f.goal_cache_xd,f.goal_cache_yd);
         canv.context.stroke();
       }
         //flag
-      canv.context.strokeStyle = "#FF0000";
       for(var i = 0; i < l.flags.length; i++)
       {
+        f = l.flags[i];
+        if(f.met)
+        canv.context.strokeStyle = "#00FF00";
+        else
+        canv.context.strokeStyle = "#FF0000";
         canv.context.beginPath();
-        canv.context.moveTo(l.flags[i].cache_x,l.flags[i].cache_y);
-        canv.context.lineTo(l.flags[i].cache_x+(l.flags[i].xd*stage.drawCanv.canvas.width),l.flags[i].cache_y+(l.flags[i].yd*stage.drawCanv.canvas.height));
+        canv.context.moveTo(f.cache_x,f.cache_y);
+        canv.context.lineTo(f.cache_x+(f.xd*canv.canvas.width),f.cache_y+(f.yd*canv.canvas.height));
         canv.context.stroke();
       }
     }
