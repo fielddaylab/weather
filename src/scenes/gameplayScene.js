@@ -2,6 +2,16 @@ var paint = false;
 var anneal = true;
 var sys = true;
 
+var ENUM;
+
+ENUM = 0;
+var P_TYPE_HIGH = ENUM; ENUM++;
+var P_TYPE_LOW  = ENUM; ENUM++;
+
+ENUM = 0;
+var L_TYPE_BALLOON = ENUM; ENUM++;
+var L_TYPE_FLAG    = ENUM; ENUM++;
+
 var GamePlayScene = function(game, stage)
 {
   var self = this;
@@ -137,6 +147,14 @@ var GamePlayScene = function(game, stage)
       self.partts[i] = Math.random();
     }
   }
+  var Balloon = function()
+  {
+    var self = this;
+    self.x = 0.2;
+    self.y = 0.2;
+    self.w = 20;
+    self.h = 20;
+  }
   var Brush = function(w,h, scene)
   {
     var self = this;
@@ -261,20 +279,46 @@ var GamePlayScene = function(game, stage)
     }
   }
 
-  var ENUM;
+  var Checkpoint = function(x,y,w,h)
+  {
+    var self = this;
+    self.x = x;
+    self.y = y;
+    self.w = w;
+    self.h = h;
+  }
+  var Flag = function(x,y,xd,yd)
+  {
+    var self = this;
+    self.x = x;
+    self.y = y;
+    self.xd = xd;
+    self.yd = yd;
+  }
+  var Level = function()
+  {
+    var self = this;
+    self.type = L_TYPE_BALLOON;
 
-  self.presser;
+    //L_TYPE_BALLOON
+    self.start = {x:0,y:0}; //just use a checkpoint if you want
+    self.checkpoints = [];
+
+    //L_TYPE_FLAG
+    self.flags = [];
+  }
+
+  self.cur_level;
+  self.levels;
 
   self.pmap;
   self.vfield;
   self.afield;
+  self.balloon;
   self.brush;
   self.psys;
   self.dragging_sys;
 
-  ENUM = 0;
-  var P_TYPE_HIGH = ENUM; ENUM++;
-  var P_TYPE_LOW  = ENUM; ENUM++;
   self.p_type = P_TYPE_LOW;
   self.p_type_toggle_h;
   self.p_type_toggle_l;
@@ -282,17 +326,27 @@ var GamePlayScene = function(game, stage)
   self.p_store_h;
   self.p_store_l;
 
+  self.presser;
+  self.hoverer;
+  self.dragger;
+
+
   self.ready = function()
   {
     self.presser = new Presser({source:stage.dispCanv.canvas});
     self.hoverer = new Hoverer({source:stage.dispCanv.canvas});
     self.dragger = new Dragger({source:stage.dispCanv.canvas});
 
+    self.cur_level = 0;
+    self.levels = [];
+
     var cells_x = 20;
     var cells_y = 20;
     self.pmap = new HeightMap(cells_x,cells_y);
     self.vfield = new VecField2d(25,25);
     self.afield = new AirField(5000);
+    self.balloon = new Balloon();
+
     if(paint)
     {
       self.brush = new Brush(stage.dispCanv.canvas.width,stage.dispCanv.canvas.height,self);
@@ -364,7 +418,29 @@ var GamePlayScene = function(game, stage)
       self.dragger.register(self.p_store_h);
       self.dragger.register(self.p_store_l);
     }
+
+
+    //LEVELS
+    var l;
+
+    l = new Level();
+    l.type = L_TYPE_BALLOON;
+    l.start = new Checkpoint(0.1,0.1,0.1,0.1);
+    l.checkpoints.push(new Checkpoint(0.5,0.5,0.1,0.1));
+    self.levels.push(l);
+
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.5,0.5,0.1,0.1));
+    self.levels.push(l);
+
+
   };
+
+  self.beginLevel = function(l)
+  {
+    self.cur_level = l;
+  }
 
   self.ticks = 0;
   self.tick = function()
@@ -373,6 +449,9 @@ var GamePlayScene = function(game, stage)
     self.hoverer.flush();
     self.dragger.flush();
 
+    /*
+    // pressure
+    */
     if(anneal)
     {
       self.pmap.anneal(0.10);
@@ -404,7 +483,9 @@ var GamePlayScene = function(game, stage)
       }
     }
 
-    //calc wind
+    /*
+    // wind
+    */
     for(var i = 0; i < self.vfield.h; i++)
     {
       for(var j = 0; j < self.vfield.w; j++)
@@ -445,7 +526,9 @@ var GamePlayScene = function(game, stage)
       }
     }
 
-    //update particles
+    /*
+    // air
+    */
     var x;
     var y;
     for(var i = 0; i < self.afield.n; i++)
@@ -466,6 +549,17 @@ var GamePlayScene = function(game, stage)
         if(self.afield.partxs[i] < 0 || self.afield.partxs[i] > 1) self.afield.partts[i] = 0;
         if(self.afield.partys[i] < 0 || self.afield.partys[i] > 1) self.afield.partts[i] = 0;
       }
+    }
+
+    /*
+    // balloon
+    */
+    if(self.levels[self.cur_level].type == L_TYPE_BALLOON)
+    {
+      x = self.vfield.x_map.sample(self.balloon.x,self.balloon.y);
+      y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
+      self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
+      self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
     }
 
     self.ticks++;
@@ -526,6 +620,15 @@ var GamePlayScene = function(game, stage)
     canv.context.fillStyle = "#8888FF";
     for(var i = 0; i < self.afield.n; i++)
       canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
+
+    /*
+    // balloon
+    */
+    if(self.levels[self.cur_level].type == L_TYPE_BALLOON)
+    {
+      canv.context.fillStyle = "#FF0000";
+      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.h/2),self.balloon.w,self.balloon.h);
+    }
 
     /*
     // pressure systems
