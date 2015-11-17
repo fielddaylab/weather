@@ -119,6 +119,20 @@ var GamePlayScene = function(game, stage)
 
     self.iFor = self.x_map.iFor;
   }
+  var AirField = function(n)
+  {
+    var self = this;
+    self.partxs = [];
+    self.partys = [];
+    self.partts = [];
+    self.n = n;
+    for(var i = 0; i < self.n; i++)
+    {
+      self.partxs[i] = Math.random();
+      self.partys[i] = Math.random();
+      self.partts[i] = Math.random();
+    }
+  }
   var Brush = function(w,h, scene)
   {
     var self = this;
@@ -128,7 +142,7 @@ var GamePlayScene = function(game, stage)
     self.h = h;
 
     self.r = 0.1;
-    self.delta = 0.01;
+    self.delta = 0.02;
 
     self.down = false;
 
@@ -161,14 +175,14 @@ var GamePlayScene = function(game, stage)
           var d = (xd*xd + yd*yd) / (self.r*self.r);
           if(d > 1) continue;
 
-               if(scene.p_type = P_TYPE_HIGH) scene.pmap.data[index] += (1-(d*d*d*d))*self.delta*1;
-          else if(scene.p_type = P_TYPE_LOW)  scene.pmap.data[index] += (1-(d*d*d*d))*self.delta*-1;
-          console.log(scene.p_type);
+               if(scene.p_type == P_TYPE_HIGH) scene.pmap.data[index] += (1-(d*d*d*d))*self.delta*1;
+          else if(scene.p_type == P_TYPE_LOW)  scene.pmap.data[index] += (1-(d*d*d*d))*self.delta*-1;
 
           if(scene.pmap.data[index] > 1) scene.pmap.data[index] = 1;
           if(scene.pmap.data[index] < 0) scene.pmap.data[index] = 0;
         }
       }
+
     }
   }
 
@@ -178,6 +192,7 @@ var GamePlayScene = function(game, stage)
 
   self.pmap;
   self.vfield;
+  self.afield;
   self.brush;
 
   ENUM = 0;
@@ -196,10 +211,10 @@ var GamePlayScene = function(game, stage)
     var cells_y = 20;
     self.pmap = new HeightMap(cells_x,cells_y);
     self.vfield = new VecField2d(25,25);
+    self.afield = new AirField(5000);
     self.brush = new Brush(stage.dispCanv.canvas.width,stage.dispCanv.canvas.height,self);
     self.dragger.register(self.brush);
 
-    self.p_type = 0;
     self.p_type_toggle_h = new ToggleBox(10,10,20,20, false, function(o) { self.p_type = !o; self.p_type_toggle_l.on =  self.p_type; });
     self.p_type_toggle_l = new ToggleBox(40,10,20,20,  true, function(o) { self.p_type =  o; self.p_type_toggle_h.on = !self.p_type; });
     self.presser.register(self.p_type_toggle_h)
@@ -256,6 +271,29 @@ var GamePlayScene = function(game, stage)
       }
     }
 
+    //update particles
+    var x;
+    var y;
+    for(var i = 0; i < self.afield.n; i++)
+    {
+      self.afield.partts[i] -= 0.01;
+      if(self.afield.partts[i] <= 0)
+      {
+        self.afield.partts[i] = 1;
+        self.afield.partxs[i] = Math.random();
+        self.afield.partys[i] = Math.random();
+      }
+      else
+      {
+        x = self.vfield.x_map.sample(self.afield.partxs[i],self.afield.partys[i]);
+        y = self.vfield.y_map.sample(self.afield.partxs[i],self.afield.partys[i]);
+        self.afield.partxs[i] += x/100 + ((Math.random()-0.5)/200);
+        self.afield.partys[i] += y/100 + ((Math.random()-0.5)/200);
+        if(self.afield.partxs[i] < 0 || self.afield.partxs[i] > 1) self.afield.partts[i] = 0;
+        if(self.afield.partys[i] < 0 || self.afield.partys[i] > 1) self.afield.partts[i] = 0;
+      }
+    }
+
     self.ticks++;
   };
 
@@ -307,6 +345,13 @@ var GamePlayScene = function(game, stage)
         canv.drawLine(x,y,x+self.vfield.x_map.data[index]*10,y+self.vfield.y_map.data[index]*10);
       }
     }
+
+    /*
+    // air
+    */
+    canv.context.fillStyle = "#8888FF";
+    for(var i = 0; i < self.afield.n; i++)
+      canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
 
     self.p_type_toggle_h.draw(canv);
     self.p_type_toggle_l.draw(canv);
