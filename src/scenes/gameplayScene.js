@@ -1,6 +1,6 @@
-var paint = true;
+var paint = false;
 var anneal = true;
-var sys = false;
+var sys = true;
 
 var GamePlayScene = function(game, stage)
 {
@@ -227,6 +227,8 @@ var GamePlayScene = function(game, stage)
     }
     self.dragStart = function(evt)
     {
+      if(scene.dragging_sys) return;
+      scene.dragging_sys = self;
       self.dragging = true;
     }
     self.drag = function(evt)
@@ -242,6 +244,7 @@ var GamePlayScene = function(game, stage)
     self.dragFinish = function(evt)
     {
       self.dragging = false;
+      scene.dragging_sys = undefined;
     }
 
     self.draw = function(canv)
@@ -267,6 +270,7 @@ var GamePlayScene = function(game, stage)
   self.afield;
   self.brush;
   self.psys;
+  self.dragging_sys;
 
   ENUM = 0;
   var P_TYPE_HIGH = ENUM; ENUM++;
@@ -274,6 +278,9 @@ var GamePlayScene = function(game, stage)
   self.p_type = P_TYPE_LOW;
   self.p_type_toggle_h;
   self.p_type_toggle_l;
+
+  self.p_store_h;
+  self.p_store_l;
 
   self.ready = function()
   {
@@ -303,10 +310,60 @@ var GamePlayScene = function(game, stage)
       }
     }
 
-    self.p_type_toggle_h = new ToggleBox(10,10,20,20, false, function(o) { self.p_type = !o; self.p_type_toggle_l.on =  self.p_type; });
-    self.p_type_toggle_l = new ToggleBox(40,10,20,20,  true, function(o) { self.p_type =  o; self.p_type_toggle_h.on = !self.p_type; });
-    self.presser.register(self.p_type_toggle_h)
-    self.presser.register(self.p_type_toggle_l)
+    if(paint)
+    {
+      self.p_type_toggle_h = new ToggleBox(10,10,20,20, false, function(o) { self.p_type = !o; self.p_type_toggle_l.on =  self.p_type; });
+      self.p_type_toggle_l = new ToggleBox(40,10,20,20,  true, function(o) { self.p_type =  o; self.p_type_toggle_h.on = !self.p_type; });
+      self.presser.register(self.p_type_toggle_h)
+      self.presser.register(self.p_type_toggle_l)
+    }
+    if(sys)
+    {
+      function fdstart(evt) {  };
+      function fdrag(evt) { self.dragging_sys.drag(evt); };
+      function fdfinish() { if(self.dragging_sys) self.dragging_sys.dragFinish(); };
+
+      self.p_store_h = new BinBox(10,10,20,20, fdstart, fdrag, fdfinish,
+        function(evt)
+        {
+          var p = new PSys(0.,0.,0.1,0.1,self);
+          self.psys.push(p);
+          self.hoverer.register(p);
+          self.dragger.register(p);
+          p.dragStart(evt);
+        },
+        function()
+        {
+          var p = self.dragging_sys;
+          self.hoverer.unregister(p);
+          self.dragger.unregister(p);
+          for(var i = 0; i < self.psys.length; i++)
+            if(self.psys[i] == p) self.psys.splice(i,1);
+          self.dragging_sys = undefined;
+        });
+      self.p_store_l = new BinBox(40,10,20,20, fdstart, fdrag, fdfinish,
+        function(evt)
+        {
+          var p = new PSys(0.,0.,0.1,-0.1,self);
+          self.psys.push(p);
+          self.hoverer.register(p);
+          self.dragger.register(p);
+          p.dragStart(evt);
+        },
+        function()
+        {
+          var p = self.dragging_sys;
+          self.hoverer.unregister(p);
+          self.dragger.unregister(p);
+          for(var i = 0; i < self.psys.length; i++)
+            if(self.psys[i] == p) self.psys.splice(i,1);
+          self.dragging_sys = undefined;
+        })
+      self.presser.register(self.p_store_h);
+      self.presser.register(self.p_store_l);
+      self.dragger.register(self.p_store_h);
+      self.dragger.register(self.p_store_l);
+    }
   };
 
   self.ticks = 0;
@@ -479,8 +536,16 @@ var GamePlayScene = function(game, stage)
         self.psys[i].draw(canv);
     }
 
-    self.p_type_toggle_h.draw(canv);
-    self.p_type_toggle_l.draw(canv);
+    if(paint)
+    {
+      self.p_type_toggle_h.draw(canv);
+      self.p_type_toggle_l.draw(canv);
+    }
+    if(sys)
+    {
+      self.p_store_h.draw(canv);
+      self.p_store_l.draw(canv);
+    }
   };
 
   self.cleanup = function()
