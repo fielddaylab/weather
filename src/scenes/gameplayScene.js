@@ -1,3 +1,7 @@
+var paint = true;
+var anneal = true;
+var sys = false;
+
 var GamePlayScene = function(game, stage)
 {
   var self = this;
@@ -142,7 +146,7 @@ var GamePlayScene = function(game, stage)
     self.h = h;
 
     self.r = 0.1;
-    self.delta = 0.02;
+    self.delta = 0.2;
 
     self.down = false;
 
@@ -185,6 +189,74 @@ var GamePlayScene = function(game, stage)
 
     }
   }
+  var PSys = function(x,y,r,delta,scene)
+  {
+    var self = this;
+    self.sx = x;
+    self.sy = y;
+    self.r = r;
+    self.w = 20;
+    self.h = 20;
+    self.x = self.sx*stage.dispCanv.canvas.width-(self.w/2);
+    self.y = self.sy*stage.dispCanv.canvas.height-(self.h/2);
+
+    self.delta = delta;
+    if(self.delta > 0)
+    {
+      self.text = "H";
+      self.color_fill = "#FFFFFF";
+      self.color_stroke = "#000000";
+    }
+    else
+    {
+      self.text = "L";
+      self.color_fill = "#000000";
+      self.color_stroke = "#FFFFFF";
+    }
+
+    self.dragging = false;
+    self.hovering = false;
+
+    self.hover = function()
+    {
+      self.hovering = true;
+    }
+    self.unhover = function()
+    {
+      self.hovering = false;
+    }
+    self.dragStart = function(evt)
+    {
+      self.dragging = true;
+    }
+    self.drag = function(evt)
+    {
+      if(self.dragging)
+      {
+        self.sx = evt.doX/stage.dispCanv.canvas.width;
+        self.sy = evt.doY/stage.dispCanv.canvas.height;
+        self.x = evt.doX-(self.w/2);
+        self.y = evt.doY-(self.h/2);
+      }
+    }
+    self.dragFinish = function(evt)
+    {
+      self.dragging = false;
+    }
+
+    self.draw = function(canv)
+    {
+      stage.drawCanv.context.font = "30px arial";
+      canv.outlineText(self.text,self.x+self.w/2-10,self.y+self.h/2+10,self.color_fill,self.color_stroke);
+
+      if(self.hovering || self.dragging)
+      {
+        canv.context.lineWidth = 3;
+        canv.context.strokeStyle = self.color_fill;
+        canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
+      }
+    }
+  }
 
   var ENUM;
 
@@ -194,6 +266,7 @@ var GamePlayScene = function(game, stage)
   self.vfield;
   self.afield;
   self.brush;
+  self.psys;
 
   ENUM = 0;
   var P_TYPE_HIGH = ENUM; ENUM++;
@@ -205,6 +278,7 @@ var GamePlayScene = function(game, stage)
   self.ready = function()
   {
     self.presser = new Presser({source:stage.dispCanv.canvas});
+    self.hoverer = new Hoverer({source:stage.dispCanv.canvas});
     self.dragger = new Dragger({source:stage.dispCanv.canvas});
 
     var cells_x = 20;
@@ -212,8 +286,22 @@ var GamePlayScene = function(game, stage)
     self.pmap = new HeightMap(cells_x,cells_y);
     self.vfield = new VecField2d(25,25);
     self.afield = new AirField(5000);
-    self.brush = new Brush(stage.dispCanv.canvas.width,stage.dispCanv.canvas.height,self);
-    self.dragger.register(self.brush);
+    if(paint)
+    {
+      self.brush = new Brush(stage.dispCanv.canvas.width,stage.dispCanv.canvas.height,self);
+      self.dragger.register(self.brush);
+    }
+    if(sys)
+    {
+      self.psys = [];
+      self.psys.push(new PSys(0.6,0.5,0.1,-0.1,self));
+      self.psys.push(new PSys(0.4,0.5,0.1, 0.1,self));
+      for(var i = 0; i < self.psys.length; i++)
+      {
+        self.hoverer.register(self.psys[i]);
+        self.dragger.register(self.psys[i]);
+      }
+    }
 
     self.p_type_toggle_h = new ToggleBox(10,10,20,20, false, function(o) { self.p_type = !o; self.p_type_toggle_l.on =  self.p_type; });
     self.p_type_toggle_l = new ToggleBox(40,10,20,20,  true, function(o) { self.p_type =  o; self.p_type_toggle_h.on = !self.p_type; });
@@ -225,10 +313,39 @@ var GamePlayScene = function(game, stage)
   self.tick = function()
   {
     self.presser.flush();
+    self.hoverer.flush();
     self.dragger.flush();
 
-    //self.pmap.anneal(0.001);
-    self.brush.tick();
+    if(anneal)
+    {
+      self.pmap.anneal(0.10);
+    }
+    if(paint)
+    {
+      self.brush.tick();
+    }
+    if(sys)
+    {
+      index = 0;
+      for(var i = 0; i < self.pmap.h; i++)
+      {
+        for(var j = 0; j < self.pmap.w; j++)
+        {
+          for(var k = 0; k < self.psys.length; k++)
+          {
+            var xd = (j/self.pmap.w)-self.psys[k].sx;
+            var yd = (i/self.pmap.h)-self.psys[k].sy;
+            var d = (xd*xd + yd*yd) / (self.psys[k].r*self.psys[k].r);
+            if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.psys[k].delta;
+          }
+
+          if(self.pmap.data[index] > 1) self.pmap.data[index] = 1;
+          if(self.pmap.data[index] < 0) self.pmap.data[index] = 0;
+
+          index++;
+        }
+      }
+    }
 
     //calc wind
     for(var i = 0; i < self.vfield.h; i++)
@@ -352,6 +469,15 @@ var GamePlayScene = function(game, stage)
     canv.context.fillStyle = "#8888FF";
     for(var i = 0; i < self.afield.n; i++)
       canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
+
+    /*
+    // pressure systems
+    */
+    if(sys)
+    {
+      for(var i = 0; i < self.psys.length; i++)
+        self.psys[i].draw(canv);
+    }
 
     self.p_type_toggle_h.draw(canv);
     self.p_type_toggle_l.draw(canv);
