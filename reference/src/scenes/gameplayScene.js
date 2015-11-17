@@ -103,10 +103,8 @@ var GamePlayScene = function(game, stage)
       ret.len = Math.sqrt(x_val*x_val+y_val*y_val);
       x_val /= ret.len;
       y_val /= ret.len;
-      if(ret.len < 0.001)
-        ret.dir = 0;
-      else
-        ret.dir = Math.atan2(y_val,x_val);
+      if(ret.len < 0.001) ret.dir = 0;
+      else ret.dir = Math.atan2(y_val,x_val);
 
       return ret;
     }
@@ -119,10 +117,8 @@ var GamePlayScene = function(game, stage)
       ret.len = Math.sqrt(x_val*x_val+y_val*y_val);
       x_val /= ret.len;
       y_val /= ret.len;
-      if(ret.len < 0.001)
-        ret.dir = 0;
-      else
-        ret.dir = Math.atan2(y_val,x_val);
+      if(ret.len < 0.001) ret.dir = 0;
+      else ret.dir = Math.atan2(y_val,x_val);
 
       return ret;
     }

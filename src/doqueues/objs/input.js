@@ -158,7 +158,7 @@ function ButtonBox(x,y,w,h,callback)
 
   self.click = function(evt)
   {
-    if(ptWithinObj(evt.doX, evt.doY, self)) self.hit();
+    self.hit();
   }
 
   self.hit = function()
@@ -202,11 +202,12 @@ function ToggleBox(x,y,w,h,val,callback)
   self.unpress = function(evt)
   {
     self.down = false;
+    self.toggle();
   }
 
   self.click = function(evt)
   {
-    if(ptWithinObj(evt.doX, evt.doY, self)) self.toggle();
+    self.toggle();
   }
 
   self.toggle = function()
