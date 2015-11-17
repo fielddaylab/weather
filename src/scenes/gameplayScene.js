@@ -1,6 +1,7 @@
 var paint = false;
+var sys = !paint;
 var anneal = true;
-var sys = true;
+var airdeath = true;
 
 var ENUM;
 
@@ -403,10 +404,8 @@ var GamePlayScene = function(game, stage)
     self.cur_level = 0;
     self.levels = [];
 
-    var cells_x = 20;
-    var cells_y = 20;
-    self.pmap = new HeightMap(cells_x,cells_y);
-    self.vfield = new VecField2d(25,25);
+    self.pmap = new HeightMap(20,20);
+    self.vfield = new VecField2d(30,30);
     self.afield = new AirField(5000);
     self.balloon = new Balloon();
 
@@ -496,7 +495,6 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_FLAG;
     l.flags.push(new Flag(0.5,0.5,0.1,0.1));
     self.levels.push(l);
-
 
     self.beginLevel(0);
   };
@@ -627,7 +625,7 @@ var GamePlayScene = function(game, stage)
     for(var i = 0; i < self.afield.n; i++)
     {
       self.afield.partts[i] -= 0.01;
-      if(self.afield.partts[i] <= 0)
+      if(airdeath && self.afield.partts[i] <= 0)
       {
         self.afield.partts[i] = 1;
         self.afield.partxs[i] = Math.random();
