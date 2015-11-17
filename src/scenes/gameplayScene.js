@@ -282,18 +282,35 @@ var GamePlayScene = function(game, stage)
   var Checkpoint = function(x,y,w,h)
   {
     var self = this;
+    //normalized vals
     self.x = x;
     self.y = y;
     self.w = w;
     self.h = h;
+
+    //actual map vals
+    self.cache_x = 0;
+    self.cache_y = 0;
+    self.cache_w = 0;
+    self.cache_h = 0;
   }
   var Flag = function(x,y,xd,yd)
   {
     var self = this;
+
+    //normalized vals
     self.x = x;
     self.y = y;
-    self.xd = xd;
-    self.yd = yd;
+    self.xd = 0.;
+    self.yd = 0.;
+    self.goal_xd = xd;
+    self.goal_yd = yd;
+
+    //actual map vals
+    self.cache_x = 0;
+    self.cache_y = 0;
+    self.goal_cache_xd = 0;
+    self.goal_cache_yd = 0;
   }
   var Level = function()
   {
@@ -424,22 +441,49 @@ var GamePlayScene = function(game, stage)
     var l;
 
     l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.5,0.5,0.1,0.1));
+    self.levels.push(l);
+
+    l = new Level();
     l.type = L_TYPE_BALLOON;
     l.start = new Checkpoint(0.1,0.1,0.1,0.1);
     l.checkpoints.push(new Checkpoint(0.5,0.5,0.1,0.1));
     self.levels.push(l);
 
-    l = new Level();
-    l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.5,0.5,0.1,0.1));
-    self.levels.push(l);
 
-
+    self.beginLevel(0);
   };
 
   self.beginLevel = function(l)
   {
     self.cur_level = l;
+    var l = self.levels[self.cur_level];
+
+    if(l.type == L_TYPE_BALLOON)
+    {
+      var c;
+      for(var i = 0; i < l.checkpoints.length; i++)
+      {
+        c = l.checkpoints[i];
+        c.cache_w = c.w*stage.drawCanv.canvas.width;
+        c.cache_h = c.h*stage.drawCanv.canvas.height;
+        c.cache_x = c.x*stage.drawCanv.canvas.width-c.cache_w/2;
+        c.cache_y = c.y*stage.drawCanv.canvas.height-c.cache_h/2;
+      }
+    }
+    if(l.type == L_TYPE_FLAG)
+    {
+      var f;
+      for(var i = 0; i < l.flags.length; i++)
+      {
+        f = l.flags[i];
+        f.cache_x = f.x*stage.drawCanv.canvas.width;
+        f.cache_y = f.y*stage.drawCanv.canvas.height;
+        f.goal_cache_xd = f.goal_xd*stage.drawCanv.canvas.width+f.cache_x;
+        f.goal_cache_yd = f.goal_yd*stage.drawCanv.canvas.height+f.cache_y;
+      }
+    }
   }
 
   self.ticks = 0;
@@ -622,15 +666,6 @@ var GamePlayScene = function(game, stage)
       canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
 
     /*
-    // balloon
-    */
-    if(self.levels[self.cur_level].type == L_TYPE_BALLOON)
-    {
-      canv.context.fillStyle = "#FF0000";
-      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.h/2),self.balloon.w,self.balloon.h);
-    }
-
-    /*
     // pressure systems
     */
     if(sys)
@@ -639,6 +674,47 @@ var GamePlayScene = function(game, stage)
         self.psys[i].draw(canv);
     }
 
+    /*
+    // game objs
+    */
+    var l = self.levels[self.cur_level];
+    if(l.type == L_TYPE_BALLOON)
+    {
+      //balloon
+      canv.context.fillStyle = "#FF0000";
+      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.h/2),self.balloon.w,self.balloon.h);
+      //checkpoints
+      canv.context.fillStyle = "#00FF00";
+      for(var i = 0; i < l.checkpoints.length; i++)
+        canv.context.fillRect(l.checkpoints[i].cache_x,l.checkpoints[i].cache_y,l.checkpoints[i].cache_w,l.checkpoints[i].cache_h);
+    }
+    if(l.type == L_TYPE_FLAG)
+    {
+      //flags
+      canv.context.lineWidth = 2;
+        //goal
+      canv.context.strokeStyle = "#00FF00";
+      for(var i = 0; i < l.flags.length; i++)
+      {
+        canv.context.beginPath();
+        canv.context.moveTo(l.flags[i].cache_x,l.flags[i].cache_y);
+        canv.context.lineTo(l.flags[i].goal_cache_xd,l.flags[i].goal_cache_yd);
+        canv.context.stroke();
+      }
+        //flag
+      canv.context.strokeStyle = "#FF0000";
+      for(var i = 0; i < l.flags.length; i++)
+      {
+        canv.context.beginPath();
+        canv.context.moveTo(l.flags[i].cache_x,l.flags[i].cache_y);
+        canv.context.lineTo(l.flags[i].cache_x+(l.flags[i].xd*stage.drawCanv.canvas.width),l.flags[i].cache_y+(l.flags[i].yd*stage.drawCanv.canvas.height));
+        canv.context.stroke();
+      }
+    }
+
+    /*
+    // UI
+    */
     if(paint)
     {
       self.p_type_toggle_h.draw(canv);
