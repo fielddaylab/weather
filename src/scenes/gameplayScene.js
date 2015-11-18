@@ -1,4 +1,4 @@
-var default_complete = true;
+var default_complete = false;
 var paint = false;
 var sys = !paint;
 var anneal = true;
@@ -364,9 +364,9 @@ var GamePlayScene = function(game, stage)
       b = new ButtonBox(20+((bs+10)*0),20+((bs+10)*0),bs,bs,
         function(on)
         {
-          if(self.buttons[1].level == 0 || levels[self.buttons[1].level-1].complete)
+          if(self.buttons[0+1].level == 0 || levels[self.buttons[0+1].level-1].complete)
           {
-            scene.beginLevel(self.buttons[1].level);
+            scene.beginLevel(self.buttons[0+1].level);
             scene.setMode(GAME_MODE_PLAY);
           }
         });
@@ -378,13 +378,55 @@ var GamePlayScene = function(game, stage)
       b = new ButtonBox(20+((bs+10)*1),20+((bs+10)*0),bs,bs,
         function(on)
         {
-          if(self.buttons[2].level == 0 || levels[self.buttons[2].level-1].complete)
+          if(self.buttons[1+1].level == 0 || levels[self.buttons[1+1].level-1].complete)
           {
-            scene.beginLevel(self.buttons[2].level);
+            scene.beginLevel(self.buttons[1+1].level);
             scene.setMode(GAME_MODE_PLAY);
           }
         });
       b.level = 1;
+      b.title_a = "test1";
+      b.title_b = "test 2";
+      self.buttons.push(b);
+
+      b = new ButtonBox(20+((bs+10)*2),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[2+1].level == 0 || levels[self.buttons[2+1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[2+1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 2;
+      b.title_a = "test1";
+      b.title_b = "test 2";
+      self.buttons.push(b);
+
+      b = new ButtonBox(20+((bs+10)*3),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[3+1].level == 0 || levels[self.buttons[3+1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[3+1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 3;
+      b.title_a = "test1";
+      b.title_b = "test 2";
+      self.buttons.push(b);
+
+      b = new ButtonBox(20+((bs+10)*4),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[4+1].level == 0 || levels[self.buttons[4+1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[4+1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 4;
       b.title_a = "test1";
       b.title_b = "test 2";
       self.buttons.push(b);
@@ -657,8 +699,8 @@ var GamePlayScene = function(game, stage)
     self.play_clicker.register(self.menu_button);
 
     self.pmap = new HeightMap(20,20);
-    self.vfield = new VecField2d(20,20);
-    self.afield = new AirField(1000);
+    self.vfield = new VecField2d(30,30);
+    self.afield = new AirField(2000);
     self.balloon = new Balloon();
 
     if(paint)
@@ -669,8 +711,8 @@ var GamePlayScene = function(game, stage)
     if(sys)
     {
       self.psys = [];
-      self.psys.push(new PSys(0.6,0.5,0.1,-0.1,self));
-      self.psys.push(new PSys(0.4,0.5,0.1, 0.1,self));
+      self.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+      self.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
       for(var i = 0; i < self.psys.length; i++)
       {
         self.play_hoverer.register(self.psys[i]);
@@ -738,14 +780,25 @@ var GamePlayScene = function(game, stage)
     var l;
 
     l = new Level();
-    l.type = L_TYPE_BALLOON;
-    l.start = new Checkpoint(0.1,0.1,0.1,0.1);
-    l.checkpoints.push(new Checkpoint(0.5,0.5,0.1,0.1));
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.5,0.5,-0.1,0.0));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_FLAG;
     l.flags.push(new Flag(0.5,0.5,0.1,0.1));
+    self.levels.push(l);
+
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.4,0.5,0.0,0.1));
+    l.flags.push(new Flag(0.6,0.5,0.0,-0.1));
+    self.levels.push(l);
+
+    l = new Level();
+    l.type = L_TYPE_BALLOON;
+    l.start = new Checkpoint(0.1,0.1,0.1,0.1);
+    l.checkpoints.push(new Checkpoint(0.5,0.5,0.1,0.1));
     self.levels.push(l);
 
     self.beginLevel(0);
@@ -843,8 +896,8 @@ var GamePlayScene = function(game, stage)
         {
           for(var k = 0; k < self.psys.length; k++)
           {
-            var xd = (j/self.pmap.w)-self.psys[k].sx;
-            var yd = (i/self.pmap.h)-self.psys[k].sy;
+            var xd = indexToSample(j,self.pmap.w)-self.psys[k].sx;
+            var yd = indexToSample(i,self.pmap.h)-self.psys[k].sy;
             var d = (xd*xd + yd*yd) / (self.psys[k].r*self.psys[k].r);
             if(d < 1) self.pmap.data[index] += (1-(d*d*d*d))*self.psys[k].delta;
           }
@@ -942,13 +995,14 @@ var GamePlayScene = function(game, stage)
       while(self.balloon.y < 0) self.balloon.y += 1;
       //checkpoints
       var c;
+      var all_met = true;
       for(var i = 0; i < l.checkpoints.length; i++)
       {
         c = l.checkpoints[i];
-        if(objIntersectsObj(self.balloon,c))
-          c.met = true;
-        else c.met = false;
+        if(objIntersectsObj(self.balloon,c)) c.met = true;
+        all_met = all_met && c.met;
       }
+      if(all_met) l.complete = true;
     }
     if(l.type == L_TYPE_FLAG)
     {
@@ -956,6 +1010,8 @@ var GamePlayScene = function(game, stage)
       var cart = {x:0,y:0};
       var polar = {dir:0,len:0};
       var f;
+      var all_met = true;
+      var t_tolerance = 0.2;
       for(var i = 0; i < l.flags.length; i++)
       {
         f = l.flags[i];
@@ -963,10 +1019,12 @@ var GamePlayScene = function(game, stage)
         f.xd = cart.x/10;
         f.yd = cart.y/10;
         self.vfield.samplePolarFill(f.x,f.y,polar);
-        if(f.goal_cache_l < polar.len && Math.abs(f.goal_cache_t-polar.dir) < 0.1)
-          f.met = true;
+        var t_diff = Math.abs(f.goal_cache_t-polar.dir);
+        if(f.goal_cache_l < polar.len && t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance) f.met = true;
         else f.met = false;
+        all_met = all_met && f.met;
       }
+      if(all_met) l.complete = true;
     }
 
     self.ticks++;
