@@ -1,3 +1,4 @@
+var default_complete = true;
 var paint = false;
 var sys = !paint;
 var anneal = true;
@@ -605,7 +606,7 @@ var GamePlayScene = function(game, stage)
     //L_TYPE_FLAG
     self.flags = [];
 
-    self.complete = false;
+    self.complete = default_complete;
   }
 
   self.game_mode;
