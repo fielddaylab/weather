@@ -13,6 +13,11 @@ ENUM = 0;
 var L_TYPE_BALLOON = ENUM; ENUM++;
 var L_TYPE_FLAG    = ENUM; ENUM++;
 
+ENUM = 0;
+var GAME_MODE_MENU  = ENUM; ENUM++;
+var GAME_MODE_PLAY  = ENUM; ENUM++;
+var GAME_MODE_BLURB = ENUM; ENUM++;
+
 var GamePlayScene = function(game, stage)
 {
   var self = this;
@@ -251,8 +256,8 @@ var GamePlayScene = function(game, stage)
     self.r = r;
     self.w = 20;
     self.h = 20;
-    self.x = self.sx*stage.dispCanv.canvas.width-(self.w/2);
-    self.y = self.sy*stage.dispCanv.canvas.height-(self.h/2);
+    self.x = self.sx*stage.drawCanv.canvas.width-(self.w/2);
+    self.y = self.sy*stage.drawCanv.canvas.height-(self.h/2);
 
     self.delta = delta;
     if(self.delta > 0)
@@ -289,8 +294,8 @@ var GamePlayScene = function(game, stage)
     {
       if(self.dragging)
       {
-        self.sx = evt.doX/stage.dispCanv.canvas.width;
-        self.sy = evt.doY/stage.dispCanv.canvas.height;
+        self.sx = evt.doX/stage.drawCanv.canvas.width;
+        self.sy = evt.doY/stage.drawCanv.canvas.height;
         self.x = evt.doX-(self.w/2);
         self.y = evt.doY-(self.h/2);
       }
@@ -312,6 +317,210 @@ var GamePlayScene = function(game, stage)
         canv.context.strokeStyle = self.color_fill;
         canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
       }
+    }
+  }
+
+  var ClipBoard = function(x,y,w,h,scene,levels)
+  {
+    var self = this;
+
+    self.canv;
+
+    self.x = x;
+    self.y = y;
+    self.w = w;
+    self.h = h;
+    self.desired_y = y;
+
+    self.canv = new Canv(
+      {
+        width:self.w,
+        height:self.h,
+        fillStyle:"#000000",
+        strokeStyle:"#000000",
+        smoothing:true
+      }
+    );
+
+    self._dirty = true;
+
+    self.buttons = [];
+    self.dismiss_button = new ButtonBox(self.w-20-20,20,20,20, function(on) { scene.setMode(GAME_MODE_PLAY); }); self.buttons.push(self.dismiss_button);
+    self.dismiss_button.draw = function(canv)
+    {
+      if(this.down) canv.context.strokeStyle = "#00F400";
+      else          canv.context.strokeStyle = "#000000";
+
+      canv.context.fillStyle = "#00F400";
+
+      canv.context.fillRect(this.off_x,this.off_y,this.w,this.h);
+      canv.context.strokeRect(this.off_x+0.5,this.off_y+0.5,this.w,this.h);
+    }
+
+    var bs = 70;
+    //self.s_play   = new ButtonBox(20+((bs+10)*0),20+((bs+10)*0),bs,bs, function(on) { /* the one level that's always unlocked */ scene.requestLevel(s_play_lvl); });  self.s_play.req_lvl   = -1;                self.s_play.title_a = "single wave";   self.s_play.title_b = "playground"; self.buttons.push(self.s_play);
+    //self.s_levels = new ButtonBox(20+((bs+10)*1),20+((bs+10)*0),bs,bs, function(on) { if(levels[self.s_levels.req_lvl].complete) scene.requestLevel(s_levels_lvl);}); self.s_levels.req_lvl = s_play_lvl;        self.s_levels.title_a = "single wave"; self.s_levels.title_b = "levels";   self.buttons.push(self.s_levels);
+    //self.s_random = new ButtonBox(20+((bs+10)*2),20+((bs+10)*0),bs,bs, function(on) { if(levels[self.s_random.req_lvl].complete) scene.requestLevel(s_random_lvl);}); self.s_random.req_lvl = s_levels_last_lvl; self.s_random.title_a = "single wave"; self.s_random.title_b = "random";   self.buttons.push(self.s_random);
+
+    //quick hack to fix clicker even though on separate canv
+    var draw = function(canv)
+    {
+      if(this.down) canv.context.strokeStyle = "#00F400";
+      else          canv.context.strokeStyle = "#000000";
+
+      if(this.req_lvl < 0 || levels[this.req_lvl].complete)
+        canv.context.fillStyle = "#00F400";
+      else
+        canv.context.fillStyle = "#FF8800";
+
+      canv.context.fillRect(this.off_x,this.off_y,this.w,this.h);
+      canv.context.strokeRect(this.off_x+0.5,this.off_y+0.5,this.w,this.h);
+      canv.context.fillStyle = "#000000";
+      canv.context.fillText(this.title_a,this.off_x+10,this.off_y+20);
+      canv.context.fillText(this.title_b,this.off_x+10,this.off_y+50);
+    }
+    for(var i = 0; i < self.buttons.length; i++)
+    {
+      var b = self.buttons[i];
+
+      b.off_x = b.x;
+      b.off_y = b.y;
+      b.x = b.off_x+self.x;
+      b.y = b.off_y+self.y;
+
+      if(i != 0) //for dismiss button, I know, hack
+        b.draw = draw;
+    }
+
+    self.draw = function(canv)
+    {
+      if(self.isDirty())
+      {
+        self.canv.clear();
+
+        self.canv.context.fillStyle = "#000000";
+        self.canv.context.fillRect(0,0,self.w,self.h);
+        self.canv.context.fillStyle = "#FFFFFF";
+        self.canv.context.fillRect(10,10,self.w-20,self.h-10);
+
+        self.canv.strokeStyle = "#000000";
+
+        for(var i = 0; i < self.buttons.length; i++)
+          self.buttons[i].draw(self.canv);
+      }
+
+      if(self.y < canv.canvas.height) //if on screen
+        canv.context.drawImage(self.canv.canvas, 0, 0, self.w, self.h, self.x, self.y, self.w, self.h);
+    }
+
+    self.tick = function()
+    {
+      if(self.desired_y != self.y)
+      {
+        if(Math.abs(self.desired_y-self.y) < 1) self.y = self.desired_y;
+        else self.y = lerp(self.y, self.desired_y, 0.2);
+
+        for(var i = 0; i < self.buttons.length; i++)
+        {
+          var b = self.buttons[i];
+          b.x = b.off_x+self.x;
+          b.y = b.off_y+self.y;
+        }
+      }
+    }
+
+    self.register = function(clicker)
+    {
+      for(var i = 0; i < self.buttons.length; i++)
+        clicker.register(self.buttons[i]);
+    }
+
+    self.dirty   = function() { self._dirty = true; }
+    self.cleanse = function()
+    {
+      self._dirty = false;
+    }
+    self.isDirty = function() { return self._dirty; }
+  }
+
+  var Blurb = function(scene)
+  {
+    var self = this;
+    self.x = 0;
+    self.y = 0;
+    self.w = 0;
+    self.h = 0;
+    self.txt = "";
+    self.lines;
+    self.txt_x = 0;
+    self.txt_y = 0;
+    self.txt_w = 0;
+    self.txt_h = 0;
+    self.img = "";
+    self.img_x = 0;
+    self.img_y = 0;
+    self.img_w = 0;
+    self.img_h = 0;
+    self.img_el;
+
+    self.format = function(canv)
+    {
+      self.lines = [];
+      var found = 0;
+      var searched = 0;
+      var tentative_search = 0;
+
+      //stage.drawCanv.context.font=whaaaat;
+      while(found < self.txt.length)
+      {
+        searched = self.txt.indexOf(" ",found);
+        if(searched == -1) searched = self.txt.length;
+        tentative_search = self.txt.indexOf(" ",searched+1);
+        if(tentative_search == -1) tentative_search = self.txt.length;
+        while(canv.context.measureText(self.txt.substring(found,tentative_search)).width < self.txt_w && searched != self.txt.length)
+        {
+          searched = tentative_search;
+          tentative_search = self.txt.indexOf(" ",searched+1);
+          if(tentative_search == -1) tentative_search = self.txt.length;
+        }
+        if(self.txt.substring(searched, searched+1) == " ") searched++;
+        self.lines.push(self.txt.substring(found,searched));
+        found = searched;
+      }
+
+      if(self.img && self.img.length)
+      {
+        self.img_el = new Image();
+        self.img_el.src = "assets/"+self.img+".png";
+      }
+      else
+        self.img_el = undefined;
+    }
+
+    self.draw = function(canv)
+    {
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.fillRect(self.x,self.y,self.w,self.h);
+      canv.context.strokeStyle = "#000000";
+      canv.context.strokeRect(self.x,self.y,self.w,self.h);
+
+      canv.context.fillStyle = "#000000";
+      for(var i = 0; i < self.lines.length; i++)
+      {
+        canv.context.fillText(self.lines[i],self.txt_x,self.txt_y+(i*15),self.txt_w);
+      }
+
+      if(self.img_el)
+      {
+        canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
+      }
+
+      canv.context.fillText("(click to dismiss)",self.x+10,self.y+self.h-10,self.w);
+    }
+
+    self.click = function(evt)
+    {
+      scene.setMode(GAME_MODE_PLAY);
     }
   }
 
@@ -372,6 +581,7 @@ var GamePlayScene = function(game, stage)
     self.complete = false;
   }
 
+  self.game_mode;
   self.cur_level;
   self.levels;
 
@@ -390,19 +600,25 @@ var GamePlayScene = function(game, stage)
   self.p_store_h;
   self.p_store_l;
 
-  self.presser;
-  self.hoverer;
-  self.dragger;
-
+  self.menu_clicker;
+  self.play_presser;
+  self.play_hoverer;
+  self.play_dragger;
+  self.blurb_clicker;
 
   self.ready = function()
   {
-    self.presser = new Presser({source:stage.dispCanv.canvas});
-    self.hoverer = new Hoverer({source:stage.dispCanv.canvas});
-    self.dragger = new Dragger({source:stage.dispCanv.canvas});
+    self.menu_clicker = new Clicker({source:stage.dispCanv.canvas});
+    self.play_presser = new Presser({source:stage.dispCanv.canvas});
+    self.play_hoverer = new Hoverer({source:stage.dispCanv.canvas});
+    self.play_dragger = new Dragger({source:stage.dispCanv.canvas});
+    self.blurb_clicker = new Clicker({source:stage.dispCanv.canvas});
 
     self.cur_level = 0;
     self.levels = [];
+
+    self.clip = new ClipBoard(20,20,stage.drawCanv.canvas.width-40,stage.drawCanv.canvas.height-20,self,self.levels);
+    self.clip.register(self.menu_clicker);
 
     self.pmap = new HeightMap(20,20);
     self.vfield = new VecField2d(30,30);
@@ -411,8 +627,8 @@ var GamePlayScene = function(game, stage)
 
     if(paint)
     {
-      self.brush = new Brush(stage.dispCanv.canvas.width,stage.dispCanv.canvas.height,self);
-      self.dragger.register(self.brush);
+      self.brush = new Brush(stage.drawCanv.canvas.width,stage.drawCanv.canvas.height,self);
+      self.play_dragger.register(self.brush);
     }
     if(sys)
     {
@@ -421,8 +637,8 @@ var GamePlayScene = function(game, stage)
       self.psys.push(new PSys(0.4,0.5,0.1, 0.1,self));
       for(var i = 0; i < self.psys.length; i++)
       {
-        self.hoverer.register(self.psys[i]);
-        self.dragger.register(self.psys[i]);
+        self.play_hoverer.register(self.psys[i]);
+        self.play_dragger.register(self.psys[i]);
       }
     }
 
@@ -430,13 +646,13 @@ var GamePlayScene = function(game, stage)
     {
       self.p_type_toggle_h = new ToggleBox(10,10,20,20, false, function(o) { self.p_type = !o; self.p_type_toggle_l.on =  self.p_type; });
       self.p_type_toggle_l = new ToggleBox(40,10,20,20,  true, function(o) { self.p_type =  o; self.p_type_toggle_h.on = !self.p_type; });
-      self.presser.register(self.p_type_toggle_h)
-      self.presser.register(self.p_type_toggle_l)
+      self.play_presser.register(self.p_type_toggle_h)
+      self.play_presser.register(self.p_type_toggle_l)
     }
     if(sys)
     {
       function fdstart(evt) {  };
-      function fdrag(evt) { self.dragging_sys.drag(evt); };
+      function fdrag(evt) { if(self.dragging_sys) self.dragging_sys.drag(evt); };
       function fdfinish() { if(self.dragging_sys) self.dragging_sys.dragFinish(); };
 
       self.p_store_h = new BinBox(10,10,20,20, fdstart, fdrag, fdfinish,
@@ -444,15 +660,15 @@ var GamePlayScene = function(game, stage)
         {
           var p = new PSys(0.,0.,0.1,0.1,self);
           self.psys.push(p);
-          self.hoverer.register(p);
-          self.dragger.register(p);
+          self.play_hoverer.register(p);
+          self.play_dragger.register(p);
           p.dragStart(evt);
         },
         function()
         {
           var p = self.dragging_sys;
-          self.hoverer.unregister(p);
-          self.dragger.unregister(p);
+          self.play_hoverer.unregister(p);
+          self.play_dragger.unregister(p);
           for(var i = 0; i < self.psys.length; i++)
             if(self.psys[i] == p) self.psys.splice(i,1);
           self.dragging_sys = undefined;
@@ -462,23 +678,23 @@ var GamePlayScene = function(game, stage)
         {
           var p = new PSys(0.,0.,0.1,-0.1,self);
           self.psys.push(p);
-          self.hoverer.register(p);
-          self.dragger.register(p);
+          self.play_hoverer.register(p);
+          self.play_dragger.register(p);
           p.dragStart(evt);
         },
         function()
         {
           var p = self.dragging_sys;
-          self.hoverer.unregister(p);
-          self.dragger.unregister(p);
+          self.play_hoverer.unregister(p);
+          self.play_dragger.unregister(p);
           for(var i = 0; i < self.psys.length; i++)
             if(self.psys[i] == p) self.psys.splice(i,1);
           self.dragging_sys = undefined;
         })
-      self.presser.register(self.p_store_h);
-      self.presser.register(self.p_store_l);
-      self.dragger.register(self.p_store_h);
-      self.dragger.register(self.p_store_l);
+      self.play_presser.register(self.p_store_h);
+      self.play_presser.register(self.p_store_l);
+      self.play_dragger.register(self.p_store_h);
+      self.play_dragger.register(self.p_store_l);
     }
 
 
@@ -497,7 +713,23 @@ var GamePlayScene = function(game, stage)
     self.levels.push(l);
 
     self.beginLevel(0);
+    self.setMode(GAME_MODE_MENU);
   };
+
+  self.setMode = function(mode)
+  {
+    self.menu_clicker.ignore();
+    self.play_presser.ignore();
+    self.play_hoverer.ignore();
+    self.play_dragger.ignore();
+    self.blurb_clicker.ignore();
+
+    self.game_mode = mode;
+
+    self.clip.dirty();
+    if(self.game_mode == GAME_MODE_MENU) self.clip.desired_y = 20;
+    if(self.game_mode == GAME_MODE_PLAY) self.clip.desired_y = 500;
+  }
 
   self.beginLevel = function(l)
   {
@@ -536,9 +768,22 @@ var GamePlayScene = function(game, stage)
   self.ticks = 0;
   self.tick = function()
   {
-    self.presser.flush();
-    self.hoverer.flush();
-    self.dragger.flush();
+    if(self.game_mode == GAME_MODE_MENU)
+    {
+      self.menu_clicker.flush();
+    }
+    else if(self.game_mode == GAME_MODE_PLAY)
+    {
+      self.play_presser.flush();
+      self.play_hoverer.flush();
+      self.play_dragger.flush();
+    }
+    else if(self.game_mode == GAME_MODE_BLURB)
+    {
+      self.blurb_clicker.flush();
+    }
+
+    self.clip.tick();
 
     /*
     // pressure
@@ -818,6 +1063,10 @@ var GamePlayScene = function(game, stage)
       self.p_store_h.draw(canv);
       self.p_store_l.draw(canv);
     }
+
+    self.clip.draw(canv);
+
+    self.clip.cleanse();
   };
 
   self.cleanup = function()
