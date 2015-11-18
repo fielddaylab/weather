@@ -358,9 +358,36 @@ var GamePlayScene = function(game, stage)
     }
 
     var bs = 70;
-    //self.s_play   = new ButtonBox(20+((bs+10)*0),20+((bs+10)*0),bs,bs, function(on) { /* the one level that's always unlocked */ scene.requestLevel(s_play_lvl); });  self.s_play.req_lvl   = -1;                self.s_play.title_a = "single wave";   self.s_play.title_b = "playground"; self.buttons.push(self.s_play);
-    //self.s_levels = new ButtonBox(20+((bs+10)*1),20+((bs+10)*0),bs,bs, function(on) { if(levels[self.s_levels.req_lvl].complete) scene.requestLevel(s_levels_lvl);}); self.s_levels.req_lvl = s_play_lvl;        self.s_levels.title_a = "single wave"; self.s_levels.title_b = "levels";   self.buttons.push(self.s_levels);
-    //self.s_random = new ButtonBox(20+((bs+10)*2),20+((bs+10)*0),bs,bs, function(on) { if(levels[self.s_random.req_lvl].complete) scene.requestLevel(s_random_lvl);}); self.s_random.req_lvl = s_levels_last_lvl; self.s_random.title_a = "single wave"; self.s_random.title_b = "random";   self.buttons.push(self.s_random);
+    var b;
+    //must manually unroll because js is terrible
+      b = new ButtonBox(20+((bs+10)*0),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[1].level == 0 || levels[self.buttons[1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 0;
+      b.title_a = "test1";
+      b.title_b = "test 2";
+      self.buttons.push(b);
+
+      b = new ButtonBox(20+((bs+10)*1),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[2].level == 0 || levels[self.buttons[2].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[2].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 1;
+      b.title_a = "test1";
+      b.title_b = "test 2";
+      self.buttons.push(b);
+
 
     //quick hack to fix clicker even though on separate canv
     var draw = function(canv)
@@ -368,7 +395,7 @@ var GamePlayScene = function(game, stage)
       if(this.down) canv.context.strokeStyle = "#00F400";
       else          canv.context.strokeStyle = "#000000";
 
-      if(this.req_lvl < 0 || levels[this.req_lvl].complete)
+      if(this.level == 0 || levels[this.level-1].complete)
         canv.context.fillStyle = "#00F400";
       else
         canv.context.fillStyle = "#FF8800";
