@@ -72,9 +72,9 @@ var GamePlayScene = function(game, stage)
       x = sampleToIndexW(x,self.w);
       y = sampleToIndexW(y,self.h);
       var low_x  = Math.floor(x);
-      var high_x = Math.ceil (x);
+      var high_x = Math.ceil (x)%self.w;
       var low_y  = Math.floor(y);
-      var high_y = Math.ceil (y);
+      var high_y = Math.ceil (y)%self.h;
 
       var tl = self.data[self.iFor( low_x, low_y)];
       var tr = self.data[self.iFor(high_x, low_y)];
@@ -621,6 +621,9 @@ var GamePlayScene = function(game, stage)
   self.psys;
   self.dragging_sys;
 
+  self.clip;
+  self.menu_button;
+
   self.p_type = P_TYPE_LOW;
   self.p_type_toggle_h;
   self.p_type_toggle_l;
@@ -629,6 +632,7 @@ var GamePlayScene = function(game, stage)
   self.p_store_l;
 
   self.menu_clicker;
+  self.play_clicker;
   self.play_presser;
   self.play_hoverer;
   self.play_dragger;
@@ -637,6 +641,7 @@ var GamePlayScene = function(game, stage)
   self.ready = function()
   {
     self.menu_clicker = new Clicker({source:stage.dispCanv.canvas});
+    self.play_clicker = new Clicker({source:stage.dispCanv.canvas});
     self.play_presser = new Presser({source:stage.dispCanv.canvas});
     self.play_hoverer = new Hoverer({source:stage.dispCanv.canvas});
     self.play_dragger = new Dragger({source:stage.dispCanv.canvas});
@@ -648,9 +653,12 @@ var GamePlayScene = function(game, stage)
     self.clip = new ClipBoard(20,20,stage.drawCanv.canvas.width-40,stage.drawCanv.canvas.height-20,self,self.levels);
     self.clip.register(self.menu_clicker);
 
+    self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-10-20,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
+    self.play_clicker.register(self.menu_button);
+
     self.pmap = new HeightMap(20,20);
-    self.vfield = new VecField2d(30,30);
-    self.afield = new AirField(5000);
+    self.vfield = new VecField2d(20,20);
+    self.afield = new AirField(1000);
     self.balloon = new Balloon();
 
     if(paint)
@@ -747,6 +755,7 @@ var GamePlayScene = function(game, stage)
   self.setMode = function(mode)
   {
     self.menu_clicker.ignore();
+    self.play_clicker.ignore();
     self.play_presser.ignore();
     self.play_hoverer.ignore();
     self.play_dragger.ignore();
@@ -802,6 +811,7 @@ var GamePlayScene = function(game, stage)
     }
     else if(self.game_mode == GAME_MODE_PLAY)
     {
+      self.play_clicker.flush();
       self.play_presser.flush();
       self.play_hoverer.flush();
       self.play_dragger.flush();
@@ -926,6 +936,10 @@ var GamePlayScene = function(game, stage)
       y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
       self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
       self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
+      while(self.balloon.x > 1) self.balloon.x -= 1;
+      while(self.balloon.x < 0) self.balloon.x += 1;
+      while(self.balloon.y > 1) self.balloon.y -= 1;
+      while(self.balloon.y < 0) self.balloon.y += 1;
       //checkpoints
       var c;
       for(var i = 0; i < l.checkpoints.length; i++)
@@ -1091,6 +1105,8 @@ var GamePlayScene = function(game, stage)
       self.p_store_h.draw(canv);
       self.p_store_l.draw(canv);
     }
+
+    self.menu_button.draw(canv);
 
     self.clip.draw(canv);
 
