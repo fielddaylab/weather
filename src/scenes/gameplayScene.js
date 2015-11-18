@@ -4,6 +4,9 @@ var sys = !paint;
 var anneal = true;
 var airdeath = true;
 
+var vec_length = 10;
+var flag_length = 10;
+
 var ENUM;
 
 ENUM = 0;
@@ -781,18 +784,24 @@ var GamePlayScene = function(game, stage)
 
     l = new Level();
     l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.5,0.5,-0.1,0.0));
+    l.flags.push(new Flag(0.5,0.5,-2.0,0.0));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.5,0.5,0.1,0.1));
+    l.flags.push(new Flag(0.5,0.5,2.0,2.0));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.4,0.5,0.0,0.1));
-    l.flags.push(new Flag(0.6,0.5,0.0,-0.1));
+    l.flags.push(new Flag(0.4,0.5,0.0,2.0));
+    l.flags.push(new Flag(0.6,0.5,0.0,-2.0));
+    self.levels.push(l);
+
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.5,0.4,2.0,0.0));
+    l.flags.push(new Flag(0.5,0.6,-2.0,0.0));
     self.levels.push(l);
 
     l = new Level();
@@ -846,8 +855,8 @@ var GamePlayScene = function(game, stage)
         f = l.flags[i];
         f.cache_x = f.x*stage.drawCanv.canvas.width;
         f.cache_y = f.y*stage.drawCanv.canvas.height;
-        f.goal_cache_xd = f.goal_xd*stage.drawCanv.canvas.width+f.cache_x;
-        f.goal_cache_yd = f.goal_yd*stage.drawCanv.canvas.height+f.cache_y;
+        f.goal_cache_xd = f.cache_x+f.goal_xd*flag_length;
+        f.goal_cache_yd = f.cache_y+f.goal_yd*flag_length;
 
         f.goal_cache_l = Math.sqrt(f.goal_xd*f.goal_xd+f.goal_yd*f.goal_yd);
         f.goal_cache_t = Math.atan2(f.goal_yd/f.goal_cache_l,f.goal_xd/f.goal_cache_l);
@@ -1016,11 +1025,11 @@ var GamePlayScene = function(game, stage)
       {
         f = l.flags[i];
         self.vfield.sampleFill(f.x,f.y,cart);
-        f.xd = cart.x/10;
-        f.yd = cart.y/10;
+        f.xd = cart.x;
+        f.yd = cart.y;
         self.vfield.samplePolarFill(f.x,f.y,polar);
         var t_diff = Math.abs(f.goal_cache_t-polar.dir);
-        if(f.goal_cache_l < polar.len && t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance) f.met = true;
+        if(f.goal_cache_l < polar.len && (t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance)) f.met = true;
         else f.met = false;
         all_met = all_met && f.met;
       }
@@ -1079,7 +1088,7 @@ var GamePlayScene = function(game, stage)
         x = x_space*j+(x_space/2);
         index = self.vfield.iFor(j,i);
         canv.context.fillRect(x-1,y-1,2,2);
-        canv.drawLine(x,y,x+self.vfield.x_map.data[index]*10,y+self.vfield.y_map.data[index]*10);
+        canv.drawLine(x,y,x+self.vfield.x_map.data[index]*vec_length,y+self.vfield.y_map.data[index]*vec_length);
       }
     }
 
@@ -1139,13 +1148,11 @@ var GamePlayScene = function(game, stage)
       for(var i = 0; i < l.flags.length; i++)
       {
         f = l.flags[i];
-        if(f.met)
-        canv.context.strokeStyle = "#00FF00";
-        else
-        canv.context.strokeStyle = "#FF0000";
+        if(f.met) canv.context.strokeStyle = "#00FF00";
+        else canv.context.strokeStyle = "#FF0000";
         canv.context.beginPath();
         canv.context.moveTo(f.cache_x,f.cache_y);
-        canv.context.lineTo(f.cache_x+(f.xd*canv.canvas.width),f.cache_y+(f.yd*canv.canvas.height));
+        canv.context.lineTo(f.cache_x+(f.xd*flag_length),f.cache_y+(f.yd*flag_length));
         canv.context.stroke();
       }
     }
