@@ -14,8 +14,13 @@ var P_TYPE_HIGH = ENUM; ENUM++;
 var P_TYPE_LOW  = ENUM; ENUM++;
 
 ENUM = 0;
-var L_TYPE_BALLOON = ENUM; ENUM++;
-var L_TYPE_FLAG    = ENUM; ENUM++;
+var L_TYPE_NONE       = ENUM; ENUM++;
+var L_TYPE_FLAG       = ENUM; ENUM++;
+var L_TYPE_BALLOON    = ENUM; ENUM++;
+
+ENUM = 0;
+var PP_MODE_PLAY  = ENUM; ENUM++;
+var PP_MODE_PAUSE = ENUM; ENUM++;
 
 ENUM = 0;
 var GAME_MODE_MENU  = ENUM; ENUM++;
@@ -655,6 +660,7 @@ var GamePlayScene = function(game, stage)
   }
 
   self.game_mode;
+  self.pp_mode;
   self.cur_level;
   self.levels;
 
@@ -668,6 +674,7 @@ var GamePlayScene = function(game, stage)
 
   self.clip;
   self.menu_button;
+  self.pp_button;
 
   self.p_type = P_TYPE_LOW;
   self.p_type_toggle_h;
@@ -700,6 +707,9 @@ var GamePlayScene = function(game, stage)
 
     self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-10-20,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
+
+    self.pp_button = new ButtonBox(stage.drawCanv.canvas.width/2-10,10,20,20, function(on) { self.pp_mode = !self.pp_mode; });
+    self.play_clicker.register(self.pp_button);
 
     self.pmap = new HeightMap(20,20);
     self.vfield = new VecField2d(30,30);
@@ -783,6 +793,11 @@ var GamePlayScene = function(game, stage)
     var l;
 
     l = new Level();
+    l.type = L_TYPE_NONE;
+    l.flags.push(new Flag(0.5,0.5,-2.0,0.0));
+    self.levels.push(l);
+
+    l = new Level();
     l.type = L_TYPE_FLAG;
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0));
     self.levels.push(l);
@@ -810,7 +825,9 @@ var GamePlayScene = function(game, stage)
     l.checkpoints.push(new Checkpoint(0.5,0.5,0.1,0.1));
     self.levels.push(l);
 
+    self.pp_mode = true;
     self.beginLevel(0);
+    self.levels[self.cur_level].complete = true;
     self.setMode(GAME_MODE_MENU);
   };
 
@@ -835,18 +852,6 @@ var GamePlayScene = function(game, stage)
     self.cur_level = l;
     var l = self.levels[self.cur_level];
 
-    if(l.type == L_TYPE_BALLOON)
-    {
-      var c;
-      for(var i = 0; i < l.checkpoints.length; i++)
-      {
-        c = l.checkpoints[i];
-        c.cache_w = c.w*stage.drawCanv.canvas.width;
-        c.cache_h = c.h*stage.drawCanv.canvas.height;
-        c.cache_x = c.x*stage.drawCanv.canvas.width;
-        c.cache_y = c.y*stage.drawCanv.canvas.height;
-      }
-    }
     if(l.type == L_TYPE_FLAG)
     {
       var f;
@@ -861,6 +866,20 @@ var GamePlayScene = function(game, stage)
         f.goal_cache_l = Math.sqrt(f.goal_xd*f.goal_xd+f.goal_yd*f.goal_yd);
         f.goal_cache_t = Math.atan2(f.goal_yd/f.goal_cache_l,f.goal_xd/f.goal_cache_l);
       }
+    }
+    if(l.type == L_TYPE_BALLOON)
+    {
+      var c;
+      for(var i = 0; i < l.checkpoints.length; i++)
+      {
+        c = l.checkpoints[i];
+        c.cache_w = c.w*stage.drawCanv.canvas.width;
+        c.cache_h = c.h*stage.drawCanv.canvas.height;
+        c.cache_x = c.x*stage.drawCanv.canvas.width;
+        c.cache_y = c.y*stage.drawCanv.canvas.height;
+      }
+      self.balloon.x = l.start.x;
+      self.balloon.y = l.start.y;
     }
   }
 
@@ -888,7 +907,7 @@ var GamePlayScene = function(game, stage)
     /*
     // pressure
     */
-    if(anneal)
+    if(anneal && self.pp_mode)
     {
       self.pmap.anneal(0.10);
     }
@@ -967,73 +986,79 @@ var GamePlayScene = function(game, stage)
     */
     var x;
     var y;
-    for(var i = 0; i < self.afield.n; i++)
+    if(self.pp_mode)
     {
-      self.afield.partts[i] -= 0.01;
-      if(airdeath && self.afield.partts[i] <= 0)
+      for(var i = 0; i < self.afield.n; i++)
       {
-        self.afield.partts[i] = 1;
-        self.afield.partxs[i] = Math.random();
-        self.afield.partys[i] = Math.random();
-      }
-      else
-      {
-        x = self.vfield.x_map.sample(self.afield.partxs[i],self.afield.partys[i]);
-        y = self.vfield.y_map.sample(self.afield.partxs[i],self.afield.partys[i]);
-        self.afield.partxs[i] += x/100 + ((Math.random()-0.5)/200);
-        self.afield.partys[i] += y/100 + ((Math.random()-0.5)/200);
-        if(self.afield.partxs[i] < 0 || self.afield.partxs[i] > 1) self.afield.partts[i] = 0;
-        if(self.afield.partys[i] < 0 || self.afield.partys[i] > 1) self.afield.partts[i] = 0;
+        self.afield.partts[i] -= 0.01;
+        if(airdeath && self.afield.partts[i] <= 0)
+        {
+          self.afield.partts[i] = 1;
+          self.afield.partxs[i] = Math.random();
+          self.afield.partys[i] = Math.random();
+        }
+        else
+        {
+          x = self.vfield.x_map.sample(self.afield.partxs[i],self.afield.partys[i]);
+          y = self.vfield.y_map.sample(self.afield.partxs[i],self.afield.partys[i]);
+          self.afield.partxs[i] += x/100 + ((Math.random()-0.5)/200);
+          self.afield.partys[i] += y/100 + ((Math.random()-0.5)/200);
+          if(self.afield.partxs[i] < 0 || self.afield.partxs[i] > 1) self.afield.partts[i] = 0;
+          if(self.afield.partys[i] < 0 || self.afield.partys[i] > 1) self.afield.partts[i] = 0;
+        }
       }
     }
 
     /*
     // game objs
     */
-    var l = self.levels[self.cur_level];
-    if(l.type == L_TYPE_BALLOON)
+    if(self.pp_mode)
     {
-      //balloon
-      x = self.vfield.x_map.sample(self.balloon.x,self.balloon.y);
-      y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
-      self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
-      self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
-      while(self.balloon.x > 1) self.balloon.x -= 1;
-      while(self.balloon.x < 0) self.balloon.x += 1;
-      while(self.balloon.y > 1) self.balloon.y -= 1;
-      while(self.balloon.y < 0) self.balloon.y += 1;
-      //checkpoints
-      var c;
-      var all_met = true;
-      for(var i = 0; i < l.checkpoints.length; i++)
+      var l = self.levels[self.cur_level];
+      if(l.type == L_TYPE_FLAG)
       {
-        c = l.checkpoints[i];
-        if(objIntersectsObj(self.balloon,c)) c.met = true;
-        all_met = all_met && c.met;
+        //flags
+        var cart = {x:0,y:0};
+        var polar = {dir:0,len:0};
+        var f;
+        var all_met = true;
+        var t_tolerance = 0.2;
+        for(var i = 0; i < l.flags.length; i++)
+        {
+          f = l.flags[i];
+          self.vfield.sampleFill(f.x,f.y,cart);
+          f.xd = cart.x;
+          f.yd = cart.y;
+          self.vfield.samplePolarFill(f.x,f.y,polar);
+          var t_diff = Math.abs(f.goal_cache_t-polar.dir);
+          if(f.goal_cache_l < polar.len && (t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance)) f.met = true;
+          else f.met = false;
+          all_met = all_met && f.met;
+        }
+        if(all_met) l.complete = true;
       }
-      if(all_met) l.complete = true;
-    }
-    if(l.type == L_TYPE_FLAG)
-    {
-      //flags
-      var cart = {x:0,y:0};
-      var polar = {dir:0,len:0};
-      var f;
-      var all_met = true;
-      var t_tolerance = 0.2;
-      for(var i = 0; i < l.flags.length; i++)
+      if(l.type == L_TYPE_BALLOON)
       {
-        f = l.flags[i];
-        self.vfield.sampleFill(f.x,f.y,cart);
-        f.xd = cart.x;
-        f.yd = cart.y;
-        self.vfield.samplePolarFill(f.x,f.y,polar);
-        var t_diff = Math.abs(f.goal_cache_t-polar.dir);
-        if(f.goal_cache_l < polar.len && (t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance)) f.met = true;
-        else f.met = false;
-        all_met = all_met && f.met;
+        //balloon
+        x = self.vfield.x_map.sample(self.balloon.x,self.balloon.y);
+        y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
+        self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
+        self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
+        while(self.balloon.x > 1) self.balloon.x -= 1;
+        while(self.balloon.x < 0) self.balloon.x += 1;
+        while(self.balloon.y > 1) self.balloon.y -= 1;
+        while(self.balloon.y < 0) self.balloon.y += 1;
+        //checkpoints
+        var c;
+        var all_met = true;
+        for(var i = 0; i < l.checkpoints.length; i++)
+        {
+          c = l.checkpoints[i];
+          if(objIntersectsObj(self.balloon,c)) c.met = true;
+          all_met = all_met && c.met;
+        }
+        if(all_met) l.complete = true;
       }
-      if(all_met) l.complete = true;
     }
 
     self.ticks++;
@@ -1112,23 +1137,6 @@ var GamePlayScene = function(game, stage)
     // game objs
     */
     var l = self.levels[self.cur_level];
-    if(l.type == L_TYPE_BALLOON)
-    {
-      //checkpoints
-      var c;
-      for(var i = 0; i < l.checkpoints.length; i++)
-      {
-        c = l.checkpoints[i];
-        if(c.met)
-        canv.context.fillStyle = "#00FF00";
-        else
-        canv.context.fillStyle = "#FF0000";
-        canv.context.fillRect(c.cache_x,c.cache_y,c.cache_w,c.cache_h);
-      }
-      //balloon
-      canv.context.fillStyle = "#FF0000";
-      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
-    }
     if(l.type == L_TYPE_FLAG)
     {
       //flags
@@ -1156,6 +1164,23 @@ var GamePlayScene = function(game, stage)
         canv.context.stroke();
       }
     }
+    if(l.type == L_TYPE_BALLOON)
+    {
+      //checkpoints
+      var c;
+      for(var i = 0; i < l.checkpoints.length; i++)
+      {
+        c = l.checkpoints[i];
+        if(c.met)
+        canv.context.fillStyle = "#00FF00";
+        else
+        canv.context.fillStyle = "#FF0000";
+        canv.context.fillRect(c.cache_x,c.cache_y,c.cache_w,c.cache_h);
+      }
+      //balloon
+      canv.context.fillStyle = "#FF0000";
+      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
+    }
 
     /*
     // UI
@@ -1171,6 +1196,7 @@ var GamePlayScene = function(game, stage)
       self.p_store_l.draw(canv);
     }
 
+    self.pp_button.draw(canv);
     self.menu_button.draw(canv);
 
     self.clip.draw(canv);
