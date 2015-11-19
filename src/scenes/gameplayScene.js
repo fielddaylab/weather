@@ -379,8 +379,8 @@ var GamePlayScene = function(game, stage)
           }
         });
       b.level = 0;
-      b.title_a = "test1";
-      b.title_b = "test 2";
+      b.title_a = "Lvl 0";
+      b.title_b = "Playground";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*1),20+((bs+10)*0),bs,bs,
@@ -393,8 +393,8 @@ var GamePlayScene = function(game, stage)
           }
         });
       b.level = 1;
-      b.title_a = "test1";
-      b.title_b = "test 2";
+      b.title_a = "Lvl 1";
+      b.title_b = "Easy Flag";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*2),20+((bs+10)*0),bs,bs,
@@ -407,8 +407,8 @@ var GamePlayScene = function(game, stage)
           }
         });
       b.level = 2;
-      b.title_a = "test1";
-      b.title_b = "test 2";
+      b.title_a = "Lvl 2";
+      b.title_b = "Angled Flag";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*3),20+((bs+10)*0),bs,bs,
@@ -421,8 +421,8 @@ var GamePlayScene = function(game, stage)
           }
         });
       b.level = 3;
-      b.title_a = "test1";
-      b.title_b = "test 2";
+      b.title_a = "Lvl 3";
+      b.title_b = "Cyclone";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*4),20+((bs+10)*0),bs,bs,
@@ -435,8 +435,8 @@ var GamePlayScene = function(game, stage)
           }
         });
       b.level = 4;
-      b.title_a = "test1";
-      b.title_b = "test 2";
+      b.title_a = "Lvl 4";
+      b.title_b = "Anti Cyclone";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*5),20+((bs+10)*0),bs,bs,
@@ -449,8 +449,8 @@ var GamePlayScene = function(game, stage)
           }
         });
       b.level = 5;
-      b.title_a = "test1";
-      b.title_b = "test 2";
+      b.title_a = "Lvl 5";
+      b.title_b = "Balloon";
       self.buttons.push(b);
 
     //quick hack to fix clicker even though on separate canv
@@ -1253,15 +1253,27 @@ var GamePlayScene = function(game, stage)
     {
       self.p_type_toggle_h.draw(canv);
       self.p_type_toggle_l.draw(canv);
+      stage.drawCanv.context.font = "20px arial";
+      canv.outlineText("H",self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_h.h,"#FFFFFF","#000000");
+      canv.outlineText("L",self.p_type_toggle_l.x,self.p_type_toggle_l.y+self.p_type_toggle_l.h,"#000000","#FFFFFF");
+      stage.drawCanv.context.font = "15px arial";
+      canv.outlineText("Toggle Brush",self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_l.h*2,"#000000","#FFFFFF");
     }
     if(sys)
     {
       self.p_store_h.draw(canv);
       self.p_store_l.draw(canv);
+      stage.drawCanv.context.font = "20px arial";
+      canv.outlineText("H",self.p_store_h.x,self.p_store_h.y+self.p_store_h.h,"#FFFFFF","#000000");
+      canv.outlineText("L",self.p_store_l.x,self.p_store_l.y+self.p_store_l.h,"#000000","#FFFFFF");
+      stage.drawCanv.context.font = "15px arial";
+      canv.outlineText("Drag To Create/Destroy",self.p_store_h.x,self.p_store_h.y+self.p_store_h.h*2,"#000000","#FFFFFF");
     }
 
     self.pp_button.draw(canv);
+    canv.outlineText("Play/Pause",self.pp_button.x,self.pp_button.y+self.pp_button.h*2,"#000000","#FFFFFF");
     self.menu_button.draw(canv);
+    canv.outlineText("Menu",self.menu_button.x,self.menu_button.y+self.menu_button.h*2,"#000000","#FFFFFF");
 
     self.clip.draw(canv);
 
