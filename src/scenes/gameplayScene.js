@@ -1140,11 +1140,8 @@ var GamePlayScene = function(game, stage)
         if(all_met)
         {
           l.timer++;
-          if(l.timer > l.req_timer)
-          {
-            l.complete = true;
-            l.complete_this_round = true;
-          }
+          l.complete = true;
+          l.complete_this_round = true;
         }
         else l.timer = 0;
       }
@@ -1220,15 +1217,6 @@ var GamePlayScene = function(game, stage)
       canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
 
     /*
-    // pressure systems
-    */
-    if(sys)
-    {
-      for(var i = 0; i < self.psys.length; i++)
-        self.psys[i].draw(canv);
-    }
-
-    /*
     // game objs
     */
     var l = self.levels[self.cur_level];
@@ -1278,6 +1266,15 @@ var GamePlayScene = function(game, stage)
     }
 
     /*
+    // pressure systems
+    */
+    if(sys)
+    {
+      for(var i = 0; i < self.psys.length; i++)
+        self.psys[i].draw(canv);
+    }
+
+    /*
     // UI
     */
     canv.context.lineWidth = 0.5;
@@ -1309,7 +1306,7 @@ var GamePlayScene = function(game, stage)
     if(self.levels[self.cur_level].complete_this_round)
       canv.outlineText("Complete!",self.menu_button.x-100,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
     else if(self.levels[self.cur_level].timer > 0)
-      canv.outlineText("Time to Complete: "+(3-(Math.round((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30)/10)),self.menu_button.x-200,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
+      canv.outlineText("Time to Complete: "+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),self.menu_button.x-200,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
 
     self.clip.draw(canv);
 
