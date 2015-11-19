@@ -439,6 +439,19 @@ var GamePlayScene = function(game, stage)
       b.title_b = "test 2";
       self.buttons.push(b);
 
+      b = new ButtonBox(20+((bs+10)*5),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[5+1].level == 0 || levels[self.buttons[5+1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[5+1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 5;
+      b.title_a = "test1";
+      b.title_b = "test 2";
+      self.buttons.push(b);
 
     //quick hack to fix clicker even though on separate canv
     var draw = function(canv)
@@ -577,6 +590,7 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
+      stage.drawCanv.context.font = "16px arial";
       canv.context.fillStyle = "#FFFFFF";
       canv.context.fillRect(self.x,self.y,self.w,self.h);
       canv.context.strokeStyle = "#000000";
@@ -584,14 +598,10 @@ var GamePlayScene = function(game, stage)
 
       canv.context.fillStyle = "#000000";
       for(var i = 0; i < self.lines.length; i++)
-      {
         canv.context.fillText(self.lines[i],self.txt_x,self.txt_y+(i*15),self.txt_w);
-      }
 
       if(self.img_el)
-      {
         canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
-      }
 
       canv.context.fillText("(click to dismiss)",self.x+10,self.y+self.h-10,self.w);
     }
@@ -675,6 +685,7 @@ var GamePlayScene = function(game, stage)
   self.clip;
   self.menu_button;
   self.pp_button;
+  self.blurb;
 
   self.p_type = P_TYPE_LOW;
   self.p_type_toggle_h;
@@ -704,6 +715,8 @@ var GamePlayScene = function(game, stage)
 
     self.clip = new ClipBoard(20,20,stage.drawCanv.canvas.width-40,stage.drawCanv.canvas.height-20,self,self.levels);
     self.clip.register(self.menu_clicker);
+    self.blurb = new Blurb(self);
+    self.blurb_clicker.register(self.blurb);
 
     self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-10-20,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
@@ -829,6 +842,27 @@ var GamePlayScene = function(game, stage)
     self.beginLevel(0);
     self.levels[self.cur_level].complete = true;
     self.setMode(GAME_MODE_MENU);
+
+  /*
+    var b = new Blurb();
+    b.x = 10;
+    b.y = 10;
+    b.w = 300;
+    b.h = 300;
+    b.txt = "bananarama";
+    b.lines;
+    b.txt_x = 0;
+    b.txt_y = 0;
+    b.txt_w = 0;
+    b.txt_h = 0;
+    b.img = "";
+    b.img_x = 0;
+    b.img_y = 0;
+    b.img_w = 0;
+    b.img_h = 0;
+
+    setTimeout(function(){ self.popBlurb(b); },1000);
+  */
   };
 
   self.setMode = function(mode)
@@ -881,6 +915,36 @@ var GamePlayScene = function(game, stage)
       self.balloon.x = l.start.x;
       self.balloon.y = l.start.y;
     }
+  }
+
+  self.popBlurb = function(blurb)
+  {
+    self.blurb.x = blurb.x;
+    self.blurb.y = blurb.y;
+    self.blurb.w = blurb.w;
+    self.blurb.h = blurb.h;
+    self.blurb.txt = blurb.txt;
+    if(blurb.txt_x || blurb.txt_y || blurb.txt_w || blurb.txt_h) //if any properties set on blurb text pos
+    {
+      self.blurb.txt_x = blurb.txt_x;
+      self.blurb.txt_y = blurb.txt_y;
+      self.blurb.txt_w = blurb.txt_w;
+      self.blurb.txt_h = blurb.txt_h;
+    }
+    else //otherwise assume full text area
+    {
+      self.blurb.txt_x = blurb.x+10;
+      self.blurb.txt_y = blurb.y+15;
+      self.blurb.txt_w = blurb.w-10;
+      self.blurb.txt_h = blurb.h-30;
+    }
+    self.blurb.img = blurb.img;
+    self.blurb.img_x = blurb.img_x;
+    self.blurb.img_y = blurb.img_y;
+    self.blurb.img_w = blurb.img_w;
+    self.blurb.img_h = blurb.img_h;
+    self.blurb.format(stage.drawCanv);
+    self.setMode(GAME_MODE_BLURB);
   }
 
   self.ticks = 0;
@@ -1200,6 +1264,9 @@ var GamePlayScene = function(game, stage)
     self.menu_button.draw(canv);
 
     self.clip.draw(canv);
+
+    if(self.game_mode == GAME_MODE_BLURB)
+      self.blurb.draw(canv);
 
     self.clip.cleanse();
   };
