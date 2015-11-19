@@ -1065,8 +1065,8 @@ var GamePlayScene = function(game, stage)
         {
           x = self.vfield.x_map.sample(self.afield.partxs[i],self.afield.partys[i]);
           y = self.vfield.y_map.sample(self.afield.partxs[i],self.afield.partys[i]);
-          self.afield.partxs[i] += x/100 + ((Math.random()-0.5)/200);
-          self.afield.partys[i] += y/100 + ((Math.random()-0.5)/200);
+          self.afield.partxs[i] += x/100;// + ((Math.random()-0.5)/200);
+          self.afield.partys[i] += y/100;// + ((Math.random()-0.5)/200);
           if(self.afield.partxs[i] < 0 || self.afield.partxs[i] > 1) self.afield.partts[i] = 0;
           if(self.afield.partys[i] < 0 || self.afield.partys[i] > 1) self.afield.partts[i] = 0;
         }
