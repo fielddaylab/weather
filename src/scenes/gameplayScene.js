@@ -1,4 +1,4 @@
-var default_complete = true;
+var default_complete = false;
 var paint = false;
 var sys = !paint;
 var anneal = true;
@@ -666,7 +666,10 @@ var GamePlayScene = function(game, stage)
     //L_TYPE_FLAG
     self.flags = [];
 
+    self.timer = 0;
+    self.req_timer = 100;
     self.complete = default_complete;
+    self.complete_this_round = false;
   }
 
   self.game_mode;
@@ -917,6 +920,8 @@ var GamePlayScene = function(game, stage)
       self.balloon.x = l.start.x;
       self.balloon.y = l.start.y;
     }
+    l.timer = 0;
+    l.complete_this_round = false;
   }
 
   self.popBlurb = function(blurb)
@@ -1101,7 +1106,16 @@ var GamePlayScene = function(game, stage)
           else f.met = false;
           all_met = all_met && f.met;
         }
-        if(all_met) l.complete = true;
+        if(all_met)
+        {
+          l.timer++;
+          if(l.timer > l.req_timer)
+          {
+            l.complete = true;
+            l.complete_this_round = true;
+          }
+        }
+        else l.timer = 0;
       }
       if(l.type == L_TYPE_BALLOON)
       {
@@ -1123,7 +1137,16 @@ var GamePlayScene = function(game, stage)
           if(objIntersectsObj(self.balloon,c)) c.met = true;
           all_met = all_met && c.met;
         }
-        if(all_met) l.complete = true;
+        if(all_met)
+        {
+          l.timer++;
+          if(l.timer > l.req_timer)
+          {
+            l.complete = true;
+            l.complete_this_round = true;
+          }
+        }
+        else l.timer = 0;
       }
     }
 
@@ -1257,6 +1280,7 @@ var GamePlayScene = function(game, stage)
     /*
     // UI
     */
+    canv.context.lineWidth = 0.5;
     if(paint)
     {
       self.p_type_toggle_h.draw(canv);
@@ -1282,6 +1306,10 @@ var GamePlayScene = function(game, stage)
     canv.outlineText("Play/Pause",self.pp_button.x,self.pp_button.y+self.pp_button.h*2,"#000000","#FFFFFF");
     self.menu_button.draw(canv);
     canv.outlineText("Menu",self.menu_button.x,self.menu_button.y+self.menu_button.h*2,"#000000","#FFFFFF");
+    if(self.levels[self.cur_level].complete_this_round)
+      canv.outlineText("Complete!",self.menu_button.x-100,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
+    else if(self.levels[self.cur_level].timer > 0)
+      canv.outlineText("Time to Complete: "+(3-(Math.round((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30)/10)),self.menu_button.x-200,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
 
     self.clip.draw(canv);
 
