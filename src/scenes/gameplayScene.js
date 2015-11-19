@@ -1,11 +1,11 @@
-var default_complete = false;
+var default_complete = true;
 var paint = false;
 var sys = !paint;
 var anneal = true;
 var airdeath = true;
 
-var vec_length = 10;
-var flag_length = 10;
+var vec_length = 5;
+var flag_length = 20;
 
 var ENUM;
 
@@ -724,7 +724,7 @@ var GamePlayScene = function(game, stage)
     self.pp_button = new ButtonBox(stage.drawCanv.canvas.width/2-10,10,20,20, function(on) { self.pp_mode = !self.pp_mode; });
     self.play_clicker.register(self.pp_button);
 
-    self.pmap = new HeightMap(20,20);
+    self.pmap = new HeightMap(50,50);
     self.vfield = new VecField2d(30,30);
     self.afield = new AirField(2000);
     self.balloon = new Balloon();
@@ -899,6 +899,7 @@ var GamePlayScene = function(game, stage)
 
         f.goal_cache_l = Math.sqrt(f.goal_xd*f.goal_xd+f.goal_yd*f.goal_yd);
         f.goal_cache_t = Math.atan2(f.goal_yd/f.goal_cache_l,f.goal_xd/f.goal_cache_l);
+        f.met = false;
       }
     }
     if(l.type == L_TYPE_BALLOON)
@@ -911,6 +912,7 @@ var GamePlayScene = function(game, stage)
         c.cache_h = c.h*stage.drawCanv.canvas.height;
         c.cache_x = c.x*stage.drawCanv.canvas.width;
         c.cache_y = c.y*stage.drawCanv.canvas.height;
+        c.met = false;
       }
       self.balloon.x = l.start.x;
       self.balloon.y = l.start.y;
@@ -1133,7 +1135,6 @@ var GamePlayScene = function(game, stage)
   self.draw = function()
   {
     var canv = stage.drawCanv;
-    canv.context.lineWidth = 0.5;
 
     canv.context.drawImage(USA,0,0,canv.canvas.width,canv.canvas.height);
 
@@ -1165,19 +1166,26 @@ var GamePlayScene = function(game, stage)
     /*
     // vectors
     */
-    canv.context.fillStyle = "#555599";
-    canv.context.strokeStyle = "#0000FF";
-    x_space = canv.canvas.width / self.vfield.w;
-    y_space = canv.canvas.height / self.vfield.h;
-    for(var i = 0; i < self.vfield.h; i++)
+    if(!self.pp_mode)
     {
-      for(var j = 0; j < self.vfield.w; j++)
+      canv.context.lineWidth = 1.0;
+      canv.context.strokeStyle = "#FF00FF";
+      canv.context.fillStyle = "#550055";
+      x_space = canv.canvas.width / self.vfield.w;
+      y_space = canv.canvas.height / self.vfield.h;
+      for(var i = 0; i < self.vfield.h; i++)
       {
-        y = y_space*i+(y_space/2);
-        x = x_space*j+(x_space/2);
-        index = self.vfield.iFor(j,i);
-        canv.context.fillRect(x-1,y-1,2,2);
-        canv.drawLine(x,y,x+self.vfield.x_map.data[index]*vec_length,y+self.vfield.y_map.data[index]*vec_length);
+        for(var j = 0; j < self.vfield.w; j++)
+        {
+          y = y_space*i+(y_space/2);
+          x = x_space*j+(x_space/2);
+          index = self.vfield.iFor(j,i);
+          if(Math.abs(self.vfield.x_map.data[index]) > 0.1 && Math.abs(self.vfield.x_map.data[index]) > 0.1)
+          {
+            canv.context.fillRect(x-1,y-1,2,2);
+            canv.drawLine(x,y,x+self.vfield.x_map.data[index]*vec_length,y+self.vfield.y_map.data[index]*vec_length);
+          }
+        }
       }
     }
 
@@ -1204,7 +1212,7 @@ var GamePlayScene = function(game, stage)
     if(l.type == L_TYPE_FLAG)
     {
       //flags
-      canv.context.lineWidth = 2;
+      canv.context.lineWidth = 3;
       var f;
         //goal
       canv.context.strokeStyle = "#00FF00";
