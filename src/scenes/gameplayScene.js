@@ -355,7 +355,7 @@ var GamePlayScene = function(game, stage)
     }
     self.dragStart = function(evt)
     {
-      if(scene.dragging_tool) return;
+      if(scene.dragging_tool || scene.dragging_sys) return;
       scene.dragging_tool = self;
       self.dragging = true;
     }
