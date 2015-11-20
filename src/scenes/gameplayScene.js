@@ -833,7 +833,7 @@ var GamePlayScene = function(game, stage)
       self.tools.push(Barometer);
       var Anemometer = new Tool(0.4,0.6,self);
       Anemometer.name = "Anemometer";
-      Anemometer.measure = function() { self.vfield.samplePolarFill(Anemometer.sx,Anemometer.sy,polar); return Math.round(polar.len*(80/3)*10)/10+"mph"; };
+      Anemometer.measure = function() { self.vfield.samplePolarFill(Anemometer.sx,Anemometer.sy,polar); return Math.round(polar.len*(80/4)*10)/10+"mph"; };
       self.tools.push(Anemometer);
       var Vane = new Tool(0.4,0.8,self);
       Vane.name = "Vane";
