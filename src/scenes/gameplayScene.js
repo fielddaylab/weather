@@ -3,6 +3,7 @@ var paint = false;
 var sys = !paint;
 var anneal = true;
 var airdeath = true;
+var tools = true;
 
 var vec_length = 5;
 var flag_length = 20;
@@ -326,6 +327,75 @@ var GamePlayScene = function(game, stage)
         canv.context.strokeStyle = self.color_fill;
         canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
       }
+    }
+  }
+  var Tool = function(x,y,scene)
+  {
+    var self = this;
+    self.sx = x;
+    self.sy = y;
+    self.w = 20;
+    self.h = 20;
+    self.x = self.sx*stage.drawCanv.canvas.width-self.w-5;
+    self.y = self.sy*stage.drawCanv.canvas.height-self.h-5;
+    self.name = "Tool";
+
+    self.dragging = false;
+    self.hovering = false;
+
+    self.hover = function()
+    {
+      self.hovering = true;
+    }
+    self.unhover = function()
+    {
+      self.hovering = false;
+    }
+    self.dragStart = function(evt)
+    {
+      if(scene.dragging_tool) return;
+      scene.dragging_tool = self;
+      self.dragging = true;
+    }
+    self.drag = function(evt)
+    {
+      if(self.dragging)
+      {
+        self.sx = (evt.doX+(self.w/2)+5)/stage.drawCanv.canvas.width;
+        self.sy = (evt.doY+(self.h/2)+5)/stage.drawCanv.canvas.height;
+        self.x = evt.doX-self.w/2;
+        self.y = evt.doY-self.h/2;
+      }
+    }
+    self.dragFinish = function(evt)
+    {
+      self.dragging = false;
+      scene.dragging_tool = undefined;
+    }
+
+    self.draw = function(canv)
+    {
+      stage.drawCanv.context.font = "30px arial";
+      canv.outlineText(self.name,self.x+self.w/2-10,self.y+self.h/2+10,"#FFFFFF","#000000");
+
+      if(self.hovering || self.dragging)
+      {
+        canv.context.lineWidth = 3;
+        canv.context.strokeStyle = "#FFFFFF";
+        canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
+      }
+
+      canv.context.lineWidth = 1;
+      canv.context.strokeStyle = "#FF0000";
+      var sample_size = 4;
+      canv.context.strokeRect(self.sx*stage.drawCanv.canvas.width-sample_size/2,self.sy*stage.drawCanv.canvas.height-sample_size/2,sample_size,sample_size);
+      stage.drawCanv.context.font = "20px arial";
+      canv.outlineText(self.measure(),self.x+self.w+10,self.y+self.h+10,"#FFFFFF","#000000");
+    }
+
+    self.measure = function() //"override" this...
+    {
+      return 0;
     }
   }
 
@@ -684,6 +754,8 @@ var GamePlayScene = function(game, stage)
   self.brush;
   self.psys;
   self.dragging_sys;
+  self.tools;
+  self.dragging_tool;
 
   self.clip;
   self.menu_button;
@@ -746,6 +818,48 @@ var GamePlayScene = function(game, stage)
       {
         self.play_hoverer.register(self.psys[i]);
         self.play_dragger.register(self.psys[i]);
+      }
+    }
+    var min_pressure = 1000;
+    var max_pressure = 1030;
+    if(tools)
+    {
+      var polar = {dir:0,len:0};
+
+      self.tools = [];
+      var Barometer = new Tool(0.4,0.4,self);
+      Barometer.name = "Barometer";
+      Barometer.measure = function() { return (min_pressure+Math.round(self.pmap.sample(Barometer.sx,Barometer.sy)*(max_pressure-min_pressure)))+"mb"; };
+      self.tools.push(Barometer);
+      var Anemometer = new Tool(0.4,0.6,self);
+      Anemometer.name = "Anemometer";
+      Anemometer.measure = function() { self.vfield.samplePolarFill(Anemometer.sx,Anemometer.sy,polar); return Math.round(polar.len*(80/3)*10)/10+"mph"; };
+      self.tools.push(Anemometer);
+      var Vane = new Tool(0.4,0.8,self);
+      Vane.name = "Vane";
+      Vane.measure = function() {
+        self.vfield.samplePolarFill(Vane.sx,Vane.sy,polar);
+        var tau = 2*Math.PI;
+        var d = polar.dir;
+        d *= -1;
+        d += tau;
+        d %= tau;
+        //return d;
+             if(d < tau/16*1)  return "E";
+        else if(d < tau/16*3)  return "NE";
+        else if(d < tau/16*5)  return "N";
+        else if(d < tau/16*7)  return "NW";
+        else if(d < tau/16*9)  return "W";
+        else if(d < tau/16*11) return "SW";
+        else if(d < tau/16*13) return "S";
+        else if(d < tau/16*15) return "SE";
+        else                       return "E";
+      };
+      self.tools.push(Vane);
+
+      for(var i = 0; i < self.tools.length; i++)
+      {
+        self.play_dragger.register(self.tools[i]);
       }
     }
 
@@ -1272,6 +1386,15 @@ var GamePlayScene = function(game, stage)
     {
       for(var i = 0; i < self.psys.length; i++)
         self.psys[i].draw(canv);
+    }
+
+    /*
+    // tools
+    */
+    if(tools)
+    {
+      for(var i = 0; i < self.tools.length; i++)
+        self.tools[i].draw(canv);
     }
 
     /*
