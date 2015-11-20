@@ -474,6 +474,13 @@ var GamePlayScene = function(game, stage)
           {
             scene.beginLevel(self.buttons[1+1].level);
             scene.setMode(GAME_MODE_PLAY);
+            var b = new Blurb();
+            b.x = 200;
+            b.y = 60;
+            b.w = 300;
+            b.h = 80;
+            b.txt = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+            setTimeout(function(){ scene.popBlurb(b); },1000);
           }
         });
       b.level = 1;
@@ -530,6 +537,13 @@ var GamePlayScene = function(game, stage)
           {
             scene.beginLevel(self.buttons[5+1].level);
             scene.setMode(GAME_MODE_PLAY);
+            var b = new Blurb();
+            b.x = 200;
+            b.y = 60;
+            b.w = 300;
+            b.h = 80;
+            b.txt = "Blow the balloon to the large red checkpoint.";
+            setTimeout(function(){ scene.popBlurb(b); },1000);
           }
         });
       b.level = 5;
@@ -1449,11 +1463,23 @@ var GamePlayScene = function(game, stage)
     self.pp_button.draw(canv);
     canv.outlineText("Play/Pause",self.pp_button.x,self.pp_button.y+self.pp_button.h*2,"#000000","#FFFFFF");
     self.menu_button.draw(canv);
-    canv.outlineText("Menu",self.menu_button.x,self.menu_button.y+self.menu_button.h*2,"#000000","#FFFFFF");
+    canv.outlineText("Menu",self.menu_button.x-20,self.menu_button.y+self.menu_button.h*2,"#000000","#FFFFFF");
     if(self.levels[self.cur_level].complete_this_round)
+    {
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.strokeStyle = "#000000";
+      canv.context.fillRect(self.menu_button.x-100-10,self.menu_button.y+self.menu_button.h*2,100,30);
+      canv.context.strokeRect(self.menu_button.x-100-10,self.menu_button.y+self.menu_button.h*2,100,30);
       canv.outlineText("Complete!",self.menu_button.x-100,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
+    }
     else if(self.levels[self.cur_level].timer > 0)
+    {
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.strokeStyle = "#000000";
+      canv.context.fillRect(self.menu_button.x-200-10,self.menu_button.y+self.menu_button.h*2,200,30);
+      canv.context.strokeRect(self.menu_button.x-200-10,self.menu_button.y+self.menu_button.h*2,200,30);
       canv.outlineText("Time to Complete: "+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),self.menu_button.x-200,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
+    }
 
     self.clip.draw(canv);
 
