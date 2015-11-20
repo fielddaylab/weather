@@ -842,7 +842,7 @@ var GamePlayScene = function(game, stage)
 
       self.tools = [];
 
-      var Barometer = new Tool(0.4,0.4,self);
+      var Barometer = new Tool(0.1,0.7,self);
       Barometer.name = "Barometer";
       if(tools_explicit)
         Barometer.measure = function() { return (min_pressure+Math.round(self.pmap.sample(Barometer.sx,Barometer.sy)*(max_pressure-min_pressure)))+"mb"; };
@@ -850,7 +850,7 @@ var GamePlayScene = function(game, stage)
         Barometer.measure = function() { return self.pmap.sample(Barometer.sx,Barometer.sy); };
       self.tools.push(Barometer);
 
-      var Anemometer = new Tool(0.4,0.6,self);
+      var Anemometer = new Tool(0.1,0.8,self);
       Anemometer.name = "Anemometer";
       if(tools_explicit)
         Anemometer.measure = function() { self.vfield.samplePolarFill(Anemometer.sx,Anemometer.sy,polar); return Math.round(polar.len*(80/4)*10)/10+"mph"; };
@@ -858,7 +858,7 @@ var GamePlayScene = function(game, stage)
         Anemometer.measure = function() { self.vfield.samplePolarFill(Anemometer.sx,Anemometer.sy,polar); return polar.len/4; };
       self.tools.push(Anemometer);
 
-      var Vane = new Tool(0.4,0.8,self);
+      var Vane = new Tool(0.1,0.9,self);
       Vane.name = "Vane";
       Vane.explicit = true;
       Vane.measure = function() {
