@@ -4,6 +4,7 @@ var sys = !paint;
 var anneal = true;
 var airdeath = true;
 var tools = true;
+var tools_explicit = false;
 
 var vec_length = 5;
 var flag_length = 20;
@@ -339,6 +340,7 @@ var GamePlayScene = function(game, stage)
     self.x = self.sx*stage.drawCanv.canvas.width-self.w-5;
     self.y = self.sy*stage.drawCanv.canvas.height-self.h-5;
     self.name = "Tool";
+    self.explicit = tools_explicit;
 
     self.dragging = false;
     self.hovering = false;
@@ -375,7 +377,7 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
-      stage.drawCanv.context.font = "30px arial";
+      canv.context.font = "30px arial";
       canv.outlineText(self.name,self.x+self.w/2-10,self.y+self.h/2+10,"#FFFFFF","#000000");
 
       if(self.hovering || self.dragging)
@@ -388,9 +390,21 @@ var GamePlayScene = function(game, stage)
       canv.context.lineWidth = 1;
       canv.context.strokeStyle = "#FF0000";
       var sample_size = 4;
-      canv.context.strokeRect(self.sx*stage.drawCanv.canvas.width-sample_size/2,self.sy*stage.drawCanv.canvas.height-sample_size/2,sample_size,sample_size);
-      stage.drawCanv.context.font = "20px arial";
-      canv.outlineText(self.measure(),self.x+self.w+10,self.y+self.h+10,"#FFFFFF","#000000");
+      canv.context.strokeRect(self.sx*canv.canvas.width-sample_size/2,self.sy*canv.canvas.height-sample_size/2,sample_size,sample_size);
+
+      if(self.explicit)
+      {
+        canv.context.font = "20px arial";
+        canv.outlineText(self.measure(),self.x+self.w+10,self.y+self.h+10,"#FFFFFF","#000000");
+      }
+      else
+      {
+        canv.context.fillStyle = "#00FF00";
+        var m = self.h*self.measure();
+        canv.context.fillRect(self.x-10,self.y+self.h-m,8,m);
+        canv.context.strokeStyle = "#000000";
+        canv.context.strokeRect(self.x-10,self.y,8,self.h);
+      }
     }
 
     self.measure = function() //"override" this...
@@ -827,16 +841,26 @@ var GamePlayScene = function(game, stage)
       var polar = {dir:0,len:0};
 
       self.tools = [];
+
       var Barometer = new Tool(0.4,0.4,self);
       Barometer.name = "Barometer";
-      Barometer.measure = function() { return (min_pressure+Math.round(self.pmap.sample(Barometer.sx,Barometer.sy)*(max_pressure-min_pressure)))+"mb"; };
+      if(tools_explicit)
+        Barometer.measure = function() { return (min_pressure+Math.round(self.pmap.sample(Barometer.sx,Barometer.sy)*(max_pressure-min_pressure)))+"mb"; };
+      else
+        Barometer.measure = function() { return self.pmap.sample(Barometer.sx,Barometer.sy); };
       self.tools.push(Barometer);
+
       var Anemometer = new Tool(0.4,0.6,self);
       Anemometer.name = "Anemometer";
-      Anemometer.measure = function() { self.vfield.samplePolarFill(Anemometer.sx,Anemometer.sy,polar); return Math.round(polar.len*(80/4)*10)/10+"mph"; };
+      if(tools_explicit)
+        Anemometer.measure = function() { self.vfield.samplePolarFill(Anemometer.sx,Anemometer.sy,polar); return Math.round(polar.len*(80/4)*10)/10+"mph"; };
+      else
+        Anemometer.measure = function() { self.vfield.samplePolarFill(Anemometer.sx,Anemometer.sy,polar); return polar.len/4; };
       self.tools.push(Anemometer);
+
       var Vane = new Tool(0.4,0.8,self);
       Vane.name = "Vane";
+      Vane.explicit = true;
       Vane.measure = function() {
         self.vfield.samplePolarFill(Vane.sx,Vane.sy,polar);
         var tau = 2*Math.PI;
