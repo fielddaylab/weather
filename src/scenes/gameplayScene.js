@@ -18,7 +18,6 @@ var P_TYPE_LOW  = ENUM; ENUM++;
 ENUM = 0;
 var L_TYPE_NONE       = ENUM; ENUM++;
 var L_TYPE_FLAG       = ENUM; ENUM++;
-var L_TYPE_BALLOON    = ENUM; ENUM++;
 
 ENUM = 0;
 var PP_MODE_PLAY  = ENUM; ENUM++;
@@ -530,27 +529,6 @@ var GamePlayScene = function(game, stage)
       b.title_b = "Anti Cyclone";
       self.buttons.push(b);
 
-      b = new ButtonBox(20+((bs+10)*5),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          if(self.buttons[5+1].level == 0 || levels[self.buttons[5+1].level-1].complete)
-          {
-            scene.beginLevel(self.buttons[5+1].level);
-            scene.setMode(GAME_MODE_PLAY);
-            var b = new Blurb();
-            b.x = 200;
-            b.y = 60;
-            b.w = 300;
-            b.h = 80;
-            b.txt = "Blow the balloon to the large red checkpoint.";
-            setTimeout(function(){ scene.popBlurb(b); },1000);
-          }
-        });
-      b.level = 5;
-      b.title_a = "Lvl 5";
-      b.title_b = "Balloon";
-      self.buttons.push(b);
-
     //quick hack to fix clicker even though on separate canv
     var draw = function(canv)
     {
@@ -710,23 +688,6 @@ var GamePlayScene = function(game, stage)
     }
   }
 
-  var Checkpoint = function(x,y,w,h)
-  {
-    var self = this;
-    //normalized vals
-    self.x = x;
-    self.y = y;
-    self.w = w;
-    self.h = h;
-
-    //actual map vals
-    self.cache_x = 0;
-    self.cache_y = 0;
-    self.cache_w = 0;
-    self.cache_h = 0;
-
-    self.met = false;
-  }
   var Flag = function(x,y,xd,yd)
   {
     var self = this;
@@ -755,11 +716,7 @@ var GamePlayScene = function(game, stage)
   var Level = function()
   {
     var self = this;
-    self.type = L_TYPE_BALLOON;
-
-    //L_TYPE_BALLOON
-    self.start = {x:0,y:0}; //just use a checkpoint if you want
-    self.checkpoints = [];
+    self.type = L_TYPE_FLAG;
 
     //L_TYPE_FLAG
     self.flags = [];
@@ -987,12 +944,6 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.6,-2.0,0.0));
     self.levels.push(l);
 
-    l = new Level();
-    l.type = L_TYPE_BALLOON;
-    l.start = new Checkpoint(0.1,0.1,0.1,0.1);
-    l.checkpoints.push(new Checkpoint(0.5,0.5,0.1,0.1));
-    self.levels.push(l);
-
     self.pp_mode = true;
     self.beginLevel(0);
     self.levels[self.cur_level].complete = true;
@@ -1056,21 +1007,6 @@ var GamePlayScene = function(game, stage)
         f.goal_cache_t = Math.atan2(f.goal_yd/f.goal_cache_l,f.goal_xd/f.goal_cache_l);
         f.met = false;
       }
-    }
-    if(l.type == L_TYPE_BALLOON)
-    {
-      var c;
-      for(var i = 0; i < l.checkpoints.length; i++)
-      {
-        c = l.checkpoints[i];
-        c.cache_w = c.w*stage.drawCanv.canvas.width;
-        c.cache_h = c.h*stage.drawCanv.canvas.height;
-        c.cache_x = c.x*stage.drawCanv.canvas.width;
-        c.cache_y = c.y*stage.drawCanv.canvas.height;
-        c.met = false;
-      }
-      self.balloon.x = l.start.x;
-      self.balloon.y = l.start.y;
     }
     l.timer = 0;
     l.complete_this_round = false;
@@ -1269,35 +1205,17 @@ var GamePlayScene = function(game, stage)
         }
         else l.timer = 0;
       }
-      if(l.type == L_TYPE_BALLOON)
-      {
-        //balloon
-        x = self.vfield.x_map.sample(self.balloon.x,self.balloon.y);
-        y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
-        self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
-        self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
-        while(self.balloon.x > 1) self.balloon.x -= 1;
-        while(self.balloon.x < 0) self.balloon.x += 1;
-        while(self.balloon.y > 1) self.balloon.y -= 1;
-        while(self.balloon.y < 0) self.balloon.y += 1;
-        //checkpoints
-        var c;
-        var all_met = true;
-        for(var i = 0; i < l.checkpoints.length; i++)
-        {
-          c = l.checkpoints[i];
-          if(objIntersectsObj(self.balloon,c)) c.met = true;
-          all_met = all_met && c.met;
-        }
-        if(all_met)
-        {
-          l.timer++;
-          l.complete = true;
-          l.complete_this_round = true;
-        }
-        else l.timer = 0;
-      }
     }
+
+    //balloon
+    x = self.vfield.x_map.sample(self.balloon.x,self.balloon.y);
+    y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
+    self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
+    self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
+    while(self.balloon.x > 1) self.balloon.x -= 1;
+    while(self.balloon.x < 0) self.balloon.x += 1;
+    while(self.balloon.y > 1) self.balloon.y -= 1;
+    while(self.balloon.y < 0) self.balloon.y += 1;
 
     self.ticks++;
   };
@@ -1399,23 +1317,6 @@ var GamePlayScene = function(game, stage)
         canv.context.stroke();
       }
     }
-    if(l.type == L_TYPE_BALLOON)
-    {
-      //checkpoints
-      var c;
-      for(var i = 0; i < l.checkpoints.length; i++)
-      {
-        c = l.checkpoints[i];
-        if(c.met)
-        canv.context.fillStyle = "#00FF00";
-        else
-        canv.context.fillStyle = "#FF0000";
-        canv.context.fillRect(c.cache_x,c.cache_y,c.cache_w,c.cache_h);
-      }
-      //balloon
-      canv.context.fillStyle = "#FF0000";
-      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
-    }
 
     /*
     // pressure systems
@@ -1434,6 +1335,9 @@ var GamePlayScene = function(game, stage)
       for(var i = 0; i < self.tools.length; i++)
         self.tools[i].draw(canv);
     }
+    //balloon
+    canv.context.fillStyle = "#FF0000";
+    canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
 
     /*
     // UI
