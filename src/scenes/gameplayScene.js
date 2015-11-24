@@ -1207,15 +1207,21 @@ var GamePlayScene = function(game, stage)
       }
     }
 
-    //balloon
-    x = self.vfield.x_map.sample(self.balloon.x,self.balloon.y);
-    y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
-    self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
-    self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
-    while(self.balloon.x > 1) self.balloon.x -= 1;
-    while(self.balloon.x < 0) self.balloon.x += 1;
-    while(self.balloon.y > 1) self.balloon.y -= 1;
-    while(self.balloon.y < 0) self.balloon.y += 1;
+    /*
+    //playground stuff
+    */
+    if(self.cur_level == 0)
+    {
+      //balloon
+      x = self.vfield.x_map.sample(self.balloon.x,self.balloon.y);
+      y = self.vfield.y_map.sample(self.balloon.x,self.balloon.y);
+      self.balloon.x += x/200;// + ((Math.random()-0.5)/200);
+      self.balloon.y += y/200;// + ((Math.random()-0.5)/200);
+      while(self.balloon.x > 1) self.balloon.x -= 1;
+      while(self.balloon.x < 0) self.balloon.x += 1;
+      while(self.balloon.y > 1) self.balloon.y -= 1;
+      while(self.balloon.y < 0) self.balloon.y += 1;
+    }
 
     self.ticks++;
   };
@@ -1328,16 +1334,20 @@ var GamePlayScene = function(game, stage)
     }
 
     /*
-    // tools
+    // playground stuff
     */
-    if(tools)
+    if(self.cur_level == 0)
     {
-      for(var i = 0; i < self.tools.length; i++)
-        self.tools[i].draw(canv);
+      //tools
+      if(tools)
+      {
+        for(var i = 0; i < self.tools.length; i++)
+          self.tools[i].draw(canv);
+      }
+      //balloon
+      canv.context.fillStyle = "#FF0000";
+      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
     }
-    //balloon
-    canv.context.fillStyle = "#FF0000";
-    canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
 
     /*
     // UI
