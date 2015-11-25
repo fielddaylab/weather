@@ -484,11 +484,11 @@ var GamePlayScene = function(game, stage)
             scene.beginLevel(self.buttons[1+1].level);
             scene.setMode(GAME_MODE_PLAY);
             var b = new Blurb();
-            b.x = 200;
+            b.x = 150;
             b.y = 60;
-            b.w = 300;
+            b.w = 350;
             b.h = 80;
-            b.txt = "Drag the Flag around the map to find a position where the wind is blowing due west (indicated by the green flag).";
+            b.txt = "Drag the Flag to the left around the map to find a position where the wind is blowing strongly due north (indicated by the green flag).";
             setTimeout(function(){ scene.popBlurb(b); },1000);
           }
         });
@@ -509,13 +509,13 @@ var GamePlayScene = function(game, stage)
             b.y = 60;
             b.w = 300;
             b.h = 80;
-            b.txt = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+            b.txt = "Drag all the flags to the left to match the blowing red flag to the direction of the green.";
             setTimeout(function(){ scene.popBlurb(b); },1000);
           }
         });
       b.level = 2;
       b.title_a = "Lvl 2";
-      b.title_b = "Blow Flag";
+      b.title_b = "Drag Flags";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*3),20+((bs+10)*0),bs,bs,
@@ -536,7 +536,7 @@ var GamePlayScene = function(game, stage)
         });
       b.level = 3;
       b.title_a = "Lvl 3";
-      b.title_b = "Angled Flag";
+      b.title_b = "Blow Flag";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*4),20+((bs+10)*0),bs,bs,
@@ -550,7 +550,7 @@ var GamePlayScene = function(game, stage)
         });
       b.level = 4;
       b.title_a = "Lvl 4";
-      b.title_b = "Cyclone";
+      b.title_b = "Angled Flag";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*5),20+((bs+10)*0),bs,bs,
@@ -564,6 +564,20 @@ var GamePlayScene = function(game, stage)
         });
       b.level = 5;
       b.title_a = "Lvl 5";
+      b.title_b = "Cyclone";
+      self.buttons.push(b);
+
+      b = new ButtonBox(20+((bs+10)*6),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[6+1].level == 0 || levels[self.buttons[6+1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[6+1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 6;
+      b.title_a = "Lvl 6";
       b.title_b = "Anti Cyclone";
       self.buttons.push(b);
 
@@ -798,6 +812,9 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
+      canv.context.lineWidth = 3;
+      canv.context.strokeStyle = "#00FF00";
+
       self.cache_x = self.sx*canv.canvas.width;
       self.cache_y = self.sy*canv.canvas.height;
 
@@ -1029,9 +1046,30 @@ var GamePlayScene = function(game, stage)
 
     l = new Level();
     l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
-    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    l.flags.push(new Flag(0.2,0.5,0.0,-1.5,self));
+    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
+    self.levels.push(l);
+
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    var i = 0;
+    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    i = 0;
+    l.psys.push(new PSys(0.5,0.5,0.1, -0.1,self));
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
     self.levels.push(l);
 
     l = new Level();
@@ -1460,9 +1498,7 @@ var GamePlayScene = function(game, stage)
     // game objs
     */
     //flags
-    canv.context.lineWidth = 3;
       //goal
-    canv.context.strokeStyle = "#00FF00";
     for(var i = 0; i < self.flags.length; i++)
       self.flags[i].draw(canv);
 
