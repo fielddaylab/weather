@@ -334,7 +334,7 @@ var GamePlayScene = function(game, stage)
       if(self.hovering || self.dragging)
       {
         canv.context.lineWidth = 3;
-        canv.context.strokeStyle = self.color_fill;
+        canv.context.strokeStyle = self.color_stroke;
         canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
       }
     }
@@ -488,13 +488,13 @@ var GamePlayScene = function(game, stage)
             b.y = 60;
             b.w = 300;
             b.h = 80;
-            b.txt = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+            b.txt = "Drag the Flag around the map to find a position where the wind is blowing due west (indicated by the green flag).";
             setTimeout(function(){ scene.popBlurb(b); },1000);
           }
         });
       b.level = 1;
       b.title_a = "Lvl 1";
-      b.title_b = "Easy Flag";
+      b.title_b = "Drag Flag";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*2),20+((bs+10)*0),bs,bs,
@@ -504,11 +504,18 @@ var GamePlayScene = function(game, stage)
           {
             scene.beginLevel(self.buttons[2+1].level);
             scene.setMode(GAME_MODE_PLAY);
+            var b = new Blurb();
+            b.x = 200;
+            b.y = 60;
+            b.w = 300;
+            b.h = 80;
+            b.txt = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+            setTimeout(function(){ scene.popBlurb(b); },1000);
           }
         });
       b.level = 2;
       b.title_a = "Lvl 2";
-      b.title_b = "Angled Flag";
+      b.title_b = "Blow Flag";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*3),20+((bs+10)*0),bs,bs,
@@ -518,11 +525,18 @@ var GamePlayScene = function(game, stage)
           {
             scene.beginLevel(self.buttons[3+1].level);
             scene.setMode(GAME_MODE_PLAY);
+            var b = new Blurb();
+            b.x = 200;
+            b.y = 60;
+            b.w = 300;
+            b.h = 80;
+            b.txt = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+            setTimeout(function(){ scene.popBlurb(b); },1000);
           }
         });
       b.level = 3;
       b.title_a = "Lvl 3";
-      b.title_b = "Cyclone";
+      b.title_b = "Angled Flag";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*4),20+((bs+10)*0),bs,bs,
@@ -536,6 +550,20 @@ var GamePlayScene = function(game, stage)
         });
       b.level = 4;
       b.title_a = "Lvl 4";
+      b.title_b = "Cyclone";
+      self.buttons.push(b);
+
+      b = new ButtonBox(20+((bs+10)*5),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[5+1].level == 0 || levels[self.buttons[5+1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[5+1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 5;
+      b.title_a = "Lvl 5";
       b.title_b = "Anti Cyclone";
       self.buttons.push(b);
 
@@ -788,7 +816,7 @@ var GamePlayScene = function(game, stage)
       if(self.hovering || self.dragging)
       {
         canv.context.lineWidth = 3;
-        canv.context.strokeStyle = self.color_fill;
+        canv.context.strokeStyle = "#000000";
         canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
       }
     }
@@ -1119,6 +1147,7 @@ var GamePlayScene = function(game, stage)
         f.met = false;
 
         self.flags.push(f);
+        f.reset();
         if(l.type == L_TYPE_FLAG)
         {
           self.play_hoverer.register(f);
@@ -1333,7 +1362,7 @@ var GamePlayScene = function(game, stage)
       if(all_met)
       {
         l.timer++;
-        if(l.timer > l.req_timer)
+        if(l.timer > l.req_timer || self.cur_level == 0)
         {
           l.complete = true;
           l.complete_this_round = true;
