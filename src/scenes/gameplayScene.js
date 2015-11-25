@@ -262,13 +262,11 @@ var GamePlayScene = function(game, stage)
   var PSys = function(x,y,r,delta,scene)
   {
     var self = this;
-    self.sx = x;
-    self.sy = y;
+    self.start_sx = x;
+    self.start_sy = y;
     self.r = r;
     self.w = 20;
     self.h = 20;
-    self.x = self.sx*stage.drawCanv.canvas.width-(self.w/2);
-    self.y = self.sy*stage.drawCanv.canvas.height-(self.h/2);
 
     self.delta = delta;
     if(self.delta > 0)
@@ -283,6 +281,17 @@ var GamePlayScene = function(game, stage)
       self.color_fill = "#000000";
       self.color_stroke = "#FFFFFF";
     }
+
+    self.reset = function()
+    {
+      self.sx = self.start_sx;
+      self.sy = self.start_sy;
+      self.x = self.sx*stage.drawCanv.canvas.width-(self.w/2);
+      self.y = self.sy*stage.drawCanv.canvas.height-(self.h/2);
+      self.dragging = false;
+      self.hovering = false;
+    }
+    self.reset();
 
     self.dragging = false;
     self.hovering = false;
@@ -720,6 +729,7 @@ var GamePlayScene = function(game, stage)
     self.type = L_TYPE_FLAG;
 
     self.flags = [];
+    self.psys = [];
 
     self.timer = 0;
     self.req_timer = 100;
@@ -799,13 +809,6 @@ var GamePlayScene = function(game, stage)
     if(sys)
     {
       self.psys = [];
-      self.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-      self.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-      for(var i = 0; i < self.psys.length; i++)
-      {
-        self.play_hoverer.register(self.psys[i]);
-        self.play_dragger.register(self.psys[i]);
-      }
     }
     var min_pressure = 1000;
     var max_pressure = 1030;
@@ -921,29 +924,36 @@ var GamePlayScene = function(game, stage)
 
     l = new Level();
     l.type = L_TYPE_NONE;
-    l.flags.push(new Flag(0.5,0.5,-2.0,0.0));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.5,2.0,2.0));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.4,0.5,0.0,2.0));
     l.flags.push(new Flag(0.6,0.5,0.0,-2.0));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.4,2.0,0.0));
     l.flags.push(new Flag(0.5,0.6,-2.0,0.0));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
     self.pp_mode = true;
@@ -996,7 +1006,15 @@ var GamePlayScene = function(game, stage)
     self.cur_level = l;
     var l = self.levels[self.cur_level];
 
-    if(l.type == L_TYPE_SYS)
+    //clear out any on-map data
+    for(var i = 0; i < self.psys.length; i++)
+    {
+      self.play_hoverer.unregister(self.psys[i]);
+      self.play_dragger.unregister(self.psys[i]);
+    }
+    self.psys = [];
+
+    if(l.type != L_TYPE_NONE)
     {
       var f;
       for(var i = 0; i < l.flags.length; i++)
@@ -1011,6 +1029,16 @@ var GamePlayScene = function(game, stage)
         f.goal_cache_t = Math.atan2(f.goal_yd/f.goal_cache_l,f.goal_xd/f.goal_cache_l);
         f.met = false;
       }
+
+      var s;
+      for(var i = 0; i < l.psys.length; i++)
+      {
+        self.psys.push(l.psys[i]);
+        self.psys[i].reset();
+        self.play_hoverer.register(self.psys[i]);
+        self.play_dragger.register(self.psys[i]);
+      }
+
     }
     l.timer = 0;
     l.complete_this_round = false;
