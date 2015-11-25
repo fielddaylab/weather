@@ -549,6 +549,13 @@ var GamePlayScene = function(game, stage)
             b.h = 80;
             b.txt = "Drag all the flags to find a position where the blowing red flag matches the green.";
             setTimeout(function(){ scene.popBlurb(b); },200);
+            var b2 = new Blurb();
+            b2.x = 200;
+            b2.y = 60;
+            b2.w = 300;
+            b2.h = 80;
+            b2.txt = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful!";
+            setTimeout(function(){ scene.popBlurb(b2); },15000);
           }
         });
       b.level = 4;
@@ -570,6 +577,13 @@ var GamePlayScene = function(game, stage)
             b.h = 80;
             b.txt = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
             setTimeout(function(){ scene.popBlurb(b); },200);
+            var b2 = new Blurb();
+            b2.x = 200;
+            b2.y = 60;
+            b2.w = 300;
+            b2.h = 80;
+            b2.txt = "Make sure to use both the L and the H! (and use the visualizers!)";
+            setTimeout(function(){ scene.popBlurb(b2); },15000);
           }
         });
       b.level = 5;
@@ -1146,6 +1160,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.9,0.1, 0.1,self));
     self.levels.push(l);
 
+    //use systems
     l = new Level();
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
@@ -1153,6 +1168,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
+    //use systems- at an angle
     l = new Level();
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
@@ -1160,20 +1176,24 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
+    //cyclone
     l = new Level();
     l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.4,0.5,0.0,2.0,self));
-    l.flags.push(new Flag(0.6,0.5,0.0,-2.0,self));
+    l.flags.push(new Flag(0.42,0.5,0.0,1.5,self));
+    l.flags.push(new Flag(0.58,0.5,0.0,-1.5,self));
+    l.psys.push(new PSys(0.2,0.3,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.7,0.1, 0.1,self));
     self.levels.push(l);
 
+    //anticyclone
     l = new Level();
     l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.5,0.4,2.0,0.0,self));
-    l.flags.push(new Flag(0.5,0.6,-2.0,0.0,self));
-    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    l.flags.push(new Flag(0.5,0.42,1.5,0.0,self));
+    l.flags.push(new Flag(0.5,0.58,-1.5,0.0,self));
+    l.psys.push(new PSys(0.2,0.3,0.1,-0.1,self));
+    l.psys.push(new PSys(0.2,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.7,0.1,-0.1,self));
     self.levels.push(l);
 
     self.vec_mode = false;
