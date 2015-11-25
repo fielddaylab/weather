@@ -455,7 +455,7 @@ var GamePlayScene = function(game, stage)
       canv.context.strokeRect(this.off_x+0.5,this.off_y+0.5,this.w,this.h);
     }
 
-    var bs = 70;
+    var bs = 40;
     var b;
     //must manually unroll because js is terrible
       b = new ButtonBox(20+((bs+10)*0),20+((bs+10)*0),bs,bs,
@@ -469,7 +469,7 @@ var GamePlayScene = function(game, stage)
         });
       b.level = 0;
       b.title_a = "Lvl 0";
-      b.title_b = "Playground";
+      b.title_b = "";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*1),20+((bs+10)*0),bs,bs,
@@ -484,13 +484,13 @@ var GamePlayScene = function(game, stage)
             b.y = 60;
             b.w = 350;
             b.h = 80;
-            b.txt = "Drag the flag around the map to find a position where the wind is blowing strongly due north (indicated by the green flag).";
-            setTimeout(function(){ scene.popBlurb(b); },1000);
+            b.txt = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the green flag).";
+            setTimeout(function(){ scene.popBlurb(b); },200);
           }
         });
       b.level = 1;
       b.title_a = "Lvl 1";
-      b.title_b = "Drag Flag";
+      b.title_b = "";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*2),20+((bs+10)*0),bs,bs,
@@ -505,13 +505,13 @@ var GamePlayScene = function(game, stage)
             b.y = 60;
             b.w = 300;
             b.h = 80;
-            b.txt = "Drag all the flags to the left to match the blowing red flag to the direction of the green.";
-            setTimeout(function(){ scene.popBlurb(b); },1000);
+            b.txt = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the green flag).";
+            setTimeout(function(){ scene.popBlurb(b); },200);
           }
         });
       b.level = 2;
       b.title_a = "Lvl 2";
-      b.title_b = "Drag Flags";
+      b.title_b = "";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*3),20+((bs+10)*0),bs,bs,
@@ -526,13 +526,13 @@ var GamePlayScene = function(game, stage)
             b.y = 60;
             b.w = 300;
             b.h = 80;
-            b.txt = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
-            setTimeout(function(){ scene.popBlurb(b); },1000);
+            b.txt = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the green flag).";
+            setTimeout(function(){ scene.popBlurb(b); },200);
           }
         });
       b.level = 3;
       b.title_a = "Lvl 3";
-      b.title_b = "Blow Flag";
+      b.title_b = "";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*4),20+((bs+10)*0),bs,bs,
@@ -542,11 +542,18 @@ var GamePlayScene = function(game, stage)
           {
             scene.beginLevel(self.buttons[4+1].level);
             scene.setMode(GAME_MODE_PLAY);
+            var b = new Blurb();
+            b.x = 200;
+            b.y = 60;
+            b.w = 300;
+            b.h = 80;
+            b.txt = "Drag all the flags to find a position where the blowing red flag matches the green.";
+            setTimeout(function(){ scene.popBlurb(b); },200);
           }
         });
       b.level = 4;
       b.title_a = "Lvl 4";
-      b.title_b = "Angled Flag";
+      b.title_b = "";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*5),20+((bs+10)*0),bs,bs,
@@ -556,11 +563,18 @@ var GamePlayScene = function(game, stage)
           {
             scene.beginLevel(self.buttons[5+1].level);
             scene.setMode(GAME_MODE_PLAY);
+            var b = new Blurb();
+            b.x = 200;
+            b.y = 60;
+            b.w = 300;
+            b.h = 80;
+            b.txt = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+            setTimeout(function(){ scene.popBlurb(b); },200);
           }
         });
       b.level = 5;
       b.title_a = "Lvl 5";
-      b.title_b = "Cyclone";
+      b.title_b = "";
       self.buttons.push(b);
 
       b = new ButtonBox(20+((bs+10)*6),20+((bs+10)*0),bs,bs,
@@ -574,8 +588,38 @@ var GamePlayScene = function(game, stage)
         });
       b.level = 6;
       b.title_a = "Lvl 6";
-      b.title_b = "Anti Cyclone";
+      b.title_b = "";
       self.buttons.push(b);
+
+      b = new ButtonBox(20+((bs+10)*7),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[7+1].level == 0 || levels[self.buttons[7+1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[7+1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 7;
+      b.title_a = "Lvl 7";
+      b.title_b = "";
+      self.buttons.push(b);
+
+      b = new ButtonBox(20+((bs+10)*8),20+((bs+10)*0),bs,bs,
+        function(on)
+        {
+          if(self.buttons[8+1].level == 0 || levels[self.buttons[8+1].level-1].complete)
+          {
+            scene.beginLevel(self.buttons[8+1].level);
+            scene.setMode(GAME_MODE_PLAY);
+          }
+        });
+      b.level = 8;
+      b.title_a = "Lvl 8";
+      b.title_b = "";
+      self.buttons.push(b);
+
+
 
     //quick hack to fix clicker even though on separate canv
     var draw = function(canv)
@@ -1044,6 +1088,7 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_NONE;
     self.levels.push(l);
 
+    //blow north
     l = new Level();
     l.type = L_TYPE_FLAG;
     l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
@@ -1051,15 +1096,33 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
+    //blow east
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.3,0.5,1.5,0.0,self));
+    l.psys.push(new PSys(0.5,0.4,0.1,-0.1,self));
+    l.psys.push(new PSys(0.5,0.6,0.1, 0.1,self));
+    self.levels.push(l);
+
+    //blow south (laterally surrounded L)
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.6,0.6,0.0,1.0,self));
+    l.psys.push(new PSys(0.5,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.3,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.7,0.5,0.1, 0.1,self));
+    self.levels.push(l);
+
+    //full circle of flags
     l = new Level();
     l.type = L_TYPE_FLAG;
     var i = 0;
-    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.1,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
     i = 0;
     l.psys.push(new PSys(0.5,0.5,0.1, -0.1,self));
     l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
