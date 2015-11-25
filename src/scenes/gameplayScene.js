@@ -16,8 +16,9 @@ var P_TYPE_HIGH = ENUM; ENUM++;
 var P_TYPE_LOW  = ENUM; ENUM++;
 
 ENUM = 0;
-var L_TYPE_NONE       = ENUM; ENUM++;
-var L_TYPE_FLAG       = ENUM; ENUM++;
+var L_TYPE_NONE = ENUM; ENUM++;
+var L_TYPE_FLAG = ENUM; ENUM++;
+var L_TYPE_SYS  = ENUM; ENUM++;
 
 ENUM = 0;
 var PP_MODE_PLAY  = ENUM; ENUM++;
@@ -718,7 +719,6 @@ var GamePlayScene = function(game, stage)
     var self = this;
     self.type = L_TYPE_FLAG;
 
-    //L_TYPE_FLAG
     self.flags = [];
 
     self.timer = 0;
@@ -764,6 +764,8 @@ var GamePlayScene = function(game, stage)
   self.ready = function()
   {
     self.menu_clicker = new Clicker({source:stage.dispCanv.canvas});
+    self.bin_presser = new Presser({source:stage.dispCanv.canvas});
+    self.bin_dragger = new Dragger({source:stage.dispCanv.canvas});
     self.play_clicker = new Clicker({source:stage.dispCanv.canvas});
     self.play_presser = new Presser({source:stage.dispCanv.canvas});
     self.play_hoverer = new Hoverer({source:stage.dispCanv.canvas});
@@ -907,10 +909,10 @@ var GamePlayScene = function(game, stage)
             if(self.psys[i] == p) self.psys.splice(i,1);
           self.dragging_sys = undefined;
         })
-      self.play_presser.register(self.p_store_h);
-      self.play_presser.register(self.p_store_l);
-      self.play_dragger.register(self.p_store_h);
-      self.play_dragger.register(self.p_store_l);
+      self.bin_presser.register(self.p_store_h);
+      self.bin_presser.register(self.p_store_l);
+      self.bin_dragger.register(self.p_store_h);
+      self.bin_dragger.register(self.p_store_l);
     }
 
 
@@ -923,23 +925,23 @@ var GamePlayScene = function(game, stage)
     self.levels.push(l);
 
     l = new Level();
-    l.type = L_TYPE_FLAG;
+    l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0));
     self.levels.push(l);
 
     l = new Level();
-    l.type = L_TYPE_FLAG;
+    l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.5,2.0,2.0));
     self.levels.push(l);
 
     l = new Level();
-    l.type = L_TYPE_FLAG;
+    l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.4,0.5,0.0,2.0));
     l.flags.push(new Flag(0.6,0.5,0.0,-2.0));
     self.levels.push(l);
 
     l = new Level();
-    l.type = L_TYPE_FLAG;
+    l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.4,2.0,0.0));
     l.flags.push(new Flag(0.5,0.6,-2.0,0.0));
     self.levels.push(l);
@@ -974,6 +976,8 @@ var GamePlayScene = function(game, stage)
   self.setMode = function(mode)
   {
     self.menu_clicker.ignore();
+    self.bin_presser.ignore();
+    self.bin_dragger.ignore();
     self.play_clicker.ignore();
     self.play_presser.ignore();
     self.play_hoverer.ignore();
@@ -992,7 +996,7 @@ var GamePlayScene = function(game, stage)
     self.cur_level = l;
     var l = self.levels[self.cur_level];
 
-    if(l.type == L_TYPE_FLAG)
+    if(l.type == L_TYPE_SYS)
     {
       var f;
       for(var i = 0; i < l.flags.length; i++)
@@ -1051,6 +1055,11 @@ var GamePlayScene = function(game, stage)
     }
     else if(self.game_mode == GAME_MODE_PLAY)
     {
+      if(self.cur_level == 0)
+      {
+        self.bin_presser.flush();
+        self.bin_dragger.flush();
+      }
       self.play_clicker.flush();
       self.play_presser.flush();
       self.play_hoverer.flush();
@@ -1174,7 +1183,7 @@ var GamePlayScene = function(game, stage)
     if(self.pp_mode)
     {
       var l = self.levels[self.cur_level];
-      if(l.type == L_TYPE_FLAG)
+      if(l.type == L_TYPE_SYS)
       {
         //flags
         var cart = {x:0,y:0};
@@ -1296,7 +1305,7 @@ var GamePlayScene = function(game, stage)
     // game objs
     */
     var l = self.levels[self.cur_level];
-    if(l.type == L_TYPE_FLAG)
+    if(l.type == L_TYPE_SYS)
     {
       //flags
       canv.context.lineWidth = 3;
@@ -1357,23 +1366,27 @@ var GamePlayScene = function(game, stage)
     {
       self.p_type_toggle_h.draw(canv);
       self.p_type_toggle_l.draw(canv);
-      stage.drawCanv.context.font = "20px arial";
+      canv.context.font = "20px arial";
       canv.outlineText("H",self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_h.h,"#FFFFFF","#000000");
       canv.outlineText("L",self.p_type_toggle_l.x,self.p_type_toggle_l.y+self.p_type_toggle_l.h,"#000000","#FFFFFF");
-      stage.drawCanv.context.font = "15px arial";
+      canv.context.font = "15px arial";
       canv.outlineText("Toggle Brush",self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_l.h*2,"#000000","#FFFFFF");
     }
     if(sys)
     {
-      self.p_store_h.draw(canv);
-      self.p_store_l.draw(canv);
-      stage.drawCanv.context.font = "20px arial";
-      canv.outlineText("H",self.p_store_h.x,self.p_store_h.y+self.p_store_h.h,"#FFFFFF","#000000");
-      canv.outlineText("L",self.p_store_l.x,self.p_store_l.y+self.p_store_l.h,"#000000","#FFFFFF");
-      stage.drawCanv.context.font = "15px arial";
-      canv.outlineText("Drag To Create/Destroy",self.p_store_h.x,self.p_store_h.y+self.p_store_h.h*2,"#000000","#FFFFFF");
+      if(self.cur_level == 0)
+      {
+        self.p_store_h.draw(canv);
+        self.p_store_l.draw(canv);
+        canv.context.font = "20px arial";
+        canv.outlineText("H",self.p_store_h.x,self.p_store_h.y+self.p_store_h.h,"#FFFFFF","#000000");
+        canv.outlineText("L",self.p_store_l.x,self.p_store_l.y+self.p_store_l.h,"#000000","#FFFFFF");
+        canv.context.font = "15px arial";
+        canv.outlineText("Drag To Create/Destroy",self.p_store_h.x,self.p_store_h.y+self.p_store_h.h*2,"#000000","#FFFFFF");
+      }
     }
 
+    canv.context.font = "15px arial";
     self.pp_button.draw(canv);
     canv.outlineText("Play/Pause",self.pp_button.x,self.pp_button.y+self.pp_button.h*2,"#000000","#FFFFFF");
     self.menu_button.draw(canv);
