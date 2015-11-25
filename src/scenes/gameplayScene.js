@@ -1070,6 +1070,14 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
     l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
     l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.1,0.1,0.1, 0.1,self));
+    l.psys.push(new PSys(0.9,0.1,0.1, 0.1,self));
+    l.psys.push(new PSys(0.1,0.9,0.1, 0.1,self));
+    l.psys.push(new PSys(0.9,0.9,0.1, 0.1,self));
+    l.psys.push(new PSys(0.1,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.5,0.1,0.1, 0.1,self));
+    l.psys.push(new PSys(0.9,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.5,0.9,0.1, 0.1,self));
     self.levels.push(l);
 
     l = new Level();
@@ -1491,14 +1499,6 @@ var GamePlayScene = function(game, stage)
     }
 
     /*
-    // game objs
-    */
-    //flags
-      //goal
-    for(var i = 0; i < self.flags.length; i++)
-      self.flags[i].draw(canv);
-
-    /*
     // pressure systems
     */
     if(sys)
@@ -1506,6 +1506,12 @@ var GamePlayScene = function(game, stage)
       for(var i = 0; i < self.psys.length; i++)
         self.psys[i].draw(canv);
     }
+
+    /*
+    // game objs
+    */
+    for(var i = 0; i < self.flags.length; i++)
+      self.flags[i].draw(canv);
 
     /*
     // playground stuff
