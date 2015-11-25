@@ -702,26 +702,73 @@ var GamePlayScene = function(game, stage)
   {
     var self = this;
 
+    self.w = 20;
+    self.h = 20;
+
     //normalized vals
-    self.x = x;
-    self.y = y;
+    self.start_sx = x;
+    self.start_sy = y;
     self.xd = 0.;
     self.yd = 0.;
     self.goal_xd = xd;
     self.goal_yd = yd;
 
-    //actual map vals
-    self.cache_x = 0;
-    self.cache_y = 0;
-    self.goal_cache_xd = 0;
-    self.goal_cache_yd = 0;
+    self.reset = function()
+    {
+      self.sx = self.start_sx;
+      self.sy = self.start_sy;
+      self.x = self.sx*stage.drawCanv.canvas.width-(self.w/2);
+      self.y = self.sy*stage.drawCanv.canvas.height-(self.h/2);
+      self.dragging = false;
+      self.hovering = false;
+      self.met = false;
+    }
+    self.reset();
 
-    self.cache_t = 0;
-    self.cache_l = 0;
-    self.goal_cache_t = 0;
-    self.goal_cache_l = 0;
+    self.cache = function()
+    {
+      self.cache_x = self.sx*stage.drawCanv.canvas.width;
+      self.cache_y = self.sy*stage.drawCanv.canvas.height;
+      self.goal_cache_xd = self.cache_x+self.goal_xd*flag_length;
+      self.goal_cache_yd = self.cache_y+self.goal_yd*flag_length;
 
-    self.met = false;
+      self.goal_cache_l = Math.sqrt(self.goal_xd*self.goal_xd+self.goal_yd*self.goal_yd);
+      self.goal_cache_t = Math.atan2(self.goal_yd/self.goal_cache_l,self.goal_xd/self.goal_cache_l);
+    }
+    self.cache();
+
+    self.dragging = false;
+    self.hovering = false;
+
+    self.hover = function()
+    {
+      self.hovering = true;
+    }
+    self.unhover = function()
+    {
+      self.hovering = false;
+    }
+    self.dragStart = function(evt)
+    {
+      if(scene.dragging_flag) return;
+      scene.dragging_flag = self;
+      self.dragging = true;
+    }
+    self.drag = function(evt)
+    {
+      if(self.dragging)
+      {
+        self.sx = evt.doX/stage.drawCanv.canvas.width;
+        self.sy = evt.doY/stage.drawCanv.canvas.height;
+        self.x = evt.doX-(self.w/2);
+        self.y = evt.doY-(self.h/2);
+      }
+    }
+    self.dragFinish = function(evt)
+    {
+      self.dragging = false;
+      scene.dragging_flag = undefined;
+    }
   }
   var Level = function()
   {
@@ -748,7 +795,9 @@ var GamePlayScene = function(game, stage)
   self.balloon;
   self.brush;
   self.psys;
+  self.flags;
   self.dragging_sys;
+  self.dragging_flag;
   self.tools;
   self.dragging_tool;
 
@@ -810,6 +859,7 @@ var GamePlayScene = function(game, stage)
     {
       self.psys = [];
     }
+    self.flags = [];
     var min_pressure = 1000;
     var max_pressure = 1030;
     if(tools)
@@ -1003,42 +1053,62 @@ var GamePlayScene = function(game, stage)
 
   self.beginLevel = function(l)
   {
-    self.cur_level = l;
-    var l = self.levels[self.cur_level];
-
     //clear out any on-map data
-    for(var i = 0; i < self.psys.length; i++)
+      //flags
+    if(self.levels[self.cur_level].type == L_TYPE_FLAG)
     {
-      self.play_hoverer.unregister(self.psys[i]);
-      self.play_dragger.unregister(self.psys[i]);
+      for(var i = 0; i < self.flags.length; i++)
+      {
+        self.play_hoverer.unregister(self.flags[i]);
+        self.play_dragger.unregister(self.flags[i]);
+      }
+    }
+    self.flags = [];
+      //sys
+    if(self.levels[self.cur_level].type == L_TYPE_SYS)
+    {
+      for(var i = 0; i < self.psys.length; i++)
+      {
+        self.play_hoverer.unregister(self.psys[i]);
+        self.play_dragger.unregister(self.psys[i]);
+      }
     }
     self.psys = [];
 
+    //set new level
+    self.cur_level = l;
+    var l = self.levels[self.cur_level];
+
     if(l.type != L_TYPE_NONE)
     {
+      //flags
       var f;
       for(var i = 0; i < l.flags.length; i++)
       {
         f = l.flags[i];
-        f.cache_x = f.x*stage.drawCanv.canvas.width;
-        f.cache_y = f.y*stage.drawCanv.canvas.height;
-        f.goal_cache_xd = f.cache_x+f.goal_xd*flag_length;
-        f.goal_cache_yd = f.cache_y+f.goal_yd*flag_length;
-
-        f.goal_cache_l = Math.sqrt(f.goal_xd*f.goal_xd+f.goal_yd*f.goal_yd);
-        f.goal_cache_t = Math.atan2(f.goal_yd/f.goal_cache_l,f.goal_xd/f.goal_cache_l);
         f.met = false;
+
+        self.flags.push(f);
+        if(l.type == L_TYPE_FLAG)
+        {
+          self.play_hoverer.register(f);
+          self.play_dragger.register(f);
+        }
       }
 
+      //sys
       var s;
       for(var i = 0; i < l.psys.length; i++)
       {
-        self.psys.push(l.psys[i]);
-        self.psys[i].reset();
-        self.play_hoverer.register(self.psys[i]);
-        self.play_dragger.register(self.psys[i]);
+        s = l.psys[i];
+        self.psys.push(s);
+        s.reset();
+        if(l.type == L_TYPE_SYS)
+        {
+          self.play_hoverer.register(s);
+          self.play_dragger.register(s);
+        }
       }
-
     }
     l.timer = 0;
     l.complete_this_round = false;
@@ -1210,38 +1280,36 @@ var GamePlayScene = function(game, stage)
     */
     if(self.pp_mode)
     {
-      var l = self.levels[self.cur_level];
-      if(l.type == L_TYPE_SYS)
+      //flags
+      var cart = {x:0,y:0};
+      var polar = {dir:0,len:0};
+      var f;
+      var all_met = true;
+      var t_tolerance = 0.2;
+      for(var i = 0; i < self.flags.length; i++)
       {
-        //flags
-        var cart = {x:0,y:0};
-        var polar = {dir:0,len:0};
-        var f;
-        var all_met = true;
-        var t_tolerance = 0.2;
-        for(var i = 0; i < l.flags.length; i++)
-        {
-          f = l.flags[i];
-          self.vfield.sampleFill(f.x,f.y,cart);
-          f.xd = cart.x;
-          f.yd = cart.y;
-          self.vfield.samplePolarFill(f.x,f.y,polar);
-          var t_diff = Math.abs(f.goal_cache_t-polar.dir);
-          if(f.goal_cache_l < polar.len && (t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance)) f.met = true;
-          else f.met = false;
-          all_met = all_met && f.met;
-        }
-        if(all_met)
-        {
-          l.timer++;
-          if(l.timer > l.req_timer)
-          {
-            l.complete = true;
-            l.complete_this_round = true;
-          }
-        }
-        else l.timer = 0;
+        f = self.flags[i];
+        self.vfield.sampleFill(f.sx,f.sy,cart);
+        f.xd = cart.x;
+        f.yd = cart.y;
+        self.vfield.samplePolarFill(f.sx,f.sy,polar);
+        var t_diff = Math.abs(f.goal_cache_t-polar.dir);
+        if(f.goal_cache_l < polar.len && (t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance)) f.met = true;
+        else f.met = false;
+        all_met = all_met && f.met;
       }
+
+      var l = self.levels[self.cur_level];
+      if(all_met)
+      {
+        l.timer++;
+        if(l.timer > l.req_timer)
+        {
+          l.complete = true;
+          l.complete_this_round = true;
+        }
+      }
+      else l.timer = 0;
     }
 
     /*
@@ -1332,33 +1400,29 @@ var GamePlayScene = function(game, stage)
     /*
     // game objs
     */
-    var l = self.levels[self.cur_level];
-    if(l.type == L_TYPE_SYS)
+    //flags
+    canv.context.lineWidth = 3;
+    var f;
+      //goal
+    canv.context.strokeStyle = "#00FF00";
+    for(var i = 0; i < self.flags.length; i++)
     {
-      //flags
-      canv.context.lineWidth = 3;
-      var f;
-        //goal
-      canv.context.strokeStyle = "#00FF00";
-      for(var i = 0; i < l.flags.length; i++)
-      {
-        f = l.flags[i];
-        canv.context.beginPath();
-        canv.context.moveTo(f.cache_x,f.cache_y);
-        canv.context.lineTo(f.goal_cache_xd,f.goal_cache_yd);
-        canv.context.stroke();
-      }
-        //flag
-      for(var i = 0; i < l.flags.length; i++)
-      {
-        f = l.flags[i];
-        if(f.met) canv.context.strokeStyle = "#00FF00";
-        else canv.context.strokeStyle = "#FF0000";
-        canv.context.beginPath();
-        canv.context.moveTo(f.cache_x,f.cache_y);
-        canv.context.lineTo(f.cache_x+(f.xd*flag_length),f.cache_y+(f.yd*flag_length));
-        canv.context.stroke();
-      }
+      f = self.flags[i];
+      canv.context.beginPath();
+      canv.context.moveTo(f.cache_x,f.cache_y);
+      canv.context.lineTo(f.goal_cache_xd,f.goal_cache_yd);
+      canv.context.stroke();
+    }
+      //flag
+    for(var i = 0; i < self.flags.length; i++)
+    {
+      f = self.flags[i];
+      if(f.met) canv.context.strokeStyle = "#00FF00";
+      else canv.context.strokeStyle = "#FF0000";
+      canv.context.beginPath();
+      canv.context.moveTo(f.cache_x,f.cache_y);
+      canv.context.lineTo(f.cache_x+(f.xd*flag_length),f.cache_y+(f.yd*flag_length));
+      canv.context.stroke();
     }
 
     /*
