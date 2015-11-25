@@ -21,10 +21,6 @@ var L_TYPE_FLAG = ENUM; ENUM++;
 var L_TYPE_SYS  = ENUM; ENUM++;
 
 ENUM = 0;
-var PP_MODE_PLAY  = ENUM; ENUM++;
-var PP_MODE_PAUSE = ENUM; ENUM++;
-
-ENUM = 0;
 var GAME_MODE_MENU  = ENUM; ENUM++;
 var GAME_MODE_PLAY  = ENUM; ENUM++;
 var GAME_MODE_BLURB = ENUM; ENUM++;
@@ -488,7 +484,7 @@ var GamePlayScene = function(game, stage)
             b.y = 60;
             b.w = 350;
             b.h = 80;
-            b.txt = "Drag the Flag to the left around the map to find a position where the wind is blowing strongly due north (indicated by the green flag).";
+            b.txt = "Drag the flag around the map to find a position where the wind is blowing strongly due north (indicated by the green flag).";
             setTimeout(function(){ scene.popBlurb(b); },1000);
           }
         });
@@ -853,7 +849,8 @@ var GamePlayScene = function(game, stage)
   }
 
   self.game_mode;
-  self.pp_mode;
+  self.vec_mode;
+  self.air_mode;
   self.cur_level;
   self.levels;
 
@@ -871,7 +868,8 @@ var GamePlayScene = function(game, stage)
 
   self.clip;
   self.menu_button;
-  self.pp_button;
+  self.vec_button;
+  self.air_button;
   self.blurb;
 
   self.p_type = P_TYPE_LOW;
@@ -910,12 +908,14 @@ var GamePlayScene = function(game, stage)
     self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-10-20,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
-    self.pp_button = new ButtonBox(stage.drawCanv.canvas.width/2-10,10,20,20, function(on) { self.pp_mode = !self.pp_mode; });
-    self.play_clicker.register(self.pp_button);
+    self.vec_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-30,10,20,20, function(on) { self.vec_mode = !self.vec_mode; });
+    self.air_button = new ButtonBox(stage.drawCanv.canvas.width/2-10,10,20,20, function(on) { self.air_mode = !self.air_mode; });
+    self.play_clicker.register(self.vec_button);
+    self.play_clicker.register(self.air_button);
 
     self.pmap = new HeightMap(50,50);
     self.vfield = new VecField2d(30,30);
-    self.afield = new AirField(2000);
+    self.afield = new AirField(1000);
     self.balloon = new Balloon();
 
     if(paint)
@@ -1046,7 +1046,7 @@ var GamePlayScene = function(game, stage)
 
     l = new Level();
     l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.2,0.5,0.0,-1.5,self));
+    l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
     self.levels.push(l);
@@ -1102,7 +1102,8 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
-    self.pp_mode = true;
+    self.vec_mode = false;
+    self.air_mode = false;
     self.beginLevel(0);
     self.levels[self.cur_level].complete = true;
     self.setMode(GAME_MODE_MENU);
@@ -1149,6 +1150,9 @@ var GamePlayScene = function(game, stage)
 
   self.beginLevel = function(l)
   {
+    self.vec_mode = false;
+    self.air_mode = false;
+
     //clear out any on-map data
       //flags
     if(self.levels[self.cur_level].type == L_TYPE_FLAG)
@@ -1270,14 +1274,8 @@ var GamePlayScene = function(game, stage)
     /*
     // pressure
     */
-    if(anneal && self.pp_mode)
-    {
+    if(anneal)
       self.pmap.anneal(0.10);
-    }
-    if(paint)
-    {
-      self.brush.tick();
-    }
     if(sys)
     {
       index = 0;
@@ -1349,7 +1347,7 @@ var GamePlayScene = function(game, stage)
     */
     var x;
     var y;
-    if(self.pp_mode)
+    if(self.air_mode)
     {
       for(var i = 0; i < self.afield.n; i++)
       {
@@ -1375,39 +1373,34 @@ var GamePlayScene = function(game, stage)
     /*
     // game objs
     */
-    if(self.pp_mode)
+    var cart = {x:0,y:0};
+    var polar = {dir:0,len:0};
+    var f;
+    var all_met = true;
+    var t_tolerance = 0.2;
+    for(var i = 0; i < self.flags.length; i++)
     {
-      //flags
-      var cart = {x:0,y:0};
-      var polar = {dir:0,len:0};
-      var f;
-      var all_met = true;
-      var t_tolerance = 0.2;
-      for(var i = 0; i < self.flags.length; i++)
-      {
-        f = self.flags[i];
-        self.vfield.sampleFill(f.sx,f.sy,cart);
-        f.xd = cart.x;
-        f.yd = cart.y;
-        self.vfield.samplePolarFill(f.sx,f.sy,polar);
-        var t_diff = Math.abs(f.goal_cache_t-polar.dir);
-        if(f.goal_cache_l < polar.len && (t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance)) f.met = true;
-        else f.met = false;
-        all_met = all_met && f.met;
-      }
-
-      var l = self.levels[self.cur_level];
-      if(all_met)
-      {
-        l.timer++;
-        if(l.timer > l.req_timer || self.cur_level == 0)
-        {
-          l.complete = true;
-          l.complete_this_round = true;
-        }
-      }
-      else l.timer = 0;
+      f = self.flags[i];
+      self.vfield.sampleFill(f.sx,f.sy,cart);
+      f.xd = cart.x;
+      f.yd = cart.y;
+      self.vfield.samplePolarFill(f.sx,f.sy,polar);
+      var t_diff = Math.abs(f.goal_cache_t-polar.dir);
+      if(f.goal_cache_l < polar.len && (t_diff < t_tolerance || t_diff > (3.141592*2)-t_tolerance)) f.met = true;
+      else f.met = false;
+      all_met = all_met && f.met;
     }
+    var l = self.levels[self.cur_level];
+    if(all_met)
+    {
+      l.timer++;
+      if(l.timer > l.req_timer || self.cur_level == 0)
+      {
+        l.complete = true;
+        l.complete_this_round = true;
+      }
+    }
+    else l.timer = 0;
 
     /*
     //playground stuff
@@ -1464,7 +1457,7 @@ var GamePlayScene = function(game, stage)
     /*
     // vectors
     */
-    if(!self.pp_mode)
+    if(self.vec_mode)
     {
       canv.context.lineWidth = 1.0;
       canv.context.strokeStyle = "#FF00FF";
@@ -1490,9 +1483,12 @@ var GamePlayScene = function(game, stage)
     /*
     // air
     */
-    canv.context.fillStyle = "#8888FF";
-    for(var i = 0; i < self.afield.n; i++)
-      canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
+    if(self.air_mode)
+    {
+      canv.context.fillStyle = "#8888FF";
+      for(var i = 0; i < self.afield.n; i++)
+        canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
+    }
 
     /*
     // game objs
@@ -1556,10 +1552,12 @@ var GamePlayScene = function(game, stage)
     }
 
     canv.context.font = "15px arial";
-    self.pp_button.draw(canv);
-    canv.outlineText("Play/Pause",self.pp_button.x,self.pp_button.y+self.pp_button.h*2,"#000000","#FFFFFF");
     self.menu_button.draw(canv);
     canv.outlineText("Menu",self.menu_button.x-20,self.menu_button.y+self.menu_button.h*2,"#000000","#FFFFFF");
+    self.vec_button.draw(canv);
+    canv.outlineText("Vec",self.vec_button.x,self.vec_button.y+self.vec_button.h*2,"#000000","#FFFFFF");
+    self.air_button.draw(canv);
+    canv.outlineText("Air",self.air_button.x,self.air_button.y+self.air_button.h*2,"#000000","#FFFFFF");
     if(self.levels[self.cur_level].complete_this_round)
     {
       canv.context.fillStyle = "#FFFFFF";
