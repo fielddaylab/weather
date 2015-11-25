@@ -1084,8 +1084,11 @@ var GamePlayScene = function(game, stage)
     //MYLEVELS
     var l;
 
+    //playground
     l = new Level();
     l.type = L_TYPE_NONE;
+    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
     //blow north
@@ -1236,7 +1239,7 @@ var GamePlayScene = function(game, stage)
     }
     self.flags = [];
       //sys
-    if(self.levels[self.cur_level].type == L_TYPE_SYS)
+    if(self.levels[self.cur_level].type == L_TYPE_SYS || self.levels[self.cur_level].type == L_TYPE_NONE)
     {
       for(var i = 0; i < self.psys.length; i++)
       {
@@ -1250,36 +1253,33 @@ var GamePlayScene = function(game, stage)
     self.cur_level = l;
     var l = self.levels[self.cur_level];
 
-    if(l.type != L_TYPE_NONE)
+    //flags
+    var f;
+    for(var i = 0; i < l.flags.length; i++)
     {
-      //flags
-      var f;
-      for(var i = 0; i < l.flags.length; i++)
-      {
-        f = l.flags[i];
-        f.met = false;
+      f = l.flags[i];
+      f.met = false;
 
-        self.flags.push(f);
-        f.reset();
-        if(l.type == L_TYPE_FLAG)
-        {
-          self.play_hoverer.register(f);
-          self.play_dragger.register(f);
-        }
+      self.flags.push(f);
+      f.reset();
+      if(l.type == L_TYPE_FLAG)
+      {
+        self.play_hoverer.register(f);
+        self.play_dragger.register(f);
       }
+    }
 
-      //sys
-      var s;
-      for(var i = 0; i < l.psys.length; i++)
+    //sys
+    var s;
+    for(var i = 0; i < l.psys.length; i++)
+    {
+      s = l.psys[i];
+      self.psys.push(s);
+      s.reset();
+      if(l.type == L_TYPE_SYS || l.type == L_TYPE_NONE)
       {
-        s = l.psys[i];
-        self.psys.push(s);
-        s.reset();
-        if(l.type == L_TYPE_SYS)
-        {
-          self.play_hoverer.register(s);
-          self.play_dragger.register(s);
-        }
+        self.play_hoverer.register(s);
+        self.play_dragger.register(s);
       }
     }
     l.timer = 0;
