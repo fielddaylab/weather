@@ -698,7 +698,7 @@ var GamePlayScene = function(game, stage)
     }
   }
 
-  var Flag = function(x,y,xd,yd)
+  var Flag = function(x,y,xd,yd,scene)
   {
     var self = this;
 
@@ -727,10 +727,8 @@ var GamePlayScene = function(game, stage)
 
     self.cache = function()
     {
-      self.cache_x = self.sx*stage.drawCanv.canvas.width;
-      self.cache_y = self.sy*stage.drawCanv.canvas.height;
-      self.goal_cache_xd = self.cache_x+self.goal_xd*flag_length;
-      self.goal_cache_yd = self.cache_y+self.goal_yd*flag_length;
+      self.goal_cache_xd = self.goal_xd*flag_length;
+      self.goal_cache_yd = self.goal_yd*flag_length;
 
       self.goal_cache_l = Math.sqrt(self.goal_xd*self.goal_xd+self.goal_yd*self.goal_yd);
       self.goal_cache_t = Math.atan2(self.goal_yd/self.goal_cache_l,self.goal_xd/self.goal_cache_l);
@@ -768,6 +766,31 @@ var GamePlayScene = function(game, stage)
     {
       self.dragging = false;
       scene.dragging_flag = undefined;
+    }
+
+    self.draw = function(canv)
+    {
+      self.cache_x = self.sx*canv.canvas.width;
+      self.cache_y = self.sy*canv.canvas.height;
+
+      canv.context.beginPath();
+      canv.context.moveTo(self.cache_x,self.cache_y);
+      canv.context.lineTo(self.cache_x+self.goal_cache_xd,self.cache_y+self.goal_cache_yd);
+      canv.context.stroke();
+
+      if(self.met) canv.context.strokeStyle = "#00FF00";
+      else canv.context.strokeStyle = "#FF0000";
+      canv.context.beginPath();
+      canv.context.moveTo(self.cache_x,self.cache_y);
+      canv.context.lineTo(self.cache_x+(self.xd*flag_length),self.cache_y+(self.yd*flag_length));
+      canv.context.stroke();
+
+      if(self.hovering || self.dragging)
+      {
+        canv.context.lineWidth = 3;
+        canv.context.strokeStyle = self.color_fill;
+        canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
+      }
     }
   }
   var Level = function()
@@ -977,31 +1000,38 @@ var GamePlayScene = function(game, stage)
     self.levels.push(l);
 
     l = new Level();
-    l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.5,0.5,-2.0,0.0));
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.5,0.5,2.0,2.0));
+    l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.4,0.5,0.0,2.0));
-    l.flags.push(new Flag(0.6,0.5,0.0,-2.0));
+    l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
 
     l = new Level();
     l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.5,0.4,2.0,0.0));
-    l.flags.push(new Flag(0.5,0.6,-2.0,0.0));
+    l.flags.push(new Flag(0.4,0.5,0.0,2.0,self));
+    l.flags.push(new Flag(0.6,0.5,0.0,-2.0,self));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    self.levels.push(l);
+
+    l = new Level();
+    l.type = L_TYPE_SYS;
+    l.flags.push(new Flag(0.5,0.4,2.0,0.0,self));
+    l.flags.push(new Flag(0.5,0.6,-2.0,0.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
     self.levels.push(l);
@@ -1402,28 +1432,10 @@ var GamePlayScene = function(game, stage)
     */
     //flags
     canv.context.lineWidth = 3;
-    var f;
       //goal
     canv.context.strokeStyle = "#00FF00";
     for(var i = 0; i < self.flags.length; i++)
-    {
-      f = self.flags[i];
-      canv.context.beginPath();
-      canv.context.moveTo(f.cache_x,f.cache_y);
-      canv.context.lineTo(f.goal_cache_xd,f.goal_cache_yd);
-      canv.context.stroke();
-    }
-      //flag
-    for(var i = 0; i < self.flags.length; i++)
-    {
-      f = self.flags[i];
-      if(f.met) canv.context.strokeStyle = "#00FF00";
-      else canv.context.strokeStyle = "#FF0000";
-      canv.context.beginPath();
-      canv.context.moveTo(f.cache_x,f.cache_y);
-      canv.context.lineTo(f.cache_x+(f.xd*flag_length),f.cache_y+(f.yd*flag_length));
-      canv.context.stroke();
-    }
+      self.flags[i].draw(canv);
 
     /*
     // pressure systems
