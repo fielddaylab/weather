@@ -427,15 +427,25 @@ var GamePlayScene = function(game, stage)
       {
         scene.beginLevel(self.level_i);
         scene.setMode(GAME_MODE_PLAY);
-        if(self.level.text && self.level.text != "")
+        if(self.level.text_0 && self.level.text_0 != "")
         {
-          var b = new Blurb();
-          b.x = self.level.text_x;
-          b.y = self.level.text_y;
-          b.w = self.level.text_w;
-          b.h = self.level.text_h;
-          b.txt = self.level.text;
-          setTimeout(function(){ scene.popBlurb(b); },200);
+          var b_0 = new Blurb(scene);
+          b_0.x = self.level.text_x;
+          b_0.y = self.level.text_y;
+          b_0.w = self.level.text_w;
+          b_0.h = self.level.text_h;
+          b_0.txt = self.level.text_0;
+          setTimeout(function(){ scene.popBlurb(b_0); },200);
+          if(self.level.text_1 && self.level.text_1 != "")
+          {
+            var b_1 = new Blurb(scene);
+            b_1.x = self.level.text_x;
+            b_1.y = self.level.text_y;
+            b_1.w = self.level.text_w;
+            b_1.h = self.level.text_h;
+            b_1.txt = self.level.text_1;
+            b_0.click = function(evt) { scene.popBlurb(b_1); };
+          }
         }
       }
     }
@@ -770,7 +780,8 @@ var GamePlayScene = function(game, stage)
     self.text_y = 0;
     self.text_w = 0;
     self.text_h = 0;
-    self.text = "";
+    self.text_0 = "";
+    self.text_1 = "";
   }
 
   self.game_mode;
@@ -837,7 +848,7 @@ var GamePlayScene = function(game, stage)
     l.text_y = 60;
     l.text_w = 350;
     l.text_h = 80;
-    l.text = "This is a playground. Drag around the Pressure Systems or the meteorological tools. When ready to begin, hit Menu.";
+    l.text_0 = "This is a playground. Drag around the Pressure Systems or the meteorological tools. When ready to begin, hit Menu.";
     self.levels.push(l);
 
     //blow north
@@ -850,7 +861,7 @@ var GamePlayScene = function(game, stage)
     l.text_y = 60;
     l.text_w = 350;
     l.text_h = 80;
-    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the green flag).";
+    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the green flag).";
     self.levels.push(l);
 
     //blow east
@@ -863,7 +874,7 @@ var GamePlayScene = function(game, stage)
     l.text_y = 60;
     l.text_w = 300;
     l.text_h = 80;
-    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the green flag).";
+    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the green flag).";
     self.levels.push(l);
 
     //blow south (laterally surrounded L)
@@ -877,7 +888,7 @@ var GamePlayScene = function(game, stage)
     l.text_y = 60;
     l.text_w = 300;
     l.text_h = 80;
-    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the green flag).";
+    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the green flag).";
     self.levels.push(l);
 
     //full circle of flags
@@ -912,8 +923,8 @@ var GamePlayScene = function(game, stage)
     l.text_y = 60;
     l.text_w = 300;
     l.text_h = 80;
-    l.text = "Drag all the flags to find a position where the blowing red flag matches the green.";
-    l.text = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful!";
+    l.text_0 = "Drag all the flags to find a position where the blowing red flag matches the green.";
+    l.text_1 = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful!";
     self.levels.push(l);
 
     //use systems
@@ -926,8 +937,8 @@ var GamePlayScene = function(game, stage)
     l.text_y = 60;
     l.text_w = 300;
     l.text_h = 80;
-    l.text = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
-    l.text = "Make sure to use both the L and the H! (and use the visualizers!)";
+    l.text_0 = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+    l.text_1 = "Make sure to use both the L and the H! (and use the visualizers!)";
     self.levels.push(l);
 
     //use systems- at an angle
@@ -1233,6 +1244,7 @@ var GamePlayScene = function(game, stage)
     self.blurb.img_w = blurb.img_w;
     self.blurb.img_h = blurb.img_h;
     self.blurb.format(stage.drawCanv);
+    self.blurb.click = blurb.click;
     self.setMode(GAME_MODE_BLURB);
   }
 
