@@ -1,4 +1,4 @@
-var default_complete = true;
+var default_complete = false;
 var paint = false;
 var sys = !paint;
 var anneal = true;
@@ -948,6 +948,11 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    l.text_x = 150;
+    l.text_y = 60;
+    l.text_w = 350;
+    l.text_h = 80;
+    l.text_0 = "High And Low Pressure Systems.";
     self.levels.push(l);
 
     //cyclone
@@ -958,6 +963,11 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.3,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.7,0.1, 0.1,self));
+    l.text_x = 150;
+    l.text_y = 60;
+    l.text_w = 350;
+    l.text_h = 80;
+    l.text_0 = "Cyclooooone.";
     self.levels.push(l);
 
     //anticyclone
@@ -968,6 +978,11 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.3,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.5,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.7,0.1,-0.1,self));
+    l.text_x = 150;
+    l.text_y = 60;
+    l.text_w = 350;
+    l.text_h = 80;
+    l.text_0 = "Cyclooooone again.";
     self.levels.push(l);
 
 
