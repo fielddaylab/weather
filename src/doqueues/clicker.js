@@ -29,6 +29,7 @@ var Clicker = function(init)
   function click(evt)
   {
     doSetPosOnEvent(evt);
+    d.log(evt.doX+","+evt.doY);
     for(var i = 0; i < clickables.length; i++)
     {
       if(clicked(clickables[i], evt))
