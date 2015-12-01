@@ -418,6 +418,38 @@ var GamePlayScene = function(game, stage)
     }
   }
 
+  var LevelButtonBox = function(i, bs, scene)
+  {
+    var self;
+    function callback(on)
+    {
+      if(self.level_i == 0 || self.req_level.complete)
+      {
+        scene.beginLevel(self.level_i);
+        scene.setMode(GAME_MODE_PLAY);
+        if(self.level.text && self.level.text != "")
+        {
+          var b = new Blurb();
+          b.x = self.level.text_x;
+          b.y = self.level.text_y;
+          b.w = self.level.text_w;
+          b.h = self.level.text_h;
+          b.txt = self.level.text;
+          setTimeout(function(){ scene.popBlurb(b); },200);
+        }
+      }
+    }
+
+    var self = new ButtonBox(20+((bs+10)*i),20+((bs+10)*0),bs,bs,callback);
+    self.level_i = i;
+    self.level = scene.levels[self.level_i];
+    if(self.level_i > 0)
+      self.req_level = scene.levels[self.level_i-1];
+    self.title_a = "Lvl "+self.level_i;
+    self.title_b = "";
+    return self;
+  }
+
   var ClipBoard = function(x,y,w,h,scene,levels)
   {
     var self = this;
@@ -455,223 +487,14 @@ var GamePlayScene = function(game, stage)
       canv.context.strokeRect(this.off_x+0.5,this.off_y+0.5,this.w,this.h);
     }
 
-    var bs = 40;
-    var b;
-    //must manually unroll because js is terrible
-      b = new ButtonBox(20+((bs+10)*0),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[0+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-          }
-        });
-      b.level = 0;
-      b.title_a = "Lvl 0";
-      b.title_b = "";
-      self.buttons.push(b);
+    for(var i = 0; i < 9; i++)
+    {
+      var b;
+      var bs = 40;
 
-      b = new ButtonBox(20+((bs+10)*1),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[1+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-            if(level.text && level.text != "")
-            {
-              var b = new Blurb();
-              b.x = 150;
-              b.y = 60;
-              b.w = 350;
-              b.h = 80;
-              b.txt = level.text;
-              setTimeout(function(){ scene.popBlurb(b); },200);
-            }
-          }
-        });
-      b.level = 1;
-      b.title_a = "Lvl 1";
-      b.title_b = "";
+      b = new LevelButtonBox(i,bs,scene);
       self.buttons.push(b);
-
-      b = new ButtonBox(20+((bs+10)*2),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[2+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-            if(level.text && level.text != "")
-            {
-              var b = new Blurb();
-              b.x = 200;
-              b.y = 60;
-              b.w = 300;
-              b.h = 80;
-              b.txt = level.text;
-              setTimeout(function(){ scene.popBlurb(b); },200);
-            }
-          }
-        });
-      b.level = 2;
-      b.title_a = "Lvl 2";
-      b.title_b = "";
-      self.buttons.push(b);
-
-      b = new ButtonBox(20+((bs+10)*3),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[3+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-            if(level.text && level.text != "")
-            {
-              var b = new Blurb();
-              b.x = 200;
-              b.y = 60;
-              b.w = 300;
-              b.h = 80;
-              b.txt = level.text;
-              setTimeout(function(){ scene.popBlurb(b); },200);
-            }
-          }
-        });
-      b.level = 3;
-      b.title_a = "Lvl 3";
-      b.title_b = "";
-      self.buttons.push(b);
-
-      b = new ButtonBox(20+((bs+10)*4),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[4+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-            if(level.text && level.text != "")
-            {
-              var b = new Blurb();
-              b.x = 200;
-              b.y = 60;
-              b.w = 300;
-              b.h = 80;
-              b.txt = level.text;
-              setTimeout(function(){ scene.popBlurb(b); },200);
-            }
-            if(level.text && level.text != "")
-            {
-              var b2 = new Blurb();
-              b2.x = 200;
-              b2.y = 60;
-              b2.w = 300;
-              b2.h = 80;
-              b.txt = level.text;
-              setTimeout(function(){ scene.popBlurb(b2); },15000);
-            }
-          }
-        });
-      b.level = 4;
-      b.title_a = "Lvl 4";
-      b.title_b = "";
-      self.buttons.push(b);
-
-      b = new ButtonBox(20+((bs+10)*5),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[5+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-            if(level.text && level.text != "")
-            {
-              var b = new Blurb();
-              b.x = 200;
-              b.y = 60;
-              b.w = 300;
-              b.h = 80;
-              b.txt = level.text;
-              setTimeout(function(){ scene.popBlurb(b); },200);
-            }
-            if(level.text && level.text != "")
-            {
-              var b2 = new Blurb();
-              b2.x = 200;
-              b2.y = 60;
-              b2.w = 300;
-              b2.h = 80;
-              b.txt = level.text;
-              setTimeout(function(){ scene.popBlurb(b2); },15000);
-            }
-          }
-        });
-      b.level = 5;
-      b.title_a = "Lvl 5";
-      b.title_b = "";
-      self.buttons.push(b);
-
-      b = new ButtonBox(20+((bs+10)*6),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[6+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-          }
-        });
-      b.level = 6;
-      b.title_a = "Lvl 6";
-      b.title_b = "";
-      self.buttons.push(b);
-
-      b = new ButtonBox(20+((bs+10)*7),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[7+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-          }
-        });
-      b.level = 7;
-      b.title_a = "Lvl 7";
-      b.title_b = "";
-      self.buttons.push(b);
-
-      b = new ButtonBox(20+((bs+10)*8),20+((bs+10)*0),bs,bs,
-        function(on)
-        {
-          var level_i = self.buttons[8+1].level;
-          var level = levels[level_i-1];
-          if(level_i == 0 || level.complete)
-          {
-            scene.beginLevel(level_i);
-            scene.setMode(GAME_MODE_PLAY);
-          }
-        });
-      b.level = 8;
-      b.title_a = "Lvl 8";
-      b.title_b = "";
-      self.buttons.push(b);
-
+    }
 
     //quick hack to fix clicker even though on separate canv
     var draw = function(canv)
@@ -679,7 +502,7 @@ var GamePlayScene = function(game, stage)
       if(this.down) canv.context.strokeStyle = "#00F400";
       else          canv.context.strokeStyle = "#000000";
 
-      if(this.level == 0 || levels[this.level-1].complete)
+      if(this.level_i == 0 || levels[this.level_i-1].complete)
         canv.context.fillStyle = "#00F400";
       else
         canv.context.fillStyle = "#FF8800";
@@ -943,6 +766,10 @@ var GamePlayScene = function(game, stage)
     self.complete = default_complete;
     self.complete_this_round = false;
 
+    self.text_x = 0;
+    self.text_y = 0;
+    self.text_w = 0;
+    self.text_h = 0;
     self.text = "";
   }
 
@@ -997,6 +824,140 @@ var GamePlayScene = function(game, stage)
 
     self.cur_level = 0;
     self.levels = [];
+
+    //MYLEVELS
+    var l;
+
+    //playground
+    l = new Level();
+    l.type = L_TYPE_NONE;
+    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
+    l.text_x = 150;
+    l.text_y = 60;
+    l.text_w = 350;
+    l.text_h = 80;
+    l.text = "This is a playground. Drag around the Pressure Systems or the meteorological tools. When ready to begin, hit Menu.";
+    self.levels.push(l);
+
+    //blow north
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
+    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
+    l.text_x = 150;
+    l.text_y = 60;
+    l.text_w = 350;
+    l.text_h = 80;
+    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the green flag).";
+    self.levels.push(l);
+
+    //blow east
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.3,0.5,1.5,0.0,self));
+    l.psys.push(new PSys(0.5,0.4,0.1,-0.1,self));
+    l.psys.push(new PSys(0.5,0.6,0.1, 0.1,self));
+    l.text_x = 200;
+    l.text_y = 60;
+    l.text_w = 300;
+    l.text_h = 80;
+    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the green flag).";
+    self.levels.push(l);
+
+    //blow south (laterally surrounded L)
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    l.flags.push(new Flag(0.6,0.6,0.0,1.0,self));
+    l.psys.push(new PSys(0.5,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.3,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.7,0.5,0.1, 0.1,self));
+    l.text_x = 200;
+    l.text_y = 60;
+    l.text_w = 300;
+    l.text_h = 80;
+    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the green flag).";
+    self.levels.push(l);
+
+    //full circle of flags
+    l = new Level();
+    l.type = L_TYPE_FLAG;
+    var i = 0;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    i = 0;
+    l.psys.push(new PSys(0.5,0.5,0.1, -0.1,self));
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
+    l.psys.push(new PSys(0.1,0.1,0.1, 0.1,self));
+    l.psys.push(new PSys(0.9,0.1,0.1, 0.1,self));
+    l.psys.push(new PSys(0.1,0.9,0.1, 0.1,self));
+    l.psys.push(new PSys(0.9,0.9,0.1, 0.1,self));
+    l.psys.push(new PSys(0.1,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.5,0.1,0.1, 0.1,self));
+    l.psys.push(new PSys(0.9,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.5,0.9,0.1, 0.1,self));
+    l.text_x = 200;
+    l.text_y = 60;
+    l.text_w = 300;
+    l.text_h = 80;
+    l.text = "Drag all the flags to find a position where the blowing red flag matches the green.";
+    l.text = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful!";
+    self.levels.push(l);
+
+    //use systems
+    l = new Level();
+    l.type = L_TYPE_SYS;
+    l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    l.text_x = 200;
+    l.text_y = 60;
+    l.text_w = 300;
+    l.text_h = 80;
+    l.text = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+    l.text = "Make sure to use both the L and the H! (and use the visualizers!)";
+    self.levels.push(l);
+
+    //use systems- at an angle
+    l = new Level();
+    l.type = L_TYPE_SYS;
+    l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    self.levels.push(l);
+
+    //cyclone
+    l = new Level();
+    l.type = L_TYPE_SYS;
+    l.flags.push(new Flag(0.42,0.5,0.0,1.5,self));
+    l.flags.push(new Flag(0.58,0.5,0.0,-1.5,self));
+    l.psys.push(new PSys(0.2,0.3,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
+    l.psys.push(new PSys(0.2,0.7,0.1, 0.1,self));
+    self.levels.push(l);
+
+    //anticyclone
+    l = new Level();
+    l.type = L_TYPE_SYS;
+    l.flags.push(new Flag(0.5,0.42,1.5,0.0,self));
+    l.flags.push(new Flag(0.5,0.58,-1.5,0.0,self));
+    l.psys.push(new PSys(0.2,0.3,0.1,-0.1,self));
+    l.psys.push(new PSys(0.2,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.7,0.1,-0.1,self));
+    self.levels.push(l);
+
 
     self.clip = new ClipBoard(20,20,stage.drawCanv.canvas.width-40,stage.drawCanv.canvas.height-20,self,self.levels);
     self.clip.register(self.menu_clicker);
@@ -1134,115 +1095,6 @@ var GamePlayScene = function(game, stage)
       self.bin_dragger.register(self.p_store_l);
     }
 
-
-    //MYLEVELS
-    var l;
-
-    //playground
-    l = new Level();
-    l.type = L_TYPE_NONE;
-    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
-    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the green flag).";
-    self.levels.push(l);
-
-    //blow north
-    l = new Level();
-    l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
-    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
-    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the green flag).";
-    self.levels.push(l);
-
-    //blow east
-    l = new Level();
-    l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.3,0.5,1.5,0.0,self));
-    l.psys.push(new PSys(0.5,0.4,0.1,-0.1,self));
-    l.psys.push(new PSys(0.5,0.6,0.1, 0.1,self));
-    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the green flag).";
-    self.levels.push(l);
-
-    //blow south (laterally surrounded L)
-    l = new Level();
-    l.type = L_TYPE_FLAG;
-    l.flags.push(new Flag(0.6,0.6,0.0,1.0,self));
-    l.psys.push(new PSys(0.5,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.3,0.5,0.1, 0.1,self));
-    l.psys.push(new PSys(0.7,0.5,0.1, 0.1,self));
-    l.text = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the green flag).";
-    self.levels.push(l);
-
-    //full circle of flags
-    l = new Level();
-    l.type = L_TYPE_FLAG;
-    var i = 0;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    i = 0;
-    l.psys.push(new PSys(0.5,0.5,0.1, -0.1,self));
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.1,0.1,0.1, 0.1,self));
-    l.psys.push(new PSys(0.9,0.1,0.1, 0.1,self));
-    l.psys.push(new PSys(0.1,0.9,0.1, 0.1,self));
-    l.psys.push(new PSys(0.9,0.9,0.1, 0.1,self));
-    l.psys.push(new PSys(0.1,0.5,0.1, 0.1,self));
-    l.psys.push(new PSys(0.5,0.1,0.1, 0.1,self));
-    l.psys.push(new PSys(0.9,0.5,0.1, 0.1,self));
-    l.psys.push(new PSys(0.5,0.9,0.1, 0.1,self));
-    l.text = "Drag all the flags to find a position where the blowing red flag matches the green.";
-    l.text = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful!";
-    self.levels.push(l);
-
-    //use systems
-    l = new Level();
-    l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
-    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-    l.text = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
-    l.text = "Make sure to use both the L and the H! (and use the visualizers!)";
-    self.levels.push(l);
-
-    //use systems- at an angle
-    l = new Level();
-    l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
-    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-    self.levels.push(l);
-
-    //cyclone
-    l = new Level();
-    l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.42,0.5,0.0,1.5,self));
-    l.flags.push(new Flag(0.58,0.5,0.0,-1.5,self));
-    l.psys.push(new PSys(0.2,0.3,0.1, 0.1,self));
-    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.2,0.7,0.1, 0.1,self));
-    self.levels.push(l);
-
-    //anticyclone
-    l = new Level();
-    l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.5,0.42,1.5,0.0,self));
-    l.flags.push(new Flag(0.5,0.58,-1.5,0.0,self));
-    l.psys.push(new PSys(0.2,0.3,0.1,-0.1,self));
-    l.psys.push(new PSys(0.2,0.5,0.1, 0.1,self));
-    l.psys.push(new PSys(0.2,0.7,0.1,-0.1,self));
-    self.levels.push(l);
 
     self.vec_mode = false;
     self.air_mode = false;
