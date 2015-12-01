@@ -28,8 +28,9 @@ function doSetPosOnEvent(evt)
   }
   else if(evt.touches != undefined && evt.touches[0] != undefined)
   {
-    evt.doX = evt.touches[0].pageX-evt.touches[0].target.offsetLeft;
-    evt.doY = evt.touches[0].pageY-evt.touches[0].target.offsetTop;
+    var r = evt.touches[0].target.getBoundingClientRect();
+    evt.doX = evt.touches[0].pageX-r.left;
+    evt.doY = evt.touches[0].pageY-r.top;
   }
   else if(evt.layerX != undefined && evt.originalTarget != undefined)
   {
