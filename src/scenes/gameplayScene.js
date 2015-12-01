@@ -85,6 +85,10 @@ var GamePlayScene = function(game, stage)
       self.buff = (self.buff+1)%2;
       self.data = self.buffs[self.buff];
     }
+    self.sample_index = function(x,y)
+    {
+      return self.data[self.iFor(x,y)];
+    }
     self.sample = function(x,y)
     {
       x = sampleToIndexW(x,self.w);
@@ -1098,13 +1102,12 @@ var GamePlayScene = function(game, stage)
     self.play_clicker.register(self.air_button);
     self.play_clicker.register(self.help_button);
 
-    self.pmap_hq = new HeightMap(50,50);
-    self.pmap_lq = new HeightMap(30,30);
-
-    self.vfield_hq = new VecField2d(30,30);
-    self.vfield_lq = new VecField2d(20,20);
-
+    self.pmap_hq = new HeightMap(40,40);
+    self.vfield_hq = new VecField2d(40,40);
     self.afield_hq = new AirField(2000);
+
+    self.pmap_lq = new HeightMap(30,30);
+    self.vfield_lq = new VecField2d(30,30);
     self.afield_lq = new AirField(500);
 
     self.pmap = self.pmap_hq;
@@ -1436,11 +1439,11 @@ var GamePlayScene = function(game, stage)
       {
         var lowest_t  = 0; var lowest_p  = 1;
         var highest_t = 0; var highest_p = 0;
-        var x = indexToSampleW(j,self.vfield.w);
-        var y = indexToSampleW(i,self.vfield.h);
+        var x = indexToSample(j,self.vfield.w);
+        var y = indexToSample(i,self.vfield.h);
         var d = 0.05;
         var p = 0;
-        for(var t = 0; t < Math.PI*2; t += 0.1)
+        for(var t = 0; t < Math.PI*2; t += 0.6)
         {
           p = self.pmap.sample(x+Math.cos(t)*d,y+Math.sin(t)*d);
           if(p < lowest_p)  { lowest_t  = t; lowest_p  = p; }
