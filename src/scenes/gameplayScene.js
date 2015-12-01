@@ -840,6 +840,7 @@ var GamePlayScene = function(game, stage)
   }
 
   self.game_mode;
+  self.quality_mode;
   self.vec_mode;
   self.air_mode;
   self.cur_level;
@@ -859,6 +860,7 @@ var GamePlayScene = function(game, stage)
 
   self.clip;
   self.menu_button;
+  self.quality_button;
   self.vec_button;
   self.air_button;
   self.help_button;
@@ -1049,6 +1051,7 @@ var GamePlayScene = function(game, stage)
     self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-10-20,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
+    self.quality_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-60,10,20,20, function(on) { self.quality_mode = !self.quality_mode; });
     self.vec_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-30,10,20,20, function(on) { self.vec_mode = !self.vec_mode; });
     self.air_button = new ButtonBox(stage.drawCanv.canvas.width/2-10,10,20,20, function(on) { self.air_mode = !self.air_mode; });
     self.help_button = new ButtonBox(stage.drawCanv.canvas.width/2-10+30,10,20,20, function(on)
@@ -1075,13 +1078,14 @@ var GamePlayScene = function(game, stage)
         self.popBlurb(b_0);
       }
     });
+    self.play_clicker.register(self.quality_button);
     self.play_clicker.register(self.vec_button);
     self.play_clicker.register(self.air_button);
     self.play_clicker.register(self.help_button);
 
     self.pmap = new HeightMap(50,50);
     self.vfield = new VecField2d(30,30);
-    self.afield = new AirField(1000);
+    self.afield = new AirField(2000,self);
     self.balloon = new Balloon();
 
     if(paint)
@@ -1202,7 +1206,7 @@ var GamePlayScene = function(game, stage)
       self.bin_dragger.register(self.p_store_l);
     }
 
-
+    self.quality_mode = true;
     self.vec_mode = false;
     self.air_mode = false;
     self.beginLevel(0);
@@ -1448,7 +1452,7 @@ var GamePlayScene = function(game, stage)
     var y;
     if(self.air_mode)
     {
-      for(var i = 0; i < self.afield.n; i++)
+      for(var i = 0; (self.quality_mode && i < self.afield.n) || (!self.quality_mode && i < self.afield.n/4); i++)
       {
         self.afield.partts[i] -= 0.01;
         if(airdeath && self.afield.partts[i] <= 0)
@@ -1528,7 +1532,7 @@ var GamePlayScene = function(game, stage)
   {
     var canv = stage.drawCanv;
 
-    canv.context.drawImage(USA,0,0,canv.canvas.width,canv.canvas.height);
+    if(self.quality_mode) canv.context.drawImage(USA,0,0,canv.canvas.width,canv.canvas.height);
 
     var x_space;
     var y_space;
@@ -1547,10 +1551,16 @@ var GamePlayScene = function(game, stage)
         y = y_space*i;
         x = x_space*j;
         index = self.pmap.iFor(j,i);
-        //var color = Math.round(self.pmap.data[index]*255);
-        //canv.context.fillStyle = "rgba("+color+","+color+","+color+",0.2)";
-        var color = .8-(self.pmap.data[index]*.8);
-        canv.context.fillStyle = "rgba(0,0,0,"+color+")";
+        if(!self.quality_mode)
+        {
+          var color = Math.round(self.pmap.data[index]*255);
+          canv.context.fillStyle = "rgba("+color+","+color+","+color+",1.0)";
+        }
+        else
+        {
+          var color = .8-(self.pmap.data[index]*.8);
+          canv.context.fillStyle = "rgba(0,0,0,"+color+")";
+        }
         canv.context.fillRect(x,y,x_space,y_space);
       }
     }
@@ -1587,7 +1597,7 @@ var GamePlayScene = function(game, stage)
     if(self.air_mode)
     {
       canv.context.fillStyle = "#8888FF";
-      for(var i = 0; i < self.afield.n; i++)
+      for(var i = 0; (self.quality_mode && i < self.afield.n) || (!self.quality_mode && i < self.afield.n/4); i++)
         canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
     }
 
@@ -1653,6 +1663,8 @@ var GamePlayScene = function(game, stage)
     canv.context.font = "15px arial";
     self.menu_button.draw(canv);
     canv.outlineText("Menu",self.menu_button.x-20,self.menu_button.y+self.menu_button.h*2,"#000000","#FFFFFF");
+    self.quality_button.draw(canv);
+    canv.outlineText("Qual",self.quality_button.x,self.quality_button.y+self.quality_button.h*2,"#000000","#FFFFFF");
     self.vec_button.draw(canv);
     canv.outlineText("Vec",self.vec_button.x,self.vec_button.y+self.vec_button.h*2,"#000000","#FFFFFF");
     self.air_button.draw(canv);
