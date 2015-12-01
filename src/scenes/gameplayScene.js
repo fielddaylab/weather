@@ -1051,7 +1051,22 @@ var GamePlayScene = function(game, stage)
     self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-10-20,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
-    self.quality_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-60,10,20,20, function(on) { self.quality_mode = !self.quality_mode; });
+    self.quality_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-60,10,20,20, function(on)
+    {
+      self.quality_mode = !self.quality_mode;
+      if(self.quality_mode)
+      {
+        self.pmap = self.pmap_hq;
+        self.vfield = self.vfield_hq;
+        self.afield = self.afield_hq;
+      }
+      else
+      {
+        self.pmap = self.pmap_lq;
+        self.vfield = self.vfield_lq;
+        self.afield = self.afield_lq;
+      }
+    });
     self.vec_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-30,10,20,20, function(on) { self.vec_mode = !self.vec_mode; });
     self.air_button = new ButtonBox(stage.drawCanv.canvas.width/2-10,10,20,20, function(on) { self.air_mode = !self.air_mode; });
     self.help_button = new ButtonBox(stage.drawCanv.canvas.width/2-10+30,10,20,20, function(on)
@@ -1083,9 +1098,19 @@ var GamePlayScene = function(game, stage)
     self.play_clicker.register(self.air_button);
     self.play_clicker.register(self.help_button);
 
-    self.pmap = new HeightMap(50,50);
-    self.vfield = new VecField2d(30,30);
-    self.afield = new AirField(2000,self);
+    self.pmap_hq = new HeightMap(50,50);
+    self.pmap_lq = new HeightMap(30,30);
+
+    self.vfield_hq = new VecField2d(30,30);
+    self.vfield_lq = new VecField2d(20,20);
+
+    self.afield_hq = new AirField(2000);
+    self.afield_lq = new AirField(500);
+
+    self.pmap = self.pmap_hq;
+    self.vfield = self.vfield_hq;
+    self.afield = self.afield_hq;
+
     self.balloon = new Balloon();
 
     if(paint)
@@ -1452,7 +1477,7 @@ var GamePlayScene = function(game, stage)
     var y;
     if(self.air_mode)
     {
-      for(var i = 0; (self.quality_mode && i < self.afield.n) || (!self.quality_mode && i < self.afield.n/4); i++)
+      for(var i = 0; i < self.afield.n; i++)
       {
         self.afield.partts[i] -= 0.01;
         if(airdeath && self.afield.partts[i] <= 0)
@@ -1597,7 +1622,7 @@ var GamePlayScene = function(game, stage)
     if(self.air_mode)
     {
       canv.context.fillStyle = "#8888FF";
-      for(var i = 0; (self.quality_mode && i < self.afield.n) || (!self.quality_mode && i < self.afield.n/4); i++)
+      for(var i = 0; i < self.afield.n; i++)
         canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
     }
 
