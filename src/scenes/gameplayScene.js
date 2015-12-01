@@ -25,6 +25,18 @@ var GAME_MODE_MENU  = ENUM; ENUM++;
 var GAME_MODE_PLAY  = ENUM; ENUM++;
 var GAME_MODE_BLURB = ENUM; ENUM++;
 
+    var cartToPolar = function(cart,polar)
+    {
+      polar.len = Math.sqrt((cart.x*cart.x)+(cart.y*cart.y));
+      polar.dir = Math.atan2(cart.y,cart.x);
+    }
+    var polarToCart = function(polar,cart)
+    {
+      cart.x = Math.cos(polar.dir)*polar.len;
+      cart.y = Math.sin(polar.dir)*polar.len;
+    }
+
+
 var GamePlayScene = function(game, stage)
 {
   var self = this;
@@ -694,8 +706,27 @@ var GamePlayScene = function(game, stage)
 
     self.cache = function()
     {
+      var tip_cart = {x:0,y:0};
+      var polar = {dir:0,len:0};
+      var head_cart = {x:0,y:0};
+
       self.goal_cache_xd = self.goal_xd*flag_length;
       self.goal_cache_yd = self.goal_yd*flag_length;
+
+      tip_cart.x = self.goal_xd;
+      tip_cart.y = self.goal_yd;
+
+      cartToPolar(tip_cart,polar);
+      polar.len *= 0.9;
+      polar.dir += 0.1;
+      polarToCart(polar,head_cart);
+      self.goal_cache_head_cw_x = head_cart.x*flag_length;
+      self.goal_cache_head_cw_y = head_cart.y*flag_length;
+
+      polar.dir -= 0.2;
+      polarToCart(polar,head_cart);
+      self.goal_cache_head_ccw_x = head_cart.x*flag_length;
+      self.goal_cache_head_ccw_y = head_cart.y*flag_length;
 
       self.goal_cache_l = Math.sqrt(self.goal_xd*self.goal_xd+self.goal_yd*self.goal_yd);
       self.goal_cache_t = Math.atan2(self.goal_yd/self.goal_cache_l,self.goal_xd/self.goal_cache_l);
@@ -737,6 +768,9 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
+      var tip_cart = {x:0,y:0};
+      var polar = {dir:0,len:0};
+      var head_cart = {x:0,y:0};
       canv.context.lineWidth = 3;
       canv.context.strokeStyle = "#00FF00";
 
@@ -746,13 +780,34 @@ var GamePlayScene = function(game, stage)
       canv.context.beginPath();
       canv.context.moveTo(self.cache_x,self.cache_y);
       canv.context.lineTo(self.cache_x+self.goal_cache_xd,self.cache_y+self.goal_cache_yd);
+
+      canv.context.moveTo(self.cache_x+self.goal_cache_head_ccw_x,self.cache_y+self.goal_cache_head_ccw_y);
+      canv.context.lineTo(self.cache_x+self.goal_cache_xd,self.cache_y+self.goal_cache_yd);
+      canv.context.lineTo(self.cache_x+self.goal_cache_head_cw_x,self.cache_y+self.goal_cache_head_cw_y);
+
       canv.context.stroke();
+
 
       if(self.met) canv.context.strokeStyle = "#00FF00";
       else canv.context.strokeStyle = "#FF0000";
       canv.context.beginPath();
       canv.context.moveTo(self.cache_x,self.cache_y);
       canv.context.lineTo(self.cache_x+(self.xd*flag_length),self.cache_y+(self.yd*flag_length));
+
+      tip_cart.x = self.xd;
+      tip_cart.y = self.yd;
+
+      cartToPolar(tip_cart,polar);
+      polar.len *= 0.9;
+      polar.dir += 0.1;
+      polarToCart(polar,head_cart);
+      canv.context.moveTo(self.cache_x+(head_cart.x*flag_length),self.cache_y+(head_cart.y*flag_length));
+      canv.context.lineTo(self.cache_x+(self.xd*flag_length),self.cache_y+(self.yd*flag_length));
+
+      polar.dir -= 0.2;
+      polarToCart(polar,head_cart);
+      canv.context.lineTo(self.cache_x+(head_cart.x*flag_length),self.cache_y+(head_cart.y*flag_length));
+
       canv.context.stroke();
 
       if(self.hovering || self.dragging)
@@ -1417,8 +1472,10 @@ var GamePlayScene = function(game, stage)
     /*
     // game objs
     */
+
     var cart = {x:0,y:0};
     var polar = {dir:0,len:0};
+
     var f;
     var all_met = true;
     var t_tolerance = 0.2;
