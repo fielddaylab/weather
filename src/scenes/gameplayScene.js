@@ -1,4 +1,4 @@
-var default_complete = false;
+var default_complete = true;
 var paint = false;
 var sys = !paint;
 var anneal = true;
@@ -195,8 +195,8 @@ var GamePlayScene = function(game, stage)
   var Balloon = function()
   {
     var self = this;
-    self.x = 0.2;
-    self.y = 0.2;
+    self.x = 0.5;
+    self.y = 0.5;
     self.w = 0.02;
     self.h = 0.02;
 
@@ -806,6 +806,7 @@ var GamePlayScene = function(game, stage)
   self.menu_button;
   self.vec_button;
   self.air_button;
+  self.help_button;
   self.blurb;
 
   self.p_type = P_TYPE_LOW;
@@ -980,8 +981,33 @@ var GamePlayScene = function(game, stage)
 
     self.vec_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-30,10,20,20, function(on) { self.vec_mode = !self.vec_mode; });
     self.air_button = new ButtonBox(stage.drawCanv.canvas.width/2-10,10,20,20, function(on) { self.air_mode = !self.air_mode; });
+    self.help_button = new ButtonBox(stage.drawCanv.canvas.width/2-10+30,10,20,20, function(on)
+    {
+      var l = self.levels[self.cur_level];
+      if(l.text_0 && l.text_0 != "")
+      {
+        var b_0 = new Blurb(self);
+        b_0.x = l.text_x;
+        b_0.y = l.text_y;
+        b_0.w = l.text_w;
+        b_0.h = l.text_h;
+        b_0.txt = l.text_0;
+        if(l.text_1 && l.text_1 != "")
+        {
+          var b_1 = new Blurb(self);
+          b_1.x = l.text_x;
+          b_1.y = l.text_y;
+          b_1.w = l.text_w;
+          b_1.h = l.text_h;
+          b_1.txt = l.text_1;
+          b_0.click = function(evt) { self.popBlurb(b_1); };
+        }
+        self.popBlurb(b_0);
+      }
+    });
     self.play_clicker.register(self.vec_button);
     self.play_clicker.register(self.air_button);
+    self.play_clicker.register(self.help_button);
 
     self.pmap = new HeightMap(50,50);
     self.vfield = new VecField2d(30,30);
@@ -1156,7 +1182,7 @@ var GamePlayScene = function(game, stage)
   self.beginLevel = function(l)
   {
     self.vec_mode = false;
-    self.air_mode = false;
+    self.air_mode = true;
 
     //clear out any on-map data
       //flags
@@ -1559,6 +1585,8 @@ var GamePlayScene = function(game, stage)
     canv.outlineText("Vec",self.vec_button.x,self.vec_button.y+self.vec_button.h*2,"#000000","#FFFFFF");
     self.air_button.draw(canv);
     canv.outlineText("Air",self.air_button.x,self.air_button.y+self.air_button.h*2,"#000000","#FFFFFF");
+    self.help_button.draw(canv);
+    canv.outlineText("Help",self.help_button.x,self.help_button.y+self.help_button.h*2,"#000000","#FFFFFF");
     if(self.levels[self.cur_level].complete_this_round)
     {
       canv.context.fillStyle = "#FFFFFF";
