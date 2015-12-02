@@ -760,7 +760,7 @@ var GamePlayScene = function(game, stage)
       {
         if(platform == "MOBILE")
         {
-          evt.doY -= 20;
+          evt.doY -= 30;
           if(evt.doY < 0) evt.doY = 0;
         }
         self.sx = evt.doX/stage.drawCanv.canvas.width;
