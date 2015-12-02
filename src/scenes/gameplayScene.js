@@ -1111,9 +1111,9 @@ var GamePlayScene = function(game, stage)
     self.vfield_hq = new VecField2d(40,40);
     self.afield_hq = new AirField(2000);
 
-    self.pmap_lq = new HeightMap(20,20);
+    self.pmap_lq = new HeightMap(10,10);
     self.vfield_lq = new VecField2d(20,20);
-    self.afield_lq = new AirField(500);
+    self.afield_lq = new AirField(1000);
 
     self.pmap = self.pmap_hq;
     self.vfield = self.vfield_hq;
@@ -1565,7 +1565,8 @@ var GamePlayScene = function(game, stage)
   {
     var canv = stage.drawCanv;
 
-    if(self.quality_mode) canv.context.drawImage(USA,0,0,canv.canvas.width,canv.canvas.height);
+    //if(self.quality_mode)
+      canv.context.drawImage(USA,0,0,canv.canvas.width,canv.canvas.height);
 
     var x_space;
     var y_space;
@@ -1584,15 +1585,15 @@ var GamePlayScene = function(game, stage)
         y = y_space*i;
         x = x_space*j;
         index = self.pmap.iFor(j,i);
-        if(!self.quality_mode)
-        {
-          var color = Math.round(self.pmap.data[index]*255);
-          canv.context.fillStyle = "rgba("+color+","+color+","+color+",1.0)";
-        }
-        else
+        if(true || self.quality_mode)
         {
           var color = .8-(self.pmap.data[index]*.8);
           canv.context.fillStyle = "rgba(0,0,0,"+color+")";
+        }
+        else
+        {
+          var color = Math.round(self.pmap.data[index]*255);
+          canv.context.fillStyle = "rgba("+color+","+color+","+color+",1.0)";
         }
         canv.context.fillRect(x,y,x_space,y_space);
       }
