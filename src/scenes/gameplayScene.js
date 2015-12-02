@@ -318,7 +318,7 @@ var GamePlayScene = function(game, stage)
     }
     self.dragStart = function(evt)
     {
-      if(scene.dragging_sys) return;
+      if(scene.dragging_sys || scene.dragging_tool) return;
       scene.dragging_sys = self;
       self.dragging = true;
     }
@@ -1106,8 +1106,8 @@ var GamePlayScene = function(game, stage)
     self.vfield_hq = new VecField2d(40,40);
     self.afield_hq = new AirField(2000);
 
-    self.pmap_lq = new HeightMap(30,30);
-    self.vfield_lq = new VecField2d(30,30);
+    self.pmap_lq = new HeightMap(20,20);
+    self.vfield_lq = new VecField2d(20,20);
     self.afield_lq = new AirField(500);
 
     self.pmap = self.pmap_hq;
