@@ -962,12 +962,12 @@ var GamePlayScene = function(game, stage)
     l = new Level();
     l.type = L_TYPE_FLAG;
     var i = 0;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.2,0.8-(i/6)*0.8,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
     i = 0;
     l.psys.push(new PSys(0.5,0.5,0.1, -0.1,self));
     l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
@@ -1024,8 +1024,8 @@ var GamePlayScene = function(game, stage)
     //cyclone
     l = new Level();
     l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.42,0.5,0.0,1.5,self));
-    l.flags.push(new Flag(0.58,0.5,0.0,-1.5,self));
+    l.flags.push(new Flag(0.40,0.5,0.0,1.5,self));
+    l.flags.push(new Flag(0.60,0.5,0.0,-1.5,self));
     l.psys.push(new PSys(0.2,0.3,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.7,0.1, 0.1,self));
@@ -1039,8 +1039,8 @@ var GamePlayScene = function(game, stage)
     //anticyclone
     l = new Level();
     l.type = L_TYPE_SYS;
-    l.flags.push(new Flag(0.5,0.42,1.5,0.0,self));
-    l.flags.push(new Flag(0.5,0.58,-1.5,0.0,self));
+    l.flags.push(new Flag(0.5,0.35,1.5,0.0,self));
+    l.flags.push(new Flag(0.5,0.65,-1.5,0.0,self));
     l.psys.push(new PSys(0.2,0.3,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.5,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.7,0.1,-0.1,self));
