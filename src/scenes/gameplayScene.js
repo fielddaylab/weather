@@ -758,6 +758,11 @@ var GamePlayScene = function(game, stage)
     {
       if(self.dragging)
       {
+        if(platform == "MOBILE")
+        {
+          evt.doY -= 20;
+          if(evt.doY < 0) evt.doY = 0;
+        }
         self.sx = evt.doX/stage.drawCanv.canvas.width;
         self.sy = evt.doY/stage.drawCanv.canvas.height;
         self.x = evt.doX-(self.w/2);
