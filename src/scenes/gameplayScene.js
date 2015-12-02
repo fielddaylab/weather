@@ -1,4 +1,4 @@
-var default_complete = false;
+var default_complete = true;
 var paint = false;
 var sys = !paint;
 var anneal = true;
@@ -991,7 +991,7 @@ var GamePlayScene = function(game, stage)
     l.text_w = 300;
     l.text_h = 80;
     l.text_0 = "Drag all the flags to find a position where the blowing red flag matches the green.";
-    l.text_1 = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful!";
+    l.text_1 = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful! (Try to see underlying shape.)";
     self.levels.push(l);
 
     //use systems
@@ -1018,7 +1018,8 @@ var GamePlayScene = function(game, stage)
     l.text_y = 60;
     l.text_w = 350;
     l.text_h = 80;
-    l.text_0 = "High And Low Pressure Systems.";
+    l.text_1 = "Again, drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+    l.text_0 = "(This is the same as last time, just a different direction).";
     self.levels.push(l);
 
     //cyclone
@@ -1026,14 +1027,16 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.40,0.5,0.0,1.5,self));
     l.flags.push(new Flag(0.60,0.5,0.0,-1.5,self));
-    l.psys.push(new PSys(0.2,0.3,0.1, 0.1,self));
-    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.2,0.7,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.2,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.4,0.1,-0.1,self));
+    l.psys.push(new PSys(0.2,0.6,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.8,0.1,-0.1,self));
     l.text_x = 150;
     l.text_y = 60;
     l.text_w = 350;
     l.text_h = 80;
-    l.text_0 = "Cyclooooone.";
+    l.text_0 = "Place the High and Low Pressure Systems to create a cyclone in the direction indicated by the green flags.";
+    l.text_1 = "You should only need 3 systems to solve.";
     self.levels.push(l);
 
     //anticyclone
@@ -1041,16 +1044,17 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.35,1.5,0.0,self));
     l.flags.push(new Flag(0.5,0.65,-1.5,0.0,self));
-    l.psys.push(new PSys(0.2,0.3,0.1,-0.1,self));
-    l.psys.push(new PSys(0.2,0.5,0.1, 0.1,self));
-    l.psys.push(new PSys(0.2,0.7,0.1,-0.1,self));
+    l.psys.push(new PSys(0.2,0.2,0.1,-0.1,self));
+    l.psys.push(new PSys(0.2,0.4,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.6,0.1,-0.1,self));
+    l.psys.push(new PSys(0.2,0.8,0.1, 0.1,self));
     l.text_x = 150;
     l.text_y = 60;
     l.text_w = 350;
     l.text_h = 80;
-    l.text_0 = "Cyclooooone again.";
+    l.text_0 = "Again, try to create a cyclone. (This time, in the opposite direction.)";
+    l.text_1 = "Notice differences in severity from the previous.";
     self.levels.push(l);
-
 
     self.clip = new ClipBoard(20,20,stage.drawCanv.canvas.width-40,stage.drawCanv.canvas.height-20,self,self.levels);
     self.clip.register(self.menu_clicker);
