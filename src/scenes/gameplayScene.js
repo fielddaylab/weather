@@ -1,4 +1,4 @@
-var default_complete = true;
+var default_complete = false;
 var paint = false;
 var sys = !paint;
 var anneal = true;
