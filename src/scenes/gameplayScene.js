@@ -851,7 +851,7 @@ var GamePlayScene = function(game, stage)
       }
       else
       {
-        canv.context.lineWidth = 1;
+        canv.context.lineWidth = 2;
         canv.context.strokeStyle = "#FFFFFF";
       }
 
@@ -894,6 +894,15 @@ var GamePlayScene = function(game, stage)
       canv.context.restore();
 
 
+      if(self.hovering || self.dragging)
+        canv.context.strokeStyle = "#FFFFFF";
+      else
+        canv.context.strokeStyle = "#FFFFFF";
+      canv.context.lineWidth = 3;
+      canv.context.beginPath();
+      canv.context.arc(self.x+self.w/2,self.y+self.h/2,self.w/2,0,2*Math.PI);
+      canv.context.stroke();
+
 
       //line
       canv.context.strokeStyle = "#BF1717";
@@ -934,15 +943,6 @@ var GamePlayScene = function(game, stage)
       canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)-3.141592/2);
       canv.context.drawImage(flag_tail_img,-l,-l,2*l,2*l);
       canv.context.restore();
-
-      if(self.hovering || self.dragging)
-      {
-        canv.context.lineWidth = 3;
-        canv.context.strokeStyle = "#FFFFFF";
-        canv.context.beginPath();
-        canv.context.arc(self.x+self.w/2,self.y+self.h/2,self.w/2,0,2*Math.PI);
-        canv.context.stroke();
-      }
     }
   }
   var Level = function()
@@ -1090,12 +1090,12 @@ var GamePlayScene = function(game, stage)
     l = new Level();
     l.type = L_TYPE_FLAG;
     var i = 0;
-    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
-    l.flags.push(new Flag(0.33,0.9-(i/6)*0.9,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.8-(i/6)*0.7,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.8-(i/6)*0.7,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.8-(i/6)*0.7,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.8-(i/6)*0.7,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.8-(i/6)*0.7,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
+    l.flags.push(new Flag(0.33,0.8-(i/6)*0.7,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
     i = 0;
     l.psys.push(new PSys(0.5,0.5,0.1, -0.1,self));
     l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
