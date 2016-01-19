@@ -42,6 +42,11 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/icon-trash-open.png");
     img_srcs.push("assets/icon-trash.png");
     img_srcs.push("assets/scout.png");
+    img_srcs.push("assets/level-bg.png");
+    img_srcs.push("assets/fade-level-bg.png");
+    img_srcs.push("assets/level-bg-outline.png");
+    img_srcs.push("assets/icon-locked.png");
+    img_srcs.push("assets/icon-check.png");
     for(var i = 0; i < img_srcs.length; i++)
     {
       images[i] = new Image();

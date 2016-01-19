@@ -24,6 +24,11 @@ var icon_l_img;
 var icon_trash_img;
 var icon_trash_open_img;
 var tall_img;
+var lvl_button_img;
+var lvl_button_fade_img;
+var lvl_button_outline_img;
+var lvl_button_lock_img;
+var lvl_button_check_img;
 
 var blue = "#76DAE2";
 
@@ -469,8 +474,8 @@ var GamePlayScene = function(game, stage)
     self.level = scene.levels[self.level_i];
     if(self.level_i > 0)
       self.req_level = scene.levels[self.level_i-1];
-    self.title_a = "Lvl "+self.level_i;
-    self.title_b = "";
+    if(i == 0) self.title = "P";
+    else self.title = self.level_i;
     return self;
   }
 
@@ -502,6 +507,7 @@ var GamePlayScene = function(game, stage)
     self.dismiss_button = new ButtonBox(self.w-20-20,20,20,20, function(on) { scene.setMode(GAME_MODE_PLAY); }); self.buttons.push(self.dismiss_button);
     self.dismiss_button.draw = function(canv)
     {
+      return;
       if(this.down) canv.context.strokeStyle = "#00F400";
       else          canv.context.strokeStyle = "#000000";
 
@@ -514,28 +520,56 @@ var GamePlayScene = function(game, stage)
     for(var i = 0; i < 9; i++)
     {
       var b;
-      var bs = 40;
+      var bs = 80;
 
       b = new LevelButtonBox(i,bs,scene);
+      if(i == 0)
+      {
+        b.x = self.canv.canvas.width/2-(bs/2);
+        b.y = 200;
+      }
+      else if(i < 5)
+      {
+        b.x = self.canv.canvas.width/2-(bs*2+60)+((i-1)*(bs+40));
+        b.y = 200+bs+40;
+      }
+      else
+      {
+        b.x = self.canv.canvas.width/2-(bs*2+60)+((i-5)*(bs+40));
+        b.y = 200+(bs+40)*2;
+      }
       self.buttons.push(b);
     }
 
     //quick hack to fix clicker even though on separate canv
     var draw = function(canv)
     {
-      if(this.down) canv.context.strokeStyle = "#00F400";
-      else          canv.context.strokeStyle = "#000000";
-
       if(this.level_i == 0 || levels[this.level_i-1].complete)
-        canv.context.fillStyle = "#00F400";
+      {
+        if(!levels[this.level_i].complete)
+        {
+          var s = (((Math.sin(scene.ticks/20)+1)/4)+0.5)*10;
+          canv.context.drawImage(lvl_button_outline_img,this.off_x-s,this.off_y-s,this.w+s*2,this.h+s*2);
+        }
+        canv.context.drawImage(lvl_button_img,this.off_x,this.off_y,this.w,this.h);
+      }
       else
-        canv.context.fillStyle = "#FF8800";
+      {
+        canv.context.drawImage(lvl_button_fade_img,this.off_x,this.off_y,this.w,this.h);
+        canv.context.drawImage(lvl_button_lock_img,this.off_x+this.w-40,this.off_y-20,60,60);
+      }
+      if(levels[this.level_i].complete)
+      {
+        canv.context.drawImage(lvl_button_check_img,this.off_x+20,this.off_y+20,this.h-40,this.h-40);
+      }
+      else
+      {
+        canv.context.font = "70px stump";
+        canv.context.fillStyle = "#FFFFFF";
+        canv.context.textAlign = "center";
+        canv.context.fillText(this.title,this.off_x+this.w/2,this.off_y+this.h-10);
+      }
 
-      canv.context.fillRect(this.off_x,this.off_y,this.w,this.h);
-      canv.context.strokeRect(this.off_x+0.5,this.off_y+0.5,this.w,this.h);
-      canv.context.fillStyle = "#000000";
-      canv.context.fillText(this.title_a,this.off_x+10,this.off_y+20);
-      canv.context.fillText(this.title_b,this.off_x+10,this.off_y+50);
     }
     for(var i = 0; i < self.buttons.length; i++)
     {
@@ -556,10 +590,10 @@ var GamePlayScene = function(game, stage)
       {
         self.canv.clear();
 
-        self.canv.context.fillStyle = "#000000";
-        self.canv.context.fillRect(0,0,self.w,self.h);
+        self.canv.context.font = "100px stump";
+        self.canv.context.textAlign = "center";
         self.canv.context.fillStyle = "#FFFFFF";
-        self.canv.context.fillRect(10,10,self.w-20,self.h-10);
+        self.canv.context.fillText("Levels",self.w/2,150);
 
         self.canv.strokeStyle = "#000000";
 
@@ -596,6 +630,7 @@ var GamePlayScene = function(game, stage)
     self.dirty   = function() { self._dirty = true; }
     self.cleanse = function()
     {
+      return;
       self._dirty = false;
     }
     self.isDirty = function() { return self._dirty; }
@@ -916,6 +951,11 @@ var GamePlayScene = function(game, stage)
     icon_trash_img = new Image(); icon_trash_img.src = "assets/icon-trash-open.png";
     icon_trash_open_img = new Image(); icon_trash_open_img.src = "assets/icon-trash.png";
     tall_img = new Image(); tall_img.src = "assets/scout.png";
+    lvl_button_img = new Image(); lvl_button_img.src = "assets/level-bg.png";
+    lvl_button_fade_img = new Image(); lvl_button_fade_img.src = "assets/fade-level-bg.png";
+    lvl_button_outline_img = new Image(); lvl_button_outline_img.src = "assets/level-bg-outline.png";
+    lvl_button_lock_img = new Image(); lvl_button_lock_img.src = "assets/icon-locked.png";
+    lvl_button_check_img = new Image(); lvl_button_check_img.src = "assets/icon-check.png";
 
     self.menu_clicker = new Clicker({source:stage.dispCanv.canvas});
     self.bin_presser = new Presser({source:stage.dispCanv.canvas});
