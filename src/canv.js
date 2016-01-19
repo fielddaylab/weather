@@ -9,7 +9,7 @@ var Canv = function(init)
     strokeStyle:"#000000",
     lineWidth:2,
     font:"12px vg_font",
-    smoothing:false
+    smoothing:true
   }
 
   var self = this;
@@ -28,7 +28,7 @@ var Canv = function(init)
   self.context.lineWidth   = init.lineWidth;
   self.context.font        = init.font;
 
-  self.context.imageSmoothingEnabled = init.smoothing;
+  self.context.imageSmoothingEnabled = true;
 };
 Canv.prototype.clear = function()
 {

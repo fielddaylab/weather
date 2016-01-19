@@ -9,6 +9,8 @@ var tools_explicit = false;
 var vec_length = 5;
 var flag_length = 20;
 
+var yard_logo_img;
+var menu_img;
 var screen_bg_img;
 var screen_cover_img;
 var button_h_img;
@@ -21,6 +23,8 @@ var icon_h_img;
 var icon_l_img;
 var icon_trash_img;
 var icon_trash_open_img;
+
+var blue = "#76DAE2";
 
 var ENUM;
 
@@ -892,6 +896,8 @@ var GamePlayScene = function(game, stage)
 
   self.ready = function()
   {
+    yard_logo_img = new Image(); yard_logo_img.src = "assets/theyard-logo.png";
+    menu_img = new Image(); menu_img.src = "assets/icon-menu.png";
     screen_bg_img = new Image(); screen_bg_img.src = "assets/main-screen.png";
     screen_cover_img = new Image(); screen_cover_img.src = "assets/main-screen_cover.png";
     button_h_img = new Image(); button_h_img.src = "assets/button-h.png";
@@ -1075,7 +1081,7 @@ var GamePlayScene = function(game, stage)
     self.blurb = new Blurb(self);
     self.blurb_clicker.register(self.blurb);
 
-    self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-10-20,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
+    self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-60,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
     self.quality_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-60,10,20,20, function(on)
@@ -1215,7 +1221,7 @@ var GamePlayScene = function(game, stage)
       function fdrag(evt) { if(self.dragging_sys) self.dragging_sys.drag(evt); };
       function fdfinish() { if(self.dragging_sys) self.dragging_sys.dragFinish(); };
 
-      self.p_store_h = new BinBox(60,40,40,40, fdstart, fdrag, fdfinish,
+      self.p_store_h = new BinBox(100,90,60,60, fdstart, fdrag, fdfinish,
         function(evt)
         {
           var p = new PSys(0.,0.,0.1,0.1,self);
@@ -1233,7 +1239,7 @@ var GamePlayScene = function(game, stage)
             if(self.psys[i] == p) self.psys.splice(i,1);
           self.dragging_sys = undefined;
         });
-      self.p_store_l = new BinBox(110,40,40,40, fdstart, fdrag, fdfinish,
+      self.p_store_l = new BinBox(180,90,60,60, fdstart, fdrag, fdfinish,
         function(evt)
         {
           var p = new PSys(0.,0.,0.1,-0.1,self);
@@ -1710,9 +1716,16 @@ var GamePlayScene = function(game, stage)
       }
     }
 
+    canv.context.fillStyle = blue;
+    canv.context.fillRect(0,0,canv.canvas.width,40);
+    canv.context.drawImage(yard_logo_img,10,7,70,25);
+    canv.context.fillStyle = "#FFFFFF";
+    canv.context.font = "25px stump";
+    canv.context.textAlign = "right";
+    canv.context.fillText("The Wind Generator",canv.canvas.width-70,30);
+    canv.context.drawImage(menu_img,self.menu_button.x,self.menu_button.y,self.menu_button.w,self.menu_button.h);
+
     canv.context.font = "15px arial";
-    self.menu_button.draw(canv);
-    canv.outlineText("Menu",self.menu_button.x-20,self.menu_button.y+self.menu_button.h*2,"#000000","#FFFFFF");
     self.quality_button.draw(canv);
     canv.outlineText("Qual",self.quality_button.x,self.quality_button.y+self.quality_button.h*2,"#000000","#FFFFFF");
     self.vec_button.draw(canv);

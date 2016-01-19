@@ -46,7 +46,7 @@ var g;
 var d;
 function begin()
 {
-  g = new Game({width:640,height:640,container:"stage_container"});
+  g = new Game({width:960,height:720,container:"stage_container"});
   g.begin();
 }
 window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prevent browser from doing anything funny
@@ -55,7 +55,8 @@ window.addEventListener("load",begin,false);
 
 </head>
 <body>
-<div id="stage_container" style="display:block; width:640px; height:640px; position:absolute; top:0px; left:0px; user-select:none;"> </div>
+<div style="position:absolute; top:0px; left:0px; background-color:#76DAE2; width:100%; height:40px; user-select:none;"></div>
+<div id="stage_container" style="position:relative; margin:0px auto; width:960px; height:720px; user-select:none;"> </div>
 </div>
 
 </body>
