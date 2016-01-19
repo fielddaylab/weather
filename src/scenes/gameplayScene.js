@@ -485,43 +485,18 @@ var GamePlayScene = function(game, stage)
     return self;
   }
 
-  var ClipBoard = function(x,y,w,h,scene,levels)
+  var ClipBoard = function(w,h,scene,levels)
   {
     var self = this;
 
-    self.canv;
-
-    self.x = x;
-    self.y = y;
     self.w = w;
     self.h = h;
-    self.desired_y = y;
-
-    self.canv = new Canv(
-      {
-        width:self.w,
-        height:self.h,
-        fillStyle:"#000000",
-        strokeStyle:"#000000",
-        smoothing:true
-      }
-    );
-
-    self._dirty = true;
+    self.pretend_y = 20;
+    self.desired_y = 20;
 
     self.buttons = [];
     self.dismiss_button = new ButtonBox(self.w-20-20,20,20,20, function(on) { scene.setMode(GAME_MODE_PLAY); }); self.buttons.push(self.dismiss_button);
-    self.dismiss_button.draw = function(canv)
-    {
-      return;
-      if(this.down) canv.context.strokeStyle = "#00F400";
-      else          canv.context.strokeStyle = "#000000";
-
-      canv.context.fillStyle = "#00F400";
-
-      canv.context.fillRect(this.off_x,this.off_y,this.w,this.h);
-      canv.context.strokeRect(this.off_x+0.5,this.off_y+0.5,this.w,this.h);
-    }
+    self.dismiss_button.draw = function(canv) { return; }
 
     for(var i = 0; i < 9; i++)
     {
@@ -531,17 +506,17 @@ var GamePlayScene = function(game, stage)
       b = new LevelButtonBox(i,bs,scene);
       if(i == 0)
       {
-        b.x = self.canv.canvas.width/2-(bs/2);
+        b.x = scene.dc.canvas.width/2-(bs/2);
         b.y = 200;
       }
       else if(i < 5)
       {
-        b.x = self.canv.canvas.width/2-(bs*2+60)+((i-1)*(bs+40));
+        b.x = scene.dc.canvas.width/2-(bs*2+60)+((i-1)*(bs+40));
         b.y = 200+bs+40;
       }
       else
       {
-        b.x = self.canv.canvas.width/2-(bs*2+60)+((i-5)*(bs+40));
+        b.x = scene.dc.canvas.width/2-(bs*2+60)+((i-5)*(bs+40));
         b.y = 200+(bs+40)*2;
       }
       self.buttons.push(b);
@@ -555,78 +530,64 @@ var GamePlayScene = function(game, stage)
         if(!levels[this.level_i].complete)
         {
           var s = (((Math.sin(scene.ticks/20)+1)/4)+0.5)*10;
-          canv.context.drawImage(lvl_button_outline_img,this.off_x-s,this.off_y-s,this.w+s*2,this.h+s*2);
+          canv.context.drawImage(lvl_button_outline_img,this.x-s,this.y-s,this.w+s*2,this.h+s*2);
         }
-        canv.context.drawImage(lvl_button_img,this.off_x,this.off_y,this.w,this.h);
+        canv.context.drawImage(lvl_button_img,this.x,this.y,this.w,this.h);
       }
       else
       {
-        canv.context.drawImage(lvl_button_fade_img,this.off_x,this.off_y,this.w,this.h);
-        canv.context.drawImage(lvl_button_lock_img,this.off_x+this.w-40,this.off_y-20,60,60);
+        canv.context.drawImage(lvl_button_fade_img,this.x,this.y,this.w,this.h);
+        canv.context.drawImage(lvl_button_lock_img,this.x+this.w-40,this.y-20,60,60);
       }
       if(levels[this.level_i].complete)
       {
-        canv.context.drawImage(lvl_button_check_img,this.off_x+20,this.off_y+20,this.h-40,this.h-40);
+        canv.context.drawImage(lvl_button_check_img,this.x+20,this.y+20,this.h-40,this.h-40);
       }
       else
       {
         canv.context.font = "70px stump";
         canv.context.fillStyle = "#FFFFFF";
         canv.context.textAlign = "center";
-        canv.context.fillText(this.title,this.off_x+this.w/2,this.off_y+this.h-10);
+        canv.context.fillText(this.title,this.x+this.w/2,this.y+this.h-10);
       }
 
     }
     for(var i = 0; i < self.buttons.length; i++)
     {
       var b = self.buttons[i];
-
-      b.off_x = b.x;
-      b.off_y = b.y;
-      b.x = b.off_x+self.x;
-      b.y = b.off_y+self.y;
-
+      b.def_y = b.y-self.pretend_y;
       if(i != 0) //for dismiss button, I know, hack
         b.draw = draw;
     }
 
     self.draw = function(canv)
     {
-      if(self.isDirty())
-      {
-        self.canv.clear();
+      global_bg_alpha = (1-((self.pretend_y*10)/self.h));
+      canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")";
+      canv.context.fillRect(0,0,self.w,self.h);
 
-        global_bg_alpha = (1-((self.y*10)/self.h));
-        self.canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")";
-        self.canv.context.fillRect(0,0,self.w,self.h);
+      canv.context.font = "100px stump";
+      canv.context.textAlign = "center";
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.fillText("Levels",self.w/2,150+self.pretend_y);
 
-        self.canv.context.font = "100px stump";
-        self.canv.context.textAlign = "center";
-        self.canv.context.fillStyle = "#FFFFFF";
-        self.canv.context.fillText("Levels",self.w/2,150);
+      canv.strokeStyle = "#000000";
 
-        self.canv.strokeStyle = "#000000";
-
-        for(var i = 0; i < self.buttons.length; i++)
-          self.buttons[i].draw(self.canv);
-      }
-
-      if(self.y < canv.canvas.height) //if on screen
-        canv.context.drawImage(self.canv.canvas, 0, 0, self.w, self.h, self.x, self.y, self.w, self.h);
+      for(var i = 0; i < self.buttons.length; i++)
+        self.buttons[i].draw(canv);
     }
 
     self.tick = function()
     {
       if(self.desired_y != self.y)
       {
-        if(Math.abs(self.desired_y-self.y) < 1) self.y = self.desired_y;
-        else self.y = lerp(self.y, self.desired_y, 0.2);
+        if(Math.abs(self.desired_y-self.pretend_y) < 1) self.pretend_y = self.desired_y;
+        else self.pretend_y = lerp(self.pretend_y, self.desired_y, 0.2);
 
         for(var i = 0; i < self.buttons.length; i++)
         {
           var b = self.buttons[i];
-          b.x = b.off_x+self.x;
-          b.y = b.off_y+self.y;
+          b.y = b.def_y+self.pretend_y;
         }
       }
     }
@@ -636,14 +597,6 @@ var GamePlayScene = function(game, stage)
       for(var i = 0; i < self.buttons.length; i++)
         clicker.register(self.buttons[i]);
     }
-
-    self.dirty   = function() { self._dirty = true; }
-    self.cleanse = function()
-    {
-      return;
-      self._dirty = false;
-    }
-    self.isDirty = function() { return self._dirty; }
   }
 
   var Blurb = function(scene)
@@ -1164,7 +1117,7 @@ var GamePlayScene = function(game, stage)
     l.text_1 = "Notice differences in severity from the previous.";
     self.levels.push(l);
 
-    self.clip = new ClipBoard(20,20,stage.drawCanv.canvas.width-40,stage.drawCanv.canvas.height-20,self,self.levels);
+    self.clip = new ClipBoard(stage.drawCanv.canvas.width,stage.drawCanv.canvas.height,self,self.levels);
     self.clip.register(self.menu_clicker);
     self.blurb = new Blurb(self);
     self.blurb_clicker.register(self.blurb);
@@ -1393,7 +1346,6 @@ var GamePlayScene = function(game, stage)
 
     self.game_mode = mode;
 
-    self.clip.dirty();
     if(self.game_mode == GAME_MODE_MENU) self.clip.desired_y = 20;
     if(self.game_mode == GAME_MODE_PLAY) self.clip.desired_y = stage.drawCanv.canvas.height;
   }
@@ -1845,8 +1797,6 @@ var GamePlayScene = function(game, stage)
 
     if(self.game_mode == GAME_MODE_BLURB)
       self.blurb.draw(canv);
-
-    self.clip.cleanse();
   };
 
   self.cleanup = function()
