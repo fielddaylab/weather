@@ -854,6 +854,7 @@ var GamePlayScene = function(game, stage)
   }
 
   self.game_mode;
+  self.options_optn;
   self.quality_mode;
   self.vec_mode;
   self.air_mode;
@@ -874,6 +875,7 @@ var GamePlayScene = function(game, stage)
 
   self.clip;
   self.menu_button;
+  self.options_button;
   self.quality_button;
   self.vec_button;
   self.air_button;
@@ -1084,7 +1086,10 @@ var GamePlayScene = function(game, stage)
     self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-60,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
-    self.quality_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-60,10,20,20, function(on)
+    self.options_button = new ButtonBox(stage.drawCanv.canvas.width-150,100,40,40, function(on) { self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
+    self.play_clicker.register(self.options_button);
+
+    self.quality_button = new ButtonBox(stage.drawCanv.canvas.width-280,200,40,40, function(on)
     {
       self.quality_mode = !self.quality_mode;
       if(self.quality_mode)
@@ -1100,9 +1105,9 @@ var GamePlayScene = function(game, stage)
         self.afield = self.afield_lq;
       }
     });
-    self.vec_button = new ButtonBox(stage.drawCanv.canvas.width/2-10-30,10,20,20, function(on) { self.vec_mode = !self.vec_mode; });
-    self.air_button = new ButtonBox(stage.drawCanv.canvas.width/2-10,10,20,20, function(on) { self.air_mode = !self.air_mode; });
-    self.help_button = new ButtonBox(stage.drawCanv.canvas.width/2-10+30,10,20,20, function(on)
+    self.vec_button = new ButtonBox(stage.drawCanv.canvas.width-280,250,40,40, function(on) { self.vec_mode = !self.vec_mode; });
+    self.air_button = new ButtonBox(stage.drawCanv.canvas.width-280,300,40,40, function(on) { self.air_mode = !self.air_mode; });
+    self.help_button = new ButtonBox(stage.drawCanv.canvas.width-280,350,40,40, function(on)
     {
       var l = self.levels[self.cur_level];
       if(l.text_0 && l.text_0 != "")
@@ -1263,6 +1268,9 @@ var GamePlayScene = function(game, stage)
       self.bin_dragger.register(self.p_store_l);
     }
 
+    self.options_open = false;
+    self.options_dir = 0;
+    self.options_x = 9999;
     self.quality_mode = true;
     self.vec_mode = false;
     self.air_mode = false;
@@ -1428,6 +1436,10 @@ var GamePlayScene = function(game, stage)
     {
       self.blurb_clicker.flush();
     }
+
+    self.options_x += self.options_dir*20;
+    if(self.options_x > stage.drawCanv.canvas.width)     self.options_x = stage.drawCanv.canvas.width;
+    if(self.options_x < stage.drawCanv.canvas.width-300) self.options_x = stage.drawCanv.canvas.width-300;
 
     self.clip.tick();
 
@@ -1658,8 +1670,6 @@ var GamePlayScene = function(game, stage)
         canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
     }
 
-    canv.context.drawImage(screen_cover_img,0,0,canv.canvas.width,canv.canvas.height);
-
     /*
     // pressure systems
     */
@@ -1716,6 +1726,50 @@ var GamePlayScene = function(game, stage)
       }
     }
 
+    canv.context.fillStyle = "rgba(0,0,0,0.5)";
+    canv.context.fillRect(self.options_x,0,canv.canvas.width,canv.canvas.height);
+    if(self.options_open)
+    {
+      canv.context.font = "25px Open Sans";
+      canv.context.fillStyle = "#FFFFFF";
+      canv.context.textAlign = "left";
+
+      canv.context.drawImage(icon_close_img,self.options_x+150,self.options_button.y,self.options_button.w,self.options_button.h);
+
+      if(!self.quality_mode) canv.context.drawImage(icon_check_img,         self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
+      else                   canv.context.drawImage(icon_check_selected_img,self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
+      canv.context.fillText("Quality",self.options_x+80,self.quality_button.y+self.quality_button.h-10);
+      if(!self.vec_mode) canv.context.drawImage(icon_check_img,         self.options_x+20,self.vec_button.y,self.vec_button.w,self.vec_button.h);
+      else               canv.context.drawImage(icon_check_selected_img,self.options_x+20,self.vec_button.y,self.vec_button.w,self.vec_button.h);
+      canv.context.fillText("Vectors",self.options_x+80,self.vec_button.y+self.vec_button.h-10);
+      if(!self.air_mode) canv.context.drawImage(icon_check_img,         self.options_x+20,self.air_button.y,self.air_button.w,self.air_button.h);
+      else               canv.context.drawImage(icon_check_selected_img,self.options_x+20,self.air_button.y,self.air_button.w,self.air_button.h);
+      canv.context.fillText("Particles",self.options_x+80,self.air_button.y+self.air_button.h-10);
+/*
+      canv.context.drawImage(icon_check_img,         self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
+      canv.outlineText("Help",self.options_x+80,self.help_button.y+self.help_button.h-10,"#000000","#FFFFFF");
+*/
+    }
+    else
+      canv.context.drawImage(icon_eye_img,self.options_button.x,self.options_button.y+5,self.options_button.w,self.options_button.h-10);
+
+    if(self.levels[self.cur_level].complete_this_round)
+    {
+      canv.context.font = "30px stump";
+      canv.context.textAlign = "center";
+      canv.outlineText("Complete!",canv.canvas.width/2,100,"#000000","#FFFFFF");
+    }
+    else if(self.levels[self.cur_level].timer > 0)
+    {
+      canv.context.font = "30px stump";
+      canv.context.textAlign = "right";
+      canv.outlineText("Time to Complete: ",canv.canvas.width/2,100,"#000000","#FFFFFF");
+      canv.context.textAlign = "left";
+      canv.outlineText(" "+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.canvas.width/2,100,"#000000","#FFFFFF");
+    }
+
+    canv.context.drawImage(screen_cover_img,0,0,canv.canvas.width,canv.canvas.height);
+
     canv.context.fillStyle = blue;
     canv.context.fillRect(0,0,canv.canvas.width,40);
     canv.context.drawImage(yard_logo_img,10,7,70,25);
@@ -1724,32 +1778,6 @@ var GamePlayScene = function(game, stage)
     canv.context.textAlign = "right";
     canv.context.fillText("The Wind Generator",canv.canvas.width-70,30);
     canv.context.drawImage(menu_img,self.menu_button.x,self.menu_button.y,self.menu_button.w,self.menu_button.h);
-
-    canv.context.font = "15px arial";
-    self.quality_button.draw(canv);
-    canv.outlineText("Qual",self.quality_button.x,self.quality_button.y+self.quality_button.h*2,"#000000","#FFFFFF");
-    self.vec_button.draw(canv);
-    canv.outlineText("Vec",self.vec_button.x,self.vec_button.y+self.vec_button.h*2,"#000000","#FFFFFF");
-    self.air_button.draw(canv);
-    canv.outlineText("Air",self.air_button.x,self.air_button.y+self.air_button.h*2,"#000000","#FFFFFF");
-    self.help_button.draw(canv);
-    canv.outlineText("Help",self.help_button.x,self.help_button.y+self.help_button.h*2,"#000000","#FFFFFF");
-    if(self.levels[self.cur_level].complete_this_round)
-    {
-      canv.context.fillStyle = "#FFFFFF";
-      canv.context.strokeStyle = "#000000";
-      canv.context.fillRect(self.menu_button.x-100-10,self.menu_button.y+self.menu_button.h*2,100,30);
-      canv.context.strokeRect(self.menu_button.x-100-10,self.menu_button.y+self.menu_button.h*2,100,30);
-      canv.outlineText("Complete!",self.menu_button.x-100,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
-    }
-    else if(self.levels[self.cur_level].timer > 0)
-    {
-      canv.context.fillStyle = "#FFFFFF";
-      canv.context.strokeStyle = "#000000";
-      canv.context.fillRect(self.menu_button.x-200-10,self.menu_button.y+self.menu_button.h*2,200,30);
-      canv.context.strokeRect(self.menu_button.x-200-10,self.menu_button.y+self.menu_button.h*2,200,30);
-      canv.outlineText("Time to Complete: "+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),self.menu_button.x-200,self.menu_button.y+self.menu_button.h*3,"#000000","#FFFFFF");
-    }
 
     self.clip.draw(canv);
 
