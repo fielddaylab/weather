@@ -1099,6 +1099,7 @@ var GamePlayScene = function(game, stage)
 
     self.quality_button = new ButtonBox(stage.drawCanv.canvas.width-280,200,40,40, function(on)
     {
+      if(!self.options_open) return;
       self.quality_mode = !self.quality_mode;
       if(self.quality_mode)
       {
@@ -1113,10 +1114,11 @@ var GamePlayScene = function(game, stage)
         self.afield = self.afield_lq;
       }
     });
-    self.vec_button = new ButtonBox(stage.drawCanv.canvas.width-280,250,40,40, function(on) { self.vec_mode = !self.vec_mode; });
-    self.air_button = new ButtonBox(stage.drawCanv.canvas.width-280,300,40,40, function(on) { self.air_mode = !self.air_mode; });
+    self.vec_button = new ButtonBox(stage.drawCanv.canvas.width-280,250,40,40, function(on) { if(!self.options_open) return; self.vec_mode = !self.vec_mode; });
+    self.air_button = new ButtonBox(stage.drawCanv.canvas.width-280,300,40,40, function(on) { if(!self.options_open) return;self.air_mode = !self.air_mode; });
     self.help_button = new ButtonBox(stage.drawCanv.canvas.width-280,350,40,40, function(on)
     {
+      if(!self.options_open) return;
       var l = self.levels[self.cur_level];
       if(l.text_0 && l.text_0 != "")
       {
