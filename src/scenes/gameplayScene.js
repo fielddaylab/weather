@@ -862,8 +862,10 @@ var GamePlayScene = function(game, stage)
       var l = Math.sqrt((tmp_vec.x*tmp_vec.x)+(tmp_vec.y*tmp_vec.y));
       tmp_vec.x /= l;
       tmp_vec.y /= l
+      l /= 4;
+      if(l > 10) l = 10;
       canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)+3.141592/2);
-      canv.context.drawImage(dotted_flag_tip_img,-10,-10,20,20);
+      canv.context.drawImage(dotted_flag_tip_img,-l,-l,2*l,2*l);
       canv.context.restore();
 
       //tail
@@ -876,8 +878,10 @@ var GamePlayScene = function(game, stage)
       var l = Math.sqrt((tmp_vec.x*tmp_vec.x)+(tmp_vec.y*tmp_vec.y));
       tmp_vec.x /= l;
       tmp_vec.y /= l
+      l /= 4;
+      if(l > 10) l = 10;
       canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)-3.141592/2);
-      canv.context.drawImage(dotted_flag_tail_img,-10,-10,20,20);
+      canv.context.drawImage(dotted_flag_tail_img,-l,-l,2*l,2*l);
       canv.context.restore();
 
 
@@ -900,8 +904,10 @@ var GamePlayScene = function(game, stage)
       var l = Math.sqrt((tmp_vec.x*tmp_vec.x)+(tmp_vec.y*tmp_vec.y));
       tmp_vec.x /= l;
       tmp_vec.y /= l
+      l /= 4;
+      if(l > 10) l = 10;
       canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)+3.141592/2);
-      canv.context.drawImage(flag_tip_img,-10,-10,20,20);
+      canv.context.drawImage(flag_tip_img,-l,-l,2*l,2*l);
       canv.context.restore();
 
       //tail
@@ -914,17 +920,19 @@ var GamePlayScene = function(game, stage)
       var l = Math.sqrt((tmp_vec.x*tmp_vec.x)+(tmp_vec.y*tmp_vec.y));
       tmp_vec.x /= l;
       tmp_vec.y /= l
+      l /= 4;
+      if(l > 10) l = 10;
       canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)-3.141592/2);
-      canv.context.drawImage(flag_tail_img,-10,-10,20,20);
+      canv.context.drawImage(flag_tail_img,-l,-l,2*l,2*l);
       canv.context.restore();
-
-
 
       if(self.hovering || self.dragging)
       {
         canv.context.lineWidth = 3;
-        canv.context.strokeStyle = "#000000";
-        canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
+        canv.context.strokeStyle = "#FFFFFF";
+        canv.context.beginPath();
+        canv.context.arc(self.x+self.w/2,self.y+self.h/2,self.w/2,0,2*Math.PI);
+        canv.context.stroke();
       }
     }
   }
