@@ -3,11 +3,24 @@ var paint = false;
 var sys = !paint;
 var anneal = true;
 var airdeath = true;
-var tools = true;
+var tools = false;
 var tools_explicit = false;
 
 var vec_length = 5;
 var flag_length = 20;
+
+var screen_bg_img;
+var screen_cover_img;
+var button_h_img;
+var button_l_img;
+var icon_check_img;
+var icon_close_img;
+var icon_eye_img;
+var icon_check_selected_img;
+var icon_h_img;
+var icon_l_img;
+var icon_trash_img;
+var icon_trash_open_img;
 
 var ENUM;
 
@@ -281,18 +294,8 @@ var GamePlayScene = function(game, stage)
     self.h = 20;
 
     self.delta = delta;
-    if(self.delta > 0)
-    {
-      self.text = "H";
-      self.color_fill = "#FFFFFF";
-      self.color_stroke = "#000000";
-    }
-    else
-    {
-      self.text = "L";
-      self.color_fill = "#000000";
-      self.color_stroke = "#FFFFFF";
-    }
+    if(self.delta > 0) self.img = icon_h_img;
+    else self.img = icon_l_img;
 
     self.reset = function()
     {
@@ -340,15 +343,13 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
-      stage.drawCanv.context.font = "30px arial";
-      canv.outlineText(self.text,self.x+self.w/2-10,self.y+self.h/2+10,self.color_fill,self.color_stroke);
-
       if(self.hovering || self.dragging)
       {
         canv.context.lineWidth = 3;
         canv.context.strokeStyle = self.color_stroke;
         canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
       }
+      canv.context.drawImage(self.img,self.x-10,self.y-10,self.w+20,self.h+20);
     }
   }
   var Tool = function(x,y,scene)
@@ -891,6 +892,19 @@ var GamePlayScene = function(game, stage)
 
   self.ready = function()
   {
+    screen_bg_img = new Image(); screen_bg_img.src = "assets/main-screen.png";
+    screen_cover_img = new Image(); screen_cover_img.src = "assets/main-screen_cover.png";
+    button_h_img = new Image(); button_h_img.src = "assets/button-h.png";
+    button_l_img = new Image(); button_l_img.src = "assets/button-l.png";
+    icon_check_img = new Image(); icon_check_img.src = "assets/icon-checkbox.png";
+    icon_close_img = new Image(); icon_close_img.src = "assets/icon-close.png";
+    icon_eye_img = new Image(); icon_eye_img.src = "assets/icon-eye.png";
+    icon_check_selected_img = new Image(); icon_check_selected_img.src = "assets/icon-checkbox-selected.png";
+    icon_h_img = new Image(); icon_h_img.src = "assets/icon-h.png";
+    icon_l_img = new Image(); icon_l_img.src = "assets/icon-l.png";
+    icon_trash_img = new Image(); icon_trash_img.src = "assets/icon-trash-open.png";
+    icon_trash_open_img = new Image(); icon_trash_open_img.src = "assets/icon-trash.png";
+
     self.menu_clicker = new Clicker({source:stage.dispCanv.canvas});
     self.bin_presser = new Presser({source:stage.dispCanv.canvas});
     self.bin_dragger = new Dragger({source:stage.dispCanv.canvas});
@@ -1201,7 +1215,7 @@ var GamePlayScene = function(game, stage)
       function fdrag(evt) { if(self.dragging_sys) self.dragging_sys.drag(evt); };
       function fdfinish() { if(self.dragging_sys) self.dragging_sys.dragFinish(); };
 
-      self.p_store_h = new BinBox(10,10,20,20, fdstart, fdrag, fdfinish,
+      self.p_store_h = new BinBox(60,40,40,40, fdstart, fdrag, fdfinish,
         function(evt)
         {
           var p = new PSys(0.,0.,0.1,0.1,self);
@@ -1219,7 +1233,7 @@ var GamePlayScene = function(game, stage)
             if(self.psys[i] == p) self.psys.splice(i,1);
           self.dragging_sys = undefined;
         });
-      self.p_store_l = new BinBox(40,10,20,20, fdstart, fdrag, fdfinish,
+      self.p_store_l = new BinBox(110,40,40,40, fdstart, fdrag, fdfinish,
         function(evt)
         {
           var p = new PSys(0.,0.,0.1,-0.1,self);
@@ -1569,8 +1583,7 @@ var GamePlayScene = function(game, stage)
   {
     var canv = stage.drawCanv;
 
-    //if(self.quality_mode)
-      canv.context.drawImage(USA,0,0,canv.canvas.width,canv.canvas.height);
+    canv.context.drawImage(screen_bg_img,0,0,canv.canvas.width,canv.canvas.height);
 
     var x_space;
     var y_space;
@@ -1639,6 +1652,8 @@ var GamePlayScene = function(game, stage)
         canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
     }
 
+    canv.context.drawImage(screen_cover_img,0,0,canv.canvas.width,canv.canvas.height);
+
     /*
     // pressure systems
     */
@@ -1681,6 +1696,8 @@ var GamePlayScene = function(game, stage)
       canv.context.font = "20px arial";
       canv.outlineText("H",self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_h.h,"#FFFFFF","#000000");
       canv.outlineText("L",self.p_type_toggle_l.x,self.p_type_toggle_l.y+self.p_type_toggle_l.h,"#000000","#FFFFFF");
+      canv.context.drawImage(button_h,self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_h.h);
+      canv.context.drawImage(button_l,self.p_type_toggle_l.x,self.p_type_toggle_l.y+self.p_type_toggle_l.h);
       canv.context.font = "15px arial";
       canv.outlineText("Toggle Brush",self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_l.h*2,"#000000","#FFFFFF");
     }
@@ -1688,13 +1705,8 @@ var GamePlayScene = function(game, stage)
     {
       if(self.cur_level == 0)
       {
-        self.p_store_h.draw(canv);
-        self.p_store_l.draw(canv);
-        canv.context.font = "20px arial";
-        canv.outlineText("H",self.p_store_h.x,self.p_store_h.y+self.p_store_h.h,"#FFFFFF","#000000");
-        canv.outlineText("L",self.p_store_l.x,self.p_store_l.y+self.p_store_l.h,"#000000","#FFFFFF");
-        canv.context.font = "15px arial";
-        canv.outlineText("Drag To Create/Destroy",self.p_store_h.x,self.p_store_h.y+self.p_store_h.h*2,"#000000","#FFFFFF");
+        canv.context.drawImage(button_h_img,self.p_store_h.x,self.p_store_h.y,self.p_store_h.w,self.p_store_h.h);
+        canv.context.drawImage(button_l_img,self.p_store_l.x,self.p_store_l.y,self.p_store_l.w,self.p_store_l.h);
       }
     }
 
