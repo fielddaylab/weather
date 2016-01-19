@@ -294,8 +294,8 @@ var GamePlayScene = function(game, stage)
     self.start_sx = x;
     self.start_sy = y;
     self.r = r;
-    self.w = 20;
-    self.h = 20;
+    self.w = 40;
+    self.h = 40;
 
     self.delta = delta;
     if(self.delta > 0) self.img = icon_h_img;
@@ -1307,7 +1307,7 @@ var GamePlayScene = function(game, stage)
 
     self.clip.dirty();
     if(self.game_mode == GAME_MODE_MENU) self.clip.desired_y = 20;
-    if(self.game_mode == GAME_MODE_PLAY) self.clip.desired_y = 500;
+    if(self.game_mode == GAME_MODE_PLAY) self.clip.desired_y = stage.drawCanv.canvas.height;
   }
 
   self.beginLevel = function(l)
