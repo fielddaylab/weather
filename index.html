@@ -46,17 +46,33 @@ var g;
 var d;
 function begin()
 {
+  var w = (window.innerWidth-960)/2;
+  document.getElementById("side_a").style.width = w+"px";
+  document.getElementById("side_b").style.width = w+"px";
+  document.getElementById("stage_container").style.left = w+"px";
+  document.getElementById("side_b").style.left = (w+960)+"px";
+
   g = new Game({width:960,height:720,container:"stage_container"});
   g.begin();
 }
 window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prevent browser from doing anything funny
 window.addEventListener("load",begin,false);
+window.onresize = function(event)
+{
+  var w = (window.innerWidth-960)/2;
+  document.getElementById("side_a").style.width = w+"px";
+  document.getElementById("side_b").style.width = w+"px";
+  document.getElementById("stage_container").style.left = w+"px";
+  document.getElementById("side_b").style.left = (w+960)+"px";
+};
 </script>
 
 </head>
 <body>
 <div style="position:absolute; top:0px; left:0px; background-color:#76DAE2; width:100%; height:40px; user-select:none;"></div>
-<div id="stage_container" style="position:relative; margin:0px auto; width:960px; height:720px; user-select:none;"> </div>
+<div id="side_a" style="position:absolute; height:720px; user-select:none;"> </div>
+<div id="stage_container" style="position:absolute; width:960px; height:720px; user-select:none;"> </div>
+<div id="side_b" style="position:absolute; height:720px; user-select:none;"> </div>
 </div>
 
 </body>

@@ -36,6 +36,8 @@ var dotted_flag_tail_img;
 
 var blue = "#76DAE2";
 
+var global_bg_alpha;
+
 var ENUM;
 
 ENUM = 0;
@@ -594,6 +596,10 @@ var GamePlayScene = function(game, stage)
       {
         self.canv.clear();
 
+        global_bg_alpha = (1-((self.y*10)/self.h));
+        self.canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")";
+        self.canv.context.fillRect(0,0,self.w,self.h);
+
         self.canv.context.font = "100px stump";
         self.canv.context.textAlign = "center";
         self.canv.context.fillStyle = "#FFFFFF";
@@ -696,6 +702,9 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
+      global_bg_alpha = (1-((20*10)/canv.canvas.height));
+      canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")"; //emulates clipboard fade
+      canv.context.fillRect(0,0,canv.canvas.width,canv.canvas.height);
       var box_height = 300;
       canv.context.fillStyle = blue;
       canv.context.fillRect(0,canv.canvas.height-box_height,canv.canvas.width,box_height);
@@ -998,6 +1007,8 @@ var GamePlayScene = function(game, stage)
 
   self.ready = function()
   {
+    global_bg_alpha = 0;
+
     self.dc = stage.drawCanv;
     yard_logo_img = new Image(); yard_logo_img.src = "assets/theyard-logo.png";
     menu_img = new Image(); menu_img.src = "assets/icon-menu.png";
@@ -1053,7 +1064,7 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
-    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the green flag).";
+    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the dotted flag).";
     self.levels.push(l);
 
     //blow east
@@ -1062,7 +1073,7 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.3,0.5,1.5,0.0,self));
     l.psys.push(new PSys(0.5,0.4,0.1,-0.1,self));
     l.psys.push(new PSys(0.5,0.6,0.1, 0.1,self));
-    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the green flag).";
+    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the dotted flag).";
     self.levels.push(l);
 
     //blow south (laterally surrounded L)
@@ -1072,7 +1083,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.3,0.5,0.1, 0.1,self));
     l.psys.push(new PSys(0.7,0.5,0.1, 0.1,self));
-    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the green flag).";
+    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the dotted flag).";
     self.levels.push(l);
 
     //full circle of flags
@@ -1113,7 +1124,7 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-    l.text_0 = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+    l.text_0 = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the dotted flag.";
     l.text_1 = "Make sure to use both the L and the H! (and use the visualizers!)";
     self.levels.push(l);
 
@@ -1123,7 +1134,7 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-    l.text_1 = "Again, drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
+    l.text_1 = "Again, drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the dotted flag.";
     l.text_0 = "(This is the same as last time, just a different direction).";
     self.levels.push(l);
 
@@ -1136,7 +1147,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.4,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.6,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.8,0.1,-0.1,self));
-    l.text_0 = "Place the High and Low Pressure Systems to create a cyclone in the direction indicated by the green flags.";
+    l.text_0 = "Place the High and Low Pressure Systems to create a cyclone in the direction indicated by the dotted flags.";
     l.text_1 = "You should only need 3 systems to solve.";
     self.levels.push(l);
 
