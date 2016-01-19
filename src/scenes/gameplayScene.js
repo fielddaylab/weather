@@ -23,6 +23,7 @@ var icon_h_img;
 var icon_l_img;
 var icon_trash_img;
 var icon_trash_open_img;
+var tall_img;
 
 var blue = "#76DAE2";
 
@@ -451,19 +452,11 @@ var GamePlayScene = function(game, stage)
         if(self.level.text_0 && self.level.text_0 != "")
         {
           var b_0 = new Blurb(scene);
-          b_0.x = self.level.text_x;
-          b_0.y = self.level.text_y;
-          b_0.w = self.level.text_w;
-          b_0.h = self.level.text_h;
           b_0.txt = self.level.text_0;
           setTimeout(function(){ scene.popBlurb(b_0); },200);
           if(self.level.text_1 && self.level.text_1 != "")
           {
             var b_1 = new Blurb(scene);
-            b_1.x = self.level.text_x;
-            b_1.y = self.level.text_y;
-            b_1.w = self.level.text_w;
-            b_1.h = self.level.text_h;
             b_1.txt = self.level.text_1;
             b_0.click = function(evt) { scene.popBlurb(b_1); };
           }
@@ -611,16 +604,13 @@ var GamePlayScene = function(game, stage)
   var Blurb = function(scene)
   {
     var self = this;
-    self.x = 0;
-    self.y = 0;
-    self.w = 0;
-    self.h = 0;
+    self.x = scene.dc.canvas.width-200;
+    self.y = scene.dc.canvas.height-200;
+    self.w = 100;
+    self.h = 50;
+
     self.txt = "";
     self.lines;
-    self.txt_x = 0;
-    self.txt_y = 0;
-    self.txt_w = 0;
-    self.txt_h = 0;
     self.img = "";
     self.img_x = 0;
     self.img_y = 0;
@@ -634,6 +624,9 @@ var GamePlayScene = function(game, stage)
       var found = 0;
       var searched = 0;
       var tentative_search = 0;
+      var width = canv.canvas.width-420;
+
+      canv.context.font = "25px Open Sans";
 
       //stage.drawCanv.context.font=whaaaat;
       while(found < self.txt.length)
@@ -642,7 +635,7 @@ var GamePlayScene = function(game, stage)
         if(searched == -1) searched = self.txt.length;
         tentative_search = self.txt.indexOf(" ",searched+1);
         if(tentative_search == -1) tentative_search = self.txt.length;
-        while(canv.context.measureText(self.txt.substring(found,tentative_search)).width < self.txt_w && searched != self.txt.length)
+        while(canv.context.measureText(self.txt.substring(found,tentative_search)).width < width && searched != self.txt.length)
         {
           searched = tentative_search;
           tentative_search = self.txt.indexOf(" ",searched+1);
@@ -664,20 +657,33 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
-      stage.drawCanv.context.font = "16px arial";
+      var box_height = 300;
+      canv.context.fillStyle = blue;
+      canv.context.fillRect(0,canv.canvas.height-box_height,canv.canvas.width,box_height);
+
+      canv.context.font = "25px Open Sans";
+      canv.context.textAlign = "left";
+      for(var i = 0; i < self.lines.length; i++)
+      {
+        canv.context.fillStyle = "#000000";
+        canv.context.fillText(self.lines[i],200-1,canv.canvas.height-box_height+50+((i+1)*40)-1,canv.canvas.width-420);
+        canv.context.fillStyle = "#FFFFFF";
+        canv.context.fillText(self.lines[i],200,canv.canvas.height-box_height+50+((i+1)*40),canv.canvas.width-420);
+      }
+
+      //if(self.img_el)
+        //canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
+
+      canv.context.fillStyle = "#CCCCCC";
+      canv.context.fillRect(self.x,self.y+10,self.w,self.h);
       canv.context.fillStyle = "#FFFFFF";
       canv.context.fillRect(self.x,self.y,self.w,self.h);
-      canv.context.strokeStyle = "#000000";
-      canv.context.strokeRect(self.x,self.y,self.w,self.h);
-
       canv.context.fillStyle = "#000000";
-      for(var i = 0; i < self.lines.length; i++)
-        canv.context.fillText(self.lines[i],self.txt_x,self.txt_y+(i*15),self.txt_w);
+      canv.context.font = "30px stump";
+      canv.context.fillText("Ok!",self.x+10,self.y+self.h-10,self.w);
+      canv.context.font = "12px stump";
 
-      if(self.img_el)
-        canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
-
-      canv.context.fillText("(click to dismiss)",self.x+10,self.y+self.h-10,self.w);
+      canv.context.drawImage(tall_img,50,canv.canvas.height-350,120,320);
     }
 
     self.click = function(evt)
@@ -845,10 +851,6 @@ var GamePlayScene = function(game, stage)
     self.complete = default_complete;
     self.complete_this_round = false;
 
-    self.text_x = 0;
-    self.text_y = 0;
-    self.text_w = 0;
-    self.text_h = 0;
     self.text_0 = "";
     self.text_1 = "";
   }
@@ -898,6 +900,7 @@ var GamePlayScene = function(game, stage)
 
   self.ready = function()
   {
+    self.dc = stage.drawCanv;
     yard_logo_img = new Image(); yard_logo_img.src = "assets/theyard-logo.png";
     menu_img = new Image(); menu_img.src = "assets/icon-menu.png";
     screen_bg_img = new Image(); screen_bg_img.src = "assets/main-screen.png";
@@ -912,6 +915,7 @@ var GamePlayScene = function(game, stage)
     icon_l_img = new Image(); icon_l_img.src = "assets/icon-l.png";
     icon_trash_img = new Image(); icon_trash_img.src = "assets/icon-trash-open.png";
     icon_trash_open_img = new Image(); icon_trash_open_img.src = "assets/icon-trash.png";
+    tall_img = new Image(); tall_img.src = "assets/scout.png";
 
     self.menu_clicker = new Clicker({source:stage.dispCanv.canvas});
     self.bin_presser = new Presser({source:stage.dispCanv.canvas});
@@ -933,10 +937,6 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_NONE;
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
-    l.text_x = 150;
-    l.text_y = 60;
-    l.text_w = 350;
-    l.text_h = 80;
     l.text_0 = "This is a playground. Drag around the Pressure Systems or the meteorological tools. When ready to begin, hit Menu.";
     self.levels.push(l);
 
@@ -946,10 +946,6 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
-    l.text_x = 150;
-    l.text_y = 60;
-    l.text_w = 350;
-    l.text_h = 80;
     l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the green flag).";
     self.levels.push(l);
 
@@ -959,10 +955,6 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.3,0.5,1.5,0.0,self));
     l.psys.push(new PSys(0.5,0.4,0.1,-0.1,self));
     l.psys.push(new PSys(0.5,0.6,0.1, 0.1,self));
-    l.text_x = 200;
-    l.text_y = 60;
-    l.text_w = 300;
-    l.text_h = 80;
     l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the green flag).";
     self.levels.push(l);
 
@@ -973,10 +965,6 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.3,0.5,0.1, 0.1,self));
     l.psys.push(new PSys(0.7,0.5,0.1, 0.1,self));
-    l.text_x = 200;
-    l.text_y = 60;
-    l.text_w = 300;
-    l.text_h = 80;
     l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the green flag).";
     self.levels.push(l);
 
@@ -1008,10 +996,6 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.1,0.1, 0.1,self));
     l.psys.push(new PSys(0.9,0.5,0.1, 0.1,self));
     l.psys.push(new PSys(0.5,0.9,0.1, 0.1,self));
-    l.text_x = 200;
-    l.text_y = 60;
-    l.text_w = 300;
-    l.text_h = 80;
     l.text_0 = "Drag all the flags to find a position where the blowing red flag matches the green.";
     l.text_1 = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful! (Try to see underlying shape.)";
     self.levels.push(l);
@@ -1022,10 +1006,6 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-    l.text_x = 200;
-    l.text_y = 60;
-    l.text_w = 300;
-    l.text_h = 80;
     l.text_0 = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
     l.text_1 = "Make sure to use both the L and the H! (and use the visualizers!)";
     self.levels.push(l);
@@ -1036,10 +1016,6 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-    l.text_x = 150;
-    l.text_y = 60;
-    l.text_w = 350;
-    l.text_h = 80;
     l.text_1 = "Again, drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the green flag.";
     l.text_0 = "(This is the same as last time, just a different direction).";
     self.levels.push(l);
@@ -1053,10 +1029,6 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.4,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.6,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.8,0.1,-0.1,self));
-    l.text_x = 150;
-    l.text_y = 60;
-    l.text_w = 350;
-    l.text_h = 80;
     l.text_0 = "Place the High and Low Pressure Systems to create a cyclone in the direction indicated by the green flags.";
     l.text_1 = "You should only need 3 systems to solve.";
     self.levels.push(l);
@@ -1070,10 +1042,6 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.4,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.6,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.8,0.1, 0.1,self));
-    l.text_x = 150;
-    l.text_y = 60;
-    l.text_w = 350;
-    l.text_h = 80;
     l.text_0 = "Again, try to create a cyclone. (This time, in the opposite direction.)";
     l.text_1 = "Notice differences in severity from the previous.";
     self.levels.push(l);
@@ -1113,18 +1081,10 @@ var GamePlayScene = function(game, stage)
       if(l.text_0 && l.text_0 != "")
       {
         var b_0 = new Blurb(self);
-        b_0.x = l.text_x;
-        b_0.y = l.text_y;
-        b_0.w = l.text_w;
-        b_0.h = l.text_h;
         b_0.txt = l.text_0;
         if(l.text_1 && l.text_1 != "")
         {
           var b_1 = new Blurb(self);
-          b_1.x = l.text_x;
-          b_1.y = l.text_y;
-          b_1.w = l.text_w;
-          b_1.h = l.text_h;
           b_1.txt = l.text_1;
           b_0.click = function(evt) { self.popBlurb(b_1); };
         }
@@ -1384,25 +1344,7 @@ var GamePlayScene = function(game, stage)
 
   self.popBlurb = function(blurb)
   {
-    self.blurb.x = blurb.x;
-    self.blurb.y = blurb.y;
-    self.blurb.w = blurb.w;
-    self.blurb.h = blurb.h;
     self.blurb.txt = blurb.txt;
-    if(blurb.txt_x || blurb.txt_y || blurb.txt_w || blurb.txt_h) //if any properties set on blurb text pos
-    {
-      self.blurb.txt_x = blurb.txt_x;
-      self.blurb.txt_y = blurb.txt_y;
-      self.blurb.txt_w = blurb.txt_w;
-      self.blurb.txt_h = blurb.txt_h;
-    }
-    else //otherwise assume full text area
-    {
-      self.blurb.txt_x = blurb.x+10;
-      self.blurb.txt_y = blurb.y+15;
-      self.blurb.txt_w = blurb.w-10;
-      self.blurb.txt_h = blurb.h-30;
-    }
     self.blurb.img = blurb.img;
     self.blurb.img_x = blurb.img_x;
     self.blurb.img_y = blurb.img_y;
