@@ -47,6 +47,10 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/level-bg-outline.png");
     img_srcs.push("assets/icon-locked.png");
     img_srcs.push("assets/icon-check.png");
+    img_srcs.push("assets/vane-tip.png");
+    img_srcs.push("assets/vane-tail.png");
+    img_srcs.push("assets/dotted-vane-tip.png");
+    img_srcs.push("assets/dotted-vane-tail.png");
     for(var i = 0; i < img_srcs.length; i++)
     {
       images[i] = new Image();
@@ -77,3 +81,4 @@ var LoadingScene = function(game, stage)
     canv.context.fillRect(0,0,canv.canvas.width,canv.canvas.height);
   };
 };
+

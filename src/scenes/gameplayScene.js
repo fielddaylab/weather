@@ -29,6 +29,10 @@ var lvl_button_fade_img;
 var lvl_button_outline_img;
 var lvl_button_lock_img;
 var lvl_button_check_img;
+var flag_tip_img;
+var flag_tail_img;
+var dotted_flag_tip_img;
+var dotted_flag_tail_img;
 
 var blue = "#76DAE2";
 
@@ -826,44 +830,95 @@ var GamePlayScene = function(game, stage)
       var tip_cart = {x:0,y:0};
       var polar = {dir:0,len:0};
       var head_cart = {x:0,y:0};
-      canv.context.lineWidth = 3;
-      canv.context.strokeStyle = "#00FF00";
+      var tmp_vec = {x:0,y:0};
 
       self.cache_x = self.sx*canv.canvas.width;
       self.cache_y = self.sy*canv.canvas.height;
 
+      if(self.met)
+      {
+        canv.context.lineWidth = 5;
+        canv.context.strokeStyle = "#00FF00";
+      }
+      else
+      {
+        canv.context.lineWidth = 1;
+        canv.context.strokeStyle = "#FFFFFF";
+      }
+
+      //line
       canv.context.beginPath();
-      canv.context.moveTo(self.cache_x,self.cache_y);
+      canv.context.moveTo(self.cache_x-self.goal_cache_xd,self.cache_y-self.goal_cache_yd);
       canv.context.lineTo(self.cache_x+self.goal_cache_xd,self.cache_y+self.goal_cache_yd);
-
-      canv.context.moveTo(self.cache_x+self.goal_cache_head_ccw_x,self.cache_y+self.goal_cache_head_ccw_y);
-      canv.context.lineTo(self.cache_x+self.goal_cache_xd,self.cache_y+self.goal_cache_yd);
-      canv.context.lineTo(self.cache_x+self.goal_cache_head_cw_x,self.cache_y+self.goal_cache_head_cw_y);
-
       canv.context.stroke();
 
+      //head
+      canv.context.save();
+      tmp_vec.x = self.cache_x+self.goal_cache_xd;
+      tmp_vec.y = self.cache_y+self.goal_cache_yd;
+      canv.context.translate(tmp_vec.x,tmp_vec.y);
+      tmp_vec.x -= self.cache_x;
+      tmp_vec.y -= self.cache_y;
+      var l = Math.sqrt((tmp_vec.x*tmp_vec.x)+(tmp_vec.y*tmp_vec.y));
+      tmp_vec.x /= l;
+      tmp_vec.y /= l
+      canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)+3.141592/2);
+      canv.context.drawImage(dotted_flag_tip_img,-10,-10,20,20);
+      canv.context.restore();
 
-      if(self.met) canv.context.strokeStyle = "#00FF00";
-      else canv.context.strokeStyle = "#FF0000";
+      //tail
+      canv.context.save();
+      tmp_vec.x = self.cache_x-self.goal_cache_xd;
+      tmp_vec.y = self.cache_y-self.goal_cache_yd;
+      canv.context.translate(tmp_vec.x,tmp_vec.y);
+      tmp_vec.x -= self.cache_x;
+      tmp_vec.y -= self.cache_y;
+      var l = Math.sqrt((tmp_vec.x*tmp_vec.x)+(tmp_vec.y*tmp_vec.y));
+      tmp_vec.x /= l;
+      tmp_vec.y /= l
+      canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)-3.141592/2);
+      canv.context.drawImage(dotted_flag_tail_img,-10,-10,20,20);
+      canv.context.restore();
+
+
+
+      //line
+      canv.context.strokeStyle = "#BF1717";
+      canv.context.lineWidth = 3;
       canv.context.beginPath();
-      canv.context.moveTo(self.cache_x,self.cache_y);
+      canv.context.moveTo(self.cache_x-(self.xd*flag_length),self.cache_y-(self.yd*flag_length));
       canv.context.lineTo(self.cache_x+(self.xd*flag_length),self.cache_y+(self.yd*flag_length));
-
-      tip_cart.x = self.xd;
-      tip_cart.y = self.yd;
-
-      cartToPolar(tip_cart,polar);
-      polar.len *= 0.9;
-      polar.dir += 0.1;
-      polarToCart(polar,head_cart);
-      canv.context.moveTo(self.cache_x+(head_cart.x*flag_length),self.cache_y+(head_cart.y*flag_length));
-      canv.context.lineTo(self.cache_x+(self.xd*flag_length),self.cache_y+(self.yd*flag_length));
-
-      polar.dir -= 0.2;
-      polarToCart(polar,head_cart);
-      canv.context.lineTo(self.cache_x+(head_cart.x*flag_length),self.cache_y+(head_cart.y*flag_length));
-
       canv.context.stroke();
+
+      //head
+      canv.context.save();
+      tmp_vec.x = self.cache_x+(self.xd*flag_length);
+      tmp_vec.y = self.cache_y+(self.yd*flag_length);
+      canv.context.translate(tmp_vec.x,tmp_vec.y);
+      tmp_vec.x -= self.cache_x;
+      tmp_vec.y -= self.cache_y;
+      var l = Math.sqrt((tmp_vec.x*tmp_vec.x)+(tmp_vec.y*tmp_vec.y));
+      tmp_vec.x /= l;
+      tmp_vec.y /= l
+      canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)+3.141592/2);
+      canv.context.drawImage(flag_tip_img,-10,-10,20,20);
+      canv.context.restore();
+
+      //tail
+      canv.context.save();
+      tmp_vec.x = self.cache_x-(self.xd*flag_length);
+      tmp_vec.y = self.cache_y-(self.yd*flag_length);
+      canv.context.translate(tmp_vec.x,tmp_vec.y);
+      tmp_vec.x -= self.cache_x;
+      tmp_vec.y -= self.cache_y;
+      var l = Math.sqrt((tmp_vec.x*tmp_vec.x)+(tmp_vec.y*tmp_vec.y));
+      tmp_vec.x /= l;
+      tmp_vec.y /= l
+      canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)-3.141592/2);
+      canv.context.drawImage(flag_tail_img,-10,-10,20,20);
+      canv.context.restore();
+
+
 
       if(self.hovering || self.dragging)
       {
@@ -956,6 +1011,10 @@ var GamePlayScene = function(game, stage)
     lvl_button_outline_img = new Image(); lvl_button_outline_img.src = "assets/level-bg-outline.png";
     lvl_button_lock_img = new Image(); lvl_button_lock_img.src = "assets/icon-locked.png";
     lvl_button_check_img = new Image(); lvl_button_check_img.src = "assets/icon-check.png";
+    flag_tip_img = new Image(); flag_tip_img.src = "assets/vane-tip.png";
+    flag_tail_img = new Image(); flag_tail_img.src = "assets/vane-tail.png";
+    dotted_flag_tip_img = new Image(); dotted_flag_tip_img.src = "assets/dotted-vane-tip.png";
+    dotted_flag_tail_img = new Image(); dotted_flag_tail_img.src = "assets/dotted-vane-tail.png";
 
     self.menu_clicker = new Clicker({source:stage.dispCanv.canvas});
     self.bin_presser = new Presser({source:stage.dispCanv.canvas});
