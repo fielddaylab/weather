@@ -21,12 +21,27 @@ var LoadingScene = function(game, stage)
     barw = (canv.canvas.width-(2*pad));
     progress = 0;
     canv.context.fillStyle = "#000000";
+    canv.context.font = "25px Open Sans";
+    canv.context.fillText(".",0,0);// funky way to encourage any custom font to load
+    canv.context.font = "25px stump";
     canv.context.fillText(".",0,0);// funky way to encourage any custom font to load
 
     //put strings in 'img_srcs' as separate array to get "static" count
-    /*
-    img_srcs.push("assets/man.png");
-    */
+    img_srcs.push("assets/theyard-logo.png");
+    img_srcs.push("assets/icon-menu.png");
+    img_srcs.push("assets/main-screen.png");
+    img_srcs.push("assets/main-screen_cover.png");
+    img_srcs.push("assets/button-h.png");
+    img_srcs.push("assets/button-l.png");
+    img_srcs.push("assets/icon-checkbox.png");
+    img_srcs.push("assets/icon-close.png");
+    img_srcs.push("assets/icon-eye.png");
+    img_srcs.push("assets/icon-checkbox-selected.png");
+    img_srcs.push("assets/icon-h.png");
+    img_srcs.push("assets/icon-l.png");
+    img_srcs.push("assets/icon-trash-open.png");
+    img_srcs.push("assets/icon-trash.png");
+    img_srcs.push("assets/scout.png");
     for(var i = 0; i < img_srcs.length; i++)
     {
       images[i] = new Image();
@@ -38,7 +53,7 @@ var LoadingScene = function(game, stage)
 
   self.tick = function()
   {
-    if(progress <= imagesloaded/(img_srcs.length+1)) progress += 100;//0.01;
+    if(progress <= imagesloaded/(img_srcs.length+1)) progress += 0.03;
     if(progress >= 1.0) game.nextScene();
   };
 
