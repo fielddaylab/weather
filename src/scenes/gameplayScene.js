@@ -460,6 +460,7 @@ var GamePlayScene = function(game, stage)
     var self;
     function callback(on)
     {
+      click_aud.play();
       if(self.level_i == 0 || self.req_level.complete)
       {
         scene.beginLevel(self.level_i);
@@ -941,6 +942,7 @@ var GamePlayScene = function(game, stage)
 
   self.clip;
   self.menu_button;
+  self.next_button;
   self.options_button;
   self.quality_button;
   self.vec_button;
@@ -1128,15 +1130,19 @@ var GamePlayScene = function(game, stage)
     self.blurb = new Blurb(self);
     self.blurb_clicker.register(self.blurb);
 
-    self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-60,10,20,20, function(on) { self.setMode(GAME_MODE_MENU); });
+    self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-60,10,20,20, function(on) { click_aud.play(); self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
-    self.options_button = new ButtonBox(stage.drawCanv.canvas.width-150,100,40,40, function(on) { self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
+    self.next_button = new ButtonBox(stage.drawCanv.canvas.width/2-100,90,200,40, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
+    self.play_clicker.register(self.next_button);
+
+    self.options_button = new ButtonBox(stage.drawCanv.canvas.width-150,100,40,40, function(on) { click_aud.play(); self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
     self.play_clicker.register(self.options_button);
 
     self.quality_button = new ButtonBox(stage.drawCanv.canvas.width-280,200,40,40, function(on)
     {
       if(!self.options_open) return;
+      click_aud.play();
       self.quality_mode = !self.quality_mode;
       if(self.quality_mode)
       {
@@ -1151,11 +1157,12 @@ var GamePlayScene = function(game, stage)
         self.afield = self.afield_lq;
       }
     });
-    self.vec_button = new ButtonBox(stage.drawCanv.canvas.width-280,250,40,40, function(on) { if(!self.options_open) return; self.vec_mode = !self.vec_mode; });
-    self.air_button = new ButtonBox(stage.drawCanv.canvas.width-280,300,40,40, function(on) { if(!self.options_open) return;self.air_mode = !self.air_mode; });
+    self.vec_button = new ButtonBox(stage.drawCanv.canvas.width-280,250,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.vec_mode = !self.vec_mode; });
+    self.air_button = new ButtonBox(stage.drawCanv.canvas.width-280,300,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.air_mode = !self.air_mode; });
     self.help_button = new ButtonBox(stage.drawCanv.canvas.width-280,350,40,40, function(on)
     {
       if(!self.options_open) return;
+      click_aud.play();
       var l = self.levels[self.cur_level];
       if(l.text_0 && l.text_0 != "")
       {

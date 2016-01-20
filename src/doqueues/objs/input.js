@@ -150,18 +150,15 @@ function ButtonBox(x,y,w,h,callback)
 
   self.press = function(evt)
   {
-    click_aud.play();
     self.down = true;
   }
   self.unpress = function(evt)
   {
-    click_aud.play();
     self.down = false;
   }
 
   self.click = function(evt)
   {
-    click_aud.play();
     self.hit();
   }
 
@@ -201,12 +198,10 @@ function ToggleBox(x,y,w,h,val,callback)
 
   self.press = function(evt)
   {
-    click_aud.play();
     self.down = true;
   }
   self.unpress = function(evt)
   {
-    click_aud.play();
     self.down = false;
     self.toggle();
   }
@@ -506,7 +501,6 @@ function BinBox(x,y,w,h,drag_start_callback,drag_callback,drag_finish_callback,p
 
   self.press = function(evt)
   {
-    click_aud.play();
     self.pressed = true;
     if(self.dragging && self.genable)
     {
@@ -517,7 +511,6 @@ function BinBox(x,y,w,h,drag_start_callback,drag_callback,drag_finish_callback,p
   }
   self.unpress = function(evt)
   {
-    click_aud.play();
     self.pressed = false;
     if(ptWithin(evt.doX, evt.doY, self.x, self.y, self.w, self.h))
       release_callback();
