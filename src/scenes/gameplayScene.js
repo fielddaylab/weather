@@ -845,12 +845,13 @@ var GamePlayScene = function(game, stage)
       canv.context.drawImage(dotted_flag_tail_img,-l,-l,2*l,2*l);
       canv.context.restore();
 
-
       //if(self.hovering || self.dragging)
-      canv.context.beginPath();
-      canv.context.arc(self.x+self.w/2,self.y+self.h/2,self.w/2,0,2*Math.PI);
-      canv.context.stroke();
-
+      if(scene.cur_level < 5)
+      {
+        canv.context.beginPath();
+        canv.context.arc(self.x+self.w/2,self.y+self.h/2,self.w/2,0,2*Math.PI);
+        canv.context.stroke();
+      }
 
       //line
       if(self.met) canv.context.strokeStyle = "#86E11B";
@@ -1132,7 +1133,7 @@ var GamePlayScene = function(game, stage)
     self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-60,10,20,20, function(on) { click_aud.play(); self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
-    self.next_button = new ButtonBox(stage.drawCanv.canvas.width/2-100,90,200,40, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
+    self.next_button = new ButtonBox(stage.drawCanv.canvas.width/2-100,50,200,100, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
     self.play_clicker.register(self.next_button);
 
     self.options_button = new ButtonBox(stage.drawCanv.canvas.width-150,100,40,40, function(on) { click_aud.play(); self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
