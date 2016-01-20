@@ -9,6 +9,7 @@ var tools_explicit = false;
 var vec_length = 5;
 var flag_length = 20;
 
+var click_aud;
 var yard_logo_img;
 var menu_img;
 var screen_bg_img;
@@ -265,6 +266,7 @@ var GamePlayScene = function(game, stage)
 
     self.dragStart = function(evt)
     {
+      click_aud.play();
       self.drag(evt);
     }
     self.drag = function(evt)
@@ -337,6 +339,7 @@ var GamePlayScene = function(game, stage)
     }
     self.dragStart = function(evt)
     {
+      click_aud.play();
       if(scene.dragging_sys || scene.dragging_tool) return;
       scene.dragging_sys = self;
       self.dragging = true;
@@ -393,6 +396,7 @@ var GamePlayScene = function(game, stage)
     }
     self.dragStart = function(evt)
     {
+      click_aud.play();
       if(scene.dragging_tool || scene.dragging_sys) return;
       scene.dragging_tool = self;
       self.dragging = true;
@@ -469,7 +473,7 @@ var GamePlayScene = function(game, stage)
           {
             var b_1 = new Blurb(scene);
             b_1.txt = self.level.text_1;
-            b_0.click = function(evt) { scene.popBlurb(b_1); };
+            b_0.click = function(evt) { click_aud.play(); scene.popBlurb(b_1); };
           }
         }
       }
@@ -687,6 +691,7 @@ var GamePlayScene = function(game, stage)
 
     self.click = function(evt)
     {
+      click_aud.play();
       scene.setMode(GAME_MODE_PLAY);
     }
   }
@@ -760,6 +765,7 @@ var GamePlayScene = function(game, stage)
     }
     self.dragStart = function(evt)
     {
+      click_aud.play();
       if(scene.dragging_flag) return;
       scene.dragging_flag = self;
       self.dragging = true;
@@ -961,6 +967,8 @@ var GamePlayScene = function(game, stage)
     global_bg_alpha = 0;
 
     self.dc = stage.drawCanv;
+    click_aud = new Aud("assets/click_0.wav");
+    click_aud.load();
     yard_logo_img = new Image(); yard_logo_img.src = "assets/theyard-logo.png";
     menu_img = new Image(); menu_img.src = "assets/icon-menu.png";
     screen_bg_img = new Image(); screen_bg_img.src = "assets/main-screen.png";
@@ -1157,7 +1165,7 @@ var GamePlayScene = function(game, stage)
         {
           var b_1 = new Blurb(self);
           b_1.txt = l.text_1;
-          b_0.click = function(evt) { self.popBlurb(b_1); };
+          b_0.click = function(evt) { click_aud.play(); self.popBlurb(b_1); };
         }
         self.popBlurb(b_0);
       }

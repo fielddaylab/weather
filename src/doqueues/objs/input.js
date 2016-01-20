@@ -70,6 +70,7 @@ function NumberBox(x,y,w,h,val,delta,callback)
   self.offY = 0;
   self.dragStart = function(evt)
   {
+    click_aud.play();
     self.focused = true;
     self.down = true;
 
@@ -149,15 +150,18 @@ function ButtonBox(x,y,w,h,callback)
 
   self.press = function(evt)
   {
+    click_aud.play();
     self.down = true;
   }
   self.unpress = function(evt)
   {
+    click_aud.play();
     self.down = false;
   }
 
   self.click = function(evt)
   {
+    click_aud.play();
     self.hit();
   }
 
@@ -197,16 +201,19 @@ function ToggleBox(x,y,w,h,val,callback)
 
   self.press = function(evt)
   {
+    click_aud.play();
     self.down = true;
   }
   self.unpress = function(evt)
   {
+    click_aud.play();
     self.down = false;
     self.toggle();
   }
 
   self.click = function(evt)
   {
+    click_aud.play();
     self.toggle();
   }
 
@@ -258,6 +265,7 @@ function SliderBox(x,y,w,h,min_val,max_val,val,callback)
   self.dragging = false;
   self.dragStart = function(evt)
   {
+    click_aud.play();
     self.dragging = true;
     self.drag(evt);
   }
@@ -332,6 +340,7 @@ function SmoothSliderBox(x,y,w,h,min_val,max_val,val,callback)
   self.dragging = false;
   self.dragStart = function(evt)
   {
+    click_aud.play();
     self.dragging = true;
     self.drag(evt);
   }
@@ -414,6 +423,7 @@ function SmoothSliderSqrtBox(x,y,w,h,min_val,max_val,val,callback)
   self.dragging = false;
   self.dragStart = function(evt)
   {
+    click_aud.play();
     self.dragging = true;
     self.drag(evt);
   }
@@ -496,6 +506,7 @@ function BinBox(x,y,w,h,drag_start_callback,drag_callback,drag_finish_callback,p
 
   self.press = function(evt)
   {
+    click_aud.play();
     self.pressed = true;
     if(self.dragging && self.genable)
     {
@@ -506,6 +517,7 @@ function BinBox(x,y,w,h,drag_start_callback,drag_callback,drag_finish_callback,p
   }
   self.unpress = function(evt)
   {
+    click_aud.play();
     self.pressed = false;
     if(ptWithin(evt.doX, evt.doY, self.x, self.y, self.w, self.h))
       release_callback();
@@ -514,6 +526,7 @@ function BinBox(x,y,w,h,drag_start_callback,drag_callback,drag_finish_callback,p
   //holds drag position in queue and forwards events
   self.dragStart = function(evt)
   {
+    click_aud.play();
     self.dragging = true;
     if(self.pressed && self.genable)
     {
