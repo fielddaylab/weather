@@ -666,8 +666,6 @@ var GamePlayScene = function(game, stage)
       canv.context.textAlign = "left";
       for(var i = 0; i < self.lines.length; i++)
       {
-        canv.context.fillStyle = "#000000";
-        canv.context.fillText(self.lines[i],200-1,canv.canvas.height-box_height+50+((i+1)*40)-1,canv.canvas.width-420);
         canv.context.fillStyle = "#FFFFFF";
         canv.context.fillText(self.lines[i],200,canv.canvas.height-box_height+50+((i+1)*40),canv.canvas.width-420);
       }
