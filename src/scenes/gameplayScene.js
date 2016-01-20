@@ -1012,7 +1012,8 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_NONE;
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
-    l.text_0 = "This is a playground. Drag around the Pressure Systems or the meteorological tools. When ready to begin, hit Menu.";
+    l.text_0 = "This is a wind simulator. This simulator will help you observe how interactions between high and low pressure systems affect the speed and direction of wind.";
+    l.text_1 = "Before you start Level 1, just play around a little. You can see that the map shows a high-pressure system (H) and a low-pressure system (L). Drawg around these pressure systems, and see what happens to the directions of speed of the wind. When you are ready to begin Level 1, click menu.";
     self.levels.push(l);
 
     //blow north
@@ -1021,7 +1022,8 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
-    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly north (as indicated by the dotted flag).";
+    l.text_0 = "The white arrow points in the direction you want the wind to blow - north - and its length indicates how fast it is blowing.";
+    l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly north.";
     self.levels.push(l);
 
     //blow east
@@ -1030,7 +1032,8 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.3,0.5,1.5,0.0,self));
     l.psys.push(new PSys(0.5,0.4,0.1,-0.1,self));
     l.psys.push(new PSys(0.5,0.6,0.1, 0.1,self));
-    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly east (as indicated by the dotted flag).";
+    l.text_0 = "The white arrow points in the direction you want the wind to blow - east - and its length indicates how fast it is blowing.";
+    l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly east.";
     self.levels.push(l);
 
     //blow south (laterally surrounded L)
@@ -1040,7 +1043,8 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.3,0.5,0.1, 0.1,self));
     l.psys.push(new PSys(0.7,0.5,0.1, 0.1,self));
-    l.text_0 = "Drag the flag around the map to find a position where the wind is blowing strongly south (as indicated by the dotted flag).";
+    l.text_0 = "The white arrow points in the direction you want the wind to blow - south - and its length indicates how fast it is blowing.";
+    l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly south.";
     self.levels.push(l);
 
     //full circle of flags
@@ -1071,8 +1075,8 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.1,0.1, 0.1,self));
     l.psys.push(new PSys(0.9,0.5,0.1, 0.1,self));
     l.psys.push(new PSys(0.5,0.9,0.1, 0.1,self));
-    l.text_0 = "Drag all the flags to find a position where the blowing red flag matches the green.";
-    l.text_1 = "Clicking 'Vec' to visualize the wind vectors around the map might prove helpful! (Try to see underlying shape.)";
+    l.text_0 = "Drag each vane to a position where it matches its green arrow.";
+    l.text_1 = "Click the eye to enable different visualizations for the wind- Can you see the underlying pattern of wind motion?";
     self.levels.push(l);
 
     //use systems
@@ -1081,8 +1085,8 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-    l.text_0 = "Drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the dotted flag.";
-    l.text_1 = "Make sure to use both the L and the H! (and use the visualizers!)";
+    l.text_0 = "Drag the high-pressure and low-pressure systems to blow the red vane in the same speed and direction as the white vane.";
+    l.text_1 = "Make sure to use both types of systems!";
     self.levels.push(l);
 
     //use systems- at an angle
@@ -1091,8 +1095,7 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
-    l.text_1 = "Again, drag the High and Low Pressure Systems to blow the red flag in the same speed/direction as the dotted flag.";
-    l.text_0 = "(This is the same as last time, just a different direction).";
+    l.text_1 = "Just as you did in the previous level, drag the high-pressure and low-pressure systems to blow the red vane in the same speed and direction as the white.";
     self.levels.push(l);
 
     //cyclone
@@ -1104,8 +1107,8 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.4,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.6,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.8,0.1,-0.1,self));
-    l.text_0 = "Place the High and Low Pressure Systems to create a cyclone in the direction indicated by the dotted flags.";
-    l.text_1 = "You should only need 3 systems to solve.";
+    l.text_0 = "Place the high-pressure and low-pressure systems to create a cyclone (also called a tornado) in the directions indicated by the white vanes.";
+    l.text_1 = "You should only need three pressure systems to create a cyclone.";
     self.levels.push(l);
 
     //anticyclone
@@ -1117,8 +1120,8 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.4,0.1, 0.1,self));
     l.psys.push(new PSys(0.2,0.6,0.1,-0.1,self));
     l.psys.push(new PSys(0.2,0.8,0.1, 0.1,self));
-    l.text_0 = "Again, try to create a cyclone. (This time, in the opposite direction.)";
-    l.text_1 = "Notice differences in severity from the previous.";
+    l.text_0 = "Again, try to create a cyclone - This time, in the opposite direction!";
+    l.text_1 = "Notice difference in severity from your previous cyclone?";
     self.levels.push(l);
 
     self.clip = new ClipBoard(stage.drawCanv.canvas.width,stage.drawCanv.canvas.height,self,self.levels);
