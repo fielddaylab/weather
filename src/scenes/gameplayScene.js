@@ -40,6 +40,7 @@ var dotted_flag_tail_img;
 var blue = "#76DAE2";
 
 var global_bg_alpha;
+var global_blurb_up;
 
 var ENUM;
 
@@ -959,6 +960,7 @@ var GamePlayScene = function(game, stage)
   self.ready = function()
   {
     global_bg_alpha = 0;
+    global_blurb_up = false;
 
     self.dc = stage.drawCanv;
     click_aud = new Aud("assets/click_0.wav");
@@ -1801,7 +1803,11 @@ var GamePlayScene = function(game, stage)
     self.clip.draw(canv);
 
     if(self.game_mode == GAME_MODE_BLURB)
+    {
+      global_blurb_up = true;
       self.blurb.draw(canv);
+    }
+    else global_blurb_up = false;
   };
 
   self.cleanup = function()
