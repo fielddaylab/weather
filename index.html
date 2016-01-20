@@ -53,6 +53,7 @@ function begin()
   document.getElementById("side_b").style.width = w+"px";
   document.getElementById("stage_container").style.left = w+"px";
   document.getElementById("side_b").style.left = (w+960)+"px";
+  document.getElementById("side_c").style.height = (window.innerHeight-720)+"px";
 
   g = new Game({width:960,height:720,container:"stage_container"});
   g.begin();
@@ -66,6 +67,7 @@ window.onresize = function(event)
   document.getElementById("side_b").style.width = w+"px";
   document.getElementById("stage_container").style.left = w+"px";
   document.getElementById("side_b").style.left = (w+960)+"px";
+  document.getElementById("side_c").style.height = (window.innerHeight-720)+"px";
 };
 </script>
 
@@ -75,6 +77,7 @@ window.onresize = function(event)
 <div id="side_a" style="position:absolute; height:720px; user-select:none;"> </div>
 <div id="stage_container" style="position:absolute; width:960px; height:720px; user-select:none;"> </div>
 <div id="side_b" style="position:absolute; height:720px; user-select:none;"> </div>
+<div id="side_c" style="position:absolute; top:720px; width:100%; user-select:none;"> </div>
 </div>
 
 </body>
