@@ -49,6 +49,8 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/icon-check.png");
     img_srcs.push("assets/vane-tip.png");
     img_srcs.push("assets/vane-tail.png");
+    img_srcs.push("assets/vane-tip-green.png");
+    img_srcs.push("assets/vane-tail-green.png");
     img_srcs.push("assets/dotted-vane-tip.png");
     img_srcs.push("assets/dotted-vane-tail.png");
     for(var i = 0; i < img_srcs.length; i++)

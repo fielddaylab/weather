@@ -32,6 +32,8 @@ var lvl_button_lock_img;
 var lvl_button_check_img;
 var flag_tip_img;
 var flag_tail_img;
+var green_flag_tip_img;
+var green_flag_tail_img;
 var dotted_flag_tip_img;
 var dotted_flag_tail_img;
 
@@ -802,18 +804,9 @@ var GamePlayScene = function(game, stage)
       self.cache_x = self.sx*canv.canvas.width;
       self.cache_y = self.sy*canv.canvas.height;
 
-      if(self.met)
-      {
-        canv.context.lineWidth = 5;
-        canv.context.strokeStyle = "#00FF00";
-      }
-      else
-      {
-        canv.context.lineWidth = 2;
-        canv.context.strokeStyle = "#FFFFFF";
-      }
-
       //line
+      canv.context.lineWidth = 2;
+      canv.context.strokeStyle = "#FFFFFF";
       canv.context.beginPath();
       canv.context.moveTo(self.cache_x-self.goal_cache_xd,self.cache_y-self.goal_cache_yd);
       canv.context.lineTo(self.cache_x+self.goal_cache_xd,self.cache_y+self.goal_cache_yd);
@@ -852,18 +845,15 @@ var GamePlayScene = function(game, stage)
       canv.context.restore();
 
 
-      if(self.hovering || self.dragging)
-        canv.context.strokeStyle = "#FFFFFF";
-      else
-        canv.context.strokeStyle = "#FFFFFF";
-      canv.context.lineWidth = 3;
+      //if(self.hovering || self.dragging)
       canv.context.beginPath();
       canv.context.arc(self.x+self.w/2,self.y+self.h/2,self.w/2,0,2*Math.PI);
       canv.context.stroke();
 
 
       //line
-      canv.context.strokeStyle = "#BF1717";
+      if(self.met) canv.context.strokeStyle = "#86E11B";
+      else         canv.context.strokeStyle = "#BF1717";
       canv.context.lineWidth = 3;
       canv.context.beginPath();
       canv.context.moveTo(self.cache_x-(self.xd*flag_length),self.cache_y-(self.yd*flag_length));
@@ -883,7 +873,8 @@ var GamePlayScene = function(game, stage)
       l /= 4;
       if(l > 10) l = 10;
       canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)+3.141592/2);
-      canv.context.drawImage(flag_tip_img,-l,-l,2*l,2*l);
+      if(self.met) canv.context.drawImage(green_flag_tip_img,-l,-l,2*l,2*l);
+      else         canv.context.drawImage(flag_tip_img,-l,-l,2*l,2*l);
       canv.context.restore();
 
       //tail
@@ -899,7 +890,8 @@ var GamePlayScene = function(game, stage)
       l /= 4;
       if(l > 10) l = 10;
       canv.context.rotate(Math.atan2(tmp_vec.y,tmp_vec.x)-3.141592/2);
-      canv.context.drawImage(flag_tail_img,-l,-l,2*l,2*l);
+      if(self.met) canv.context.drawImage(green_flag_tail_img,-l,-l,2*l,2*l);
+      else         canv.context.drawImage(flag_tail_img,-l,-l,2*l,2*l);
       canv.context.restore();
     }
   }
@@ -993,6 +985,8 @@ var GamePlayScene = function(game, stage)
     lvl_button_check_img = new Image(); lvl_button_check_img.src = "assets/icon-check.png";
     flag_tip_img = new Image(); flag_tip_img.src = "assets/vane-tip.png";
     flag_tail_img = new Image(); flag_tail_img.src = "assets/vane-tail.png";
+    green_flag_tip_img = new Image(); green_flag_tip_img.src = "assets/vane-tip-green.png";
+    green_flag_tail_img = new Image(); green_flag_tail_img.src = "assets/vane-tail-green.png";
     dotted_flag_tip_img = new Image(); dotted_flag_tip_img.src = "assets/dotted-vane-tip.png";
     dotted_flag_tail_img = new Image(); dotted_flag_tail_img.src = "assets/dotted-vane-tail.png";
 
