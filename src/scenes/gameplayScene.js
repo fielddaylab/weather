@@ -1780,6 +1780,8 @@ var GamePlayScene = function(game, stage)
     else
       canv.context.drawImage(icon_eye_img,self.options_button.x,self.options_button.y+5,self.options_button.w,self.options_button.h-10);
 
+    canv.context.drawImage(screen_cover_img,0,20,canv.canvas.width,canv.canvas.height-20);
+
     if(self.levels[self.cur_level].complete_this_round)
     {
       canv.context.font = "30px stump";
@@ -1792,8 +1794,6 @@ var GamePlayScene = function(game, stage)
       canv.context.textAlign = "left";
       canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.canvas.width/2-10,100+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
     }
-
-    canv.context.drawImage(screen_cover_img,0,0,canv.canvas.width,canv.canvas.height);
 
     canv.context.fillStyle = blue;
     canv.context.fillRect(0,0,canv.canvas.width,40);
