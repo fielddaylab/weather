@@ -1013,8 +1013,8 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_NONE;
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
-    l.text_0 = "This is a wind simulator. This simulator will help you observe how interactions between high and low pressure systems affect the speed and direction of wind.";
-    l.text_1 = "Before you start Level 1, just play around a little. You can see that the map shows a high-pressure system (H) and a low-pressure system (L). Drawg around these pressure systems, and see what happens to the directions of speed of the wind. When you are ready to begin Level 1, click menu.";
+    l.text_0 = "This is a wind simulator. This simulator will help you observe how interactions between high and low pressure systems affect the speed and direction of wind. Before you start Level 1, just play around a little.";
+    l.text_1 = "You can see that the map shows a high-pressure system (H) and a low-pressure system (L). Drawg around these pressure systems, and see what happens to the directions of speed of the wind. When you are ready to begin Level 1, click menu.";
     self.levels.push(l);
 
     //blow north
