@@ -935,6 +935,7 @@ var GamePlayScene = function(game, stage)
   self.dragging_tool;
 
   self.clip;
+  self.yard_button;
   self.menu_button;
   self.next_button;
   self.options_button;
@@ -1129,6 +1130,9 @@ var GamePlayScene = function(game, stage)
     self.clip.register(self.menu_clicker);
     self.blurb = new Blurb(self);
     self.blurb_clicker.register(self.blurb);
+
+    self.yard_button = new ButtonBox(10,7,70,25, function(on) { window.location.href = "http://theyardgames.org/"; });
+    self.play_clicker.register(self.yard_button);
 
     self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-60,10,20,20, function(on) { click_aud.play(); self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
@@ -1797,7 +1801,7 @@ var GamePlayScene = function(game, stage)
 
     canv.context.fillStyle = blue;
     canv.context.fillRect(0,0,canv.canvas.width,40);
-    canv.context.drawImage(yard_logo_img,10,7,70,25);
+    canv.context.drawImage(yard_logo_img,self.yard_button.x,self.yard_button.y,self.yard_button.w,self.yard_button.h);
     canv.context.fillStyle = "#FFFFFF";
     canv.context.font = "25px stump";
     canv.context.textAlign = "right";
