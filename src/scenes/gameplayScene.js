@@ -1791,12 +1791,15 @@ var GamePlayScene = function(game, stage)
       canv.context.font = "30px stump";
       canv.context.textAlign = "center";
       canv.outlineText("Complete!",canv.canvas.width/2,100+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText("(Click to Continue)",canv.canvas.width/2,130+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
     }
     else if(self.levels[self.cur_level].timer > 0)
     {
       canv.context.font = "30px stump";
+      canv.context.textAlign = "center";
+      canv.outlineText("Hold it!",canv.canvas.width/2,100+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
       canv.context.textAlign = "left";
-      canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.canvas.width/2-10,100+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.canvas.width/2-10,130+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
     }
 
     canv.context.fillStyle = blue;
