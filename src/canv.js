@@ -15,9 +15,13 @@ var Canv = function(init)
   var self = this;
   doMapInitDefaults(init,init,default_init);
 
+  self.width = init.width;
+  self.height = init.height;
+  self.dpr_to_bspr = init.dpr_to_bspr;
+  self.scale = 1; //must manually update if changed!
   self.canvas = document.createElement('canvas');
-  self.canvas.setAttribute('width', init.width);
-  self.canvas.setAttribute('height',init.height);
+  self.canvas.setAttribute('width', self.width*self.dpr_to_bspr);
+  self.canvas.setAttribute('height',self.height*self.dpr_to_bspr);
   self.canvas.addEventListener('mousedown',function(evt){ evt.preventDefault(); },false);
   self.canvas.addEventListener('touchstart',function(evt){ evt.preventDefault(); },false);
 
@@ -28,18 +32,18 @@ var Canv = function(init)
   self.context.lineWidth   = init.lineWidth;
   self.context.font        = init.font;
 
-  self.context.imageSmoothingEnabled = true;
+  self.context.imageSmoothingEnabled = true;//init.smoothing;
 };
 Canv.prototype.clear = function()
 {
   var self = this;
-  self.context.clearRect(0, 0, self.canvas.width, self.canvas.height);
+  self.context.clearRect(0, 0, self.canvas.width/self.scale, self.canvas.height/self.scale);
 };
 Canv.prototype.blitTo = function(canv)
 {
   var self = this;
   //drawImage(source, sourcex, sourcey, sourcew, sourceh, destx, desty, destw, desth);
-  canv.context.drawImage(self.canvas, 0, 0, self.canvas.width, self.canvas.height, 0, 0, canv.canvas.width, canv.canvas.height);
+  canv.context.drawImage(self.canvas, 0, 0, self.canvas.width, self.canvas.height, 0, 0, canv.canvas.width/canv.scale, canv.canvas.height/canv.scale);
 };
 Canv.prototype.drawLine = function(ax,ay,bx,by)
 {

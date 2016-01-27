@@ -250,8 +250,8 @@ var GamePlayScene = function(game, stage)
     self.w = 0.02;
     self.h = 0.02;
 
-    self.cache_w = self.w*stage.drawCanv.canvas.width;
-    self.cache_h = self.h*stage.drawCanv.canvas.height;
+    self.cache_w = self.w*stage.drawCanv.width;
+    self.cache_h = self.h*stage.drawCanv.height;
   }
   var Brush = function(w,h, scene)
   {
@@ -323,8 +323,8 @@ var GamePlayScene = function(game, stage)
     {
       self.sx = self.start_sx;
       self.sy = self.start_sy;
-      self.x = self.sx*stage.drawCanv.canvas.width-(self.w/2);
-      self.y = self.sy*stage.drawCanv.canvas.height-(self.h/2);
+      self.x = self.sx*stage.drawCanv.width-(self.w/2);
+      self.y = self.sy*stage.drawCanv.height-(self.h/2);
       self.dragging = false;
       self.hovering = false;
       self.dragged = false;
@@ -355,8 +355,8 @@ var GamePlayScene = function(game, stage)
     {
       if(self.dragging)
       {
-        self.sx = evt.doX/stage.drawCanv.canvas.width;
-        self.sy = evt.doY/stage.drawCanv.canvas.height;
+        self.sx = evt.doX/stage.drawCanv.width;
+        self.sy = evt.doY/stage.drawCanv.height;
         self.x = evt.doX-(self.w/2);
         self.y = evt.doY-(self.h/2);
       }
@@ -389,8 +389,8 @@ var GamePlayScene = function(game, stage)
     self.sy = y;
     self.w = 20;
     self.h = 20;
-    self.x = self.sx*stage.drawCanv.canvas.width-self.w-5;
-    self.y = self.sy*stage.drawCanv.canvas.height-self.h-5;
+    self.x = self.sx*stage.drawCanv.width-self.w-5;
+    self.y = self.sy*stage.drawCanv.height-self.h-5;
     self.name = "Tool";
     self.explicit = tools_explicit;
 
@@ -416,8 +416,8 @@ var GamePlayScene = function(game, stage)
     {
       if(self.dragging)
       {
-        self.sx = (evt.doX+(self.w/2)+5)/stage.drawCanv.canvas.width;
-        self.sy = (evt.doY+(self.h/2)+5)/stage.drawCanv.canvas.height;
+        self.sx = (evt.doX+(self.w/2)+5)/stage.drawCanv.width;
+        self.sy = (evt.doY+(self.h/2)+5)/stage.drawCanv.height;
         self.x = evt.doX-self.w/2;
         self.y = evt.doY-self.h/2;
       }
@@ -443,7 +443,7 @@ var GamePlayScene = function(game, stage)
       canv.context.lineWidth = 1;
       canv.context.strokeStyle = "#FF0000";
       var sample_size = 4;
-      canv.context.strokeRect(self.sx*canv.canvas.width-sample_size/2,self.sy*canv.canvas.height-sample_size/2,sample_size,sample_size);
+      canv.context.strokeRect(self.sx*canv.width-sample_size/2,self.sy*canv.height-sample_size/2,sample_size,sample_size);
 
       if(self.explicit)
       {
@@ -522,17 +522,17 @@ var GamePlayScene = function(game, stage)
       b = new LevelButtonBox(i,bs,scene);
       if(i == 0)
       {
-        b.x = scene.dc.canvas.width/2-(bs/2);
+        b.x = scene.dc.width/2-(bs/2);
         b.y = 200;
       }
       else if(i < 5)
       {
-        b.x = scene.dc.canvas.width/2-(bs*2+60)+((i-1)*(bs+40));
+        b.x = scene.dc.width/2-(bs*2+60)+((i-1)*(bs+40));
         b.y = 200+bs+40;
       }
       else
       {
-        b.x = scene.dc.canvas.width/2-(bs*2+60)+((i-5)*(bs+40));
+        b.x = scene.dc.width/2-(bs*2+60)+((i-5)*(bs+40));
         b.y = 200+(bs+40)*2;
       }
       self.buttons.push(b);
@@ -618,8 +618,8 @@ var GamePlayScene = function(game, stage)
   var Blurb = function(scene)
   {
     var self = this;
-    self.x = scene.dc.canvas.width-200;
-    self.y = scene.dc.canvas.height-200;
+    self.x = scene.dc.width-200;
+    self.y = scene.dc.height-200;
     self.w = 100;
     self.h = 50;
 
@@ -638,7 +638,7 @@ var GamePlayScene = function(game, stage)
       var found = 0;
       var searched = 0;
       var tentative_search = 0;
-      var width = canv.canvas.width-420;
+      var width = canv.width-420;
 
       canv.context.font = "25px Open Sans";
 
@@ -671,19 +671,19 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
-      global_bg_alpha = (1-((20*10)/canv.canvas.height));
+      global_bg_alpha = (1-((20*10)/canv.height));
       canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")"; //emulates clipboard fade
-      canv.context.fillRect(0,0,canv.canvas.width,canv.canvas.height);
+      canv.context.fillRect(0,0,canv.width,canv.height);
       var box_height = 300;
       canv.context.fillStyle = blue;
-      canv.context.fillRect(0,canv.canvas.height-box_height,canv.canvas.width,box_height);
+      canv.context.fillRect(0,canv.height-box_height,canv.width,box_height);
 
       canv.context.font = "25px Open Sans";
       canv.context.textAlign = "left";
       for(var i = 0; i < self.lines.length; i++)
       {
         canv.context.fillStyle = "#000000";
-        canv.context.fillText(self.lines[i],200,canv.canvas.height-box_height+50+((i+1)*40),canv.canvas.width-420);
+        canv.context.fillText(self.lines[i],200,canv.height-box_height+50+((i+1)*40),canv.width-420);
       }
 
       //if(self.img_el)
@@ -698,7 +698,7 @@ var GamePlayScene = function(game, stage)
       canv.context.fillText("Ok!",self.x+10,self.y+self.h-10,self.w);
       canv.context.font = "12px stump";
 
-      canv.context.drawImage(tall_img,50,canv.canvas.height-350,120,320);
+      canv.context.drawImage(tall_img,50,canv.height-350,120,320);
     }
 
     self.click = function(evt)
@@ -727,8 +727,8 @@ var GamePlayScene = function(game, stage)
     {
       self.sx = self.start_sx;
       self.sy = self.start_sy;
-      self.x = self.sx*stage.drawCanv.canvas.width-(self.w/2);
-      self.y = self.sy*stage.drawCanv.canvas.height-(self.h/2);
+      self.x = self.sx*stage.drawCanv.width-(self.w/2);
+      self.y = self.sy*stage.drawCanv.height-(self.h/2);
       self.dragging = false;
       self.hovering = false;
       self.dragged = false;
@@ -794,8 +794,8 @@ var GamePlayScene = function(game, stage)
           evt.doY -= 30;
           if(evt.doY < 0) evt.doY = 0;
         }
-        self.sx = evt.doX/stage.drawCanv.canvas.width;
-        self.sy = evt.doY/stage.drawCanv.canvas.height;
+        self.sx = evt.doX/stage.drawCanv.width;
+        self.sy = evt.doY/stage.drawCanv.height;
         self.x = evt.doX-(self.w/2);
         self.y = evt.doY-(self.h/2);
       }
@@ -813,8 +813,8 @@ var GamePlayScene = function(game, stage)
       var head_cart = {x:0,y:0};
       var tmp_vec = {x:0,y:0};
 
-      self.cache_x = self.sx*canv.canvas.width;
-      self.cache_y = self.sy*canv.canvas.height;
+      self.cache_x = self.sx*canv.width;
+      self.cache_y = self.sy*canv.height;
 
       //line
       canv.context.lineWidth = 2;
@@ -1145,7 +1145,7 @@ var GamePlayScene = function(game, stage)
     l.text_1 = "Notice difference in severity from your previous cyclone?";
     self.levels.push(l);
 
-    self.clip = new ClipBoard(stage.drawCanv.canvas.width,stage.drawCanv.canvas.height,self,self.levels);
+    self.clip = new ClipBoard(stage.drawCanv.width,stage.drawCanv.height,self,self.levels);
     self.clip.register(self.menu_clicker);
     self.blurb = new Blurb(self);
     self.blurb_clicker.register(self.blurb);
@@ -1153,16 +1153,16 @@ var GamePlayScene = function(game, stage)
     self.yard_button = new ButtonBox(10,7,70,25, function(on) { window.location.href = "http://theyardgames.org/"; });
     self.play_clicker.register(self.yard_button);
 
-    self.menu_button = new ButtonBox(stage.drawCanv.canvas.width-60,10,20,20, function(on) { click_aud.play(); self.setMode(GAME_MODE_MENU); });
+    self.menu_button = new ButtonBox(stage.drawCanv.width-60,10,20,20, function(on) { click_aud.play(); self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
-    self.next_button = new ButtonBox(stage.drawCanv.canvas.width/2-100,50,200,100, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
+    self.next_button = new ButtonBox(stage.drawCanv.width/2-100,50,200,100, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
     self.play_clicker.register(self.next_button);
 
-    self.options_button = new ButtonBox(stage.drawCanv.canvas.width-150,100,40,40, function(on) { click_aud.play(); self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
+    self.options_button = new ButtonBox(stage.drawCanv.width-150,100,40,40, function(on) { click_aud.play(); self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
     self.play_clicker.register(self.options_button);
 
-    self.quality_button = new ButtonBox(stage.drawCanv.canvas.width-280,200,40,40, function(on)
+    self.quality_button = new ButtonBox(stage.drawCanv.width-280,200,40,40, function(on)
     {
       if(!self.options_open) return;
       click_aud.play();
@@ -1180,9 +1180,9 @@ var GamePlayScene = function(game, stage)
         self.afield = self.afield_lq;
       }
     });
-    self.vec_button = new ButtonBox(stage.drawCanv.canvas.width-280,250,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.vec_mode = !self.vec_mode; });
-    self.air_button = new ButtonBox(stage.drawCanv.canvas.width-280,300,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.air_mode = !self.air_mode; });
-    self.help_button = new ButtonBox(stage.drawCanv.canvas.width-280,350,40,40, function(on)
+    self.vec_button = new ButtonBox(stage.drawCanv.width-280,250,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.vec_mode = !self.vec_mode; });
+    self.air_button = new ButtonBox(stage.drawCanv.width-280,300,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.air_mode = !self.air_mode; });
+    self.help_button = new ButtonBox(stage.drawCanv.width-280,350,40,40, function(on)
     {
       if(!self.options_open) return;
       click_aud.play();
@@ -1221,7 +1221,7 @@ var GamePlayScene = function(game, stage)
 
     if(paint)
     {
-      self.brush = new Brush(stage.drawCanv.canvas.width,stage.drawCanv.canvas.height,self);
+      self.brush = new Brush(stage.drawCanv.width,stage.drawCanv.height,self);
       self.play_dragger.register(self.brush);
     }
     if(sys)
@@ -1383,7 +1383,7 @@ var GamePlayScene = function(game, stage)
     self.game_mode = mode;
 
     if(self.game_mode == GAME_MODE_MENU) self.clip.desired_y = 20;
-    if(self.game_mode == GAME_MODE_PLAY) self.clip.desired_y = stage.drawCanv.canvas.height;
+    if(self.game_mode == GAME_MODE_PLAY) self.clip.desired_y = stage.drawCanv.height;
   }
 
   self.beginLevel = function(l)
@@ -1487,8 +1487,8 @@ var GamePlayScene = function(game, stage)
     }
 
     self.options_x += self.options_dir*20;
-    if(self.options_x > stage.drawCanv.canvas.width)     self.options_x = stage.drawCanv.canvas.width;
-    if(self.options_x < stage.drawCanv.canvas.width-300) self.options_x = stage.drawCanv.canvas.width-300;
+    if(self.options_x > stage.drawCanv.width)     self.options_x = stage.drawCanv.width;
+    if(self.options_x < stage.drawCanv.width-300) self.options_x = stage.drawCanv.width-300;
 
     self.clip.tick();
 
@@ -1650,7 +1650,7 @@ var GamePlayScene = function(game, stage)
   {
     var canv = stage.drawCanv;
 
-    canv.context.drawImage(screen_bg_img,0,0,canv.canvas.width,canv.canvas.height);
+    canv.context.drawImage(screen_bg_img,0,0,canv.width,canv.height);
 
     var x_space;
     var y_space;
@@ -1660,8 +1660,8 @@ var GamePlayScene = function(game, stage)
     /*
     // pressure height map
     */
-    x_space = canv.canvas.width / self.pmap.w;
-    y_space = canv.canvas.height / self.pmap.h;
+    x_space = canv.width / self.pmap.w;
+    y_space = canv.height / self.pmap.h;
     for(var i = 0; i < self.pmap.h; i++)
     {
       for(var j = 0; j < self.pmap.w; j++)
@@ -1691,8 +1691,8 @@ var GamePlayScene = function(game, stage)
       canv.context.lineWidth = 1.0;
       canv.context.strokeStyle = "#FF00FF";
       canv.context.fillStyle = "#550055";
-      x_space = canv.canvas.width / self.vfield.w;
-      y_space = canv.canvas.height / self.vfield.h;
+      x_space = canv.width / self.vfield.w;
+      y_space = canv.height / self.vfield.h;
       for(var i = 0; i < self.vfield.h; i++)
       {
         for(var j = 0; j < self.vfield.w; j++)
@@ -1716,7 +1716,7 @@ var GamePlayScene = function(game, stage)
     {
       canv.context.fillStyle = "#8888FF";
       for(var i = 0; i < self.afield.n; i++)
-        canv.context.fillRect(self.afield.partxs[i]*canv.canvas.width-1,self.afield.partys[i]*canv.canvas.height-1,2,2);
+        canv.context.fillRect(self.afield.partxs[i]*canv.width-1,self.afield.partys[i]*canv.height-1,2,2);
     }
 
     /*
@@ -1747,7 +1747,7 @@ var GamePlayScene = function(game, stage)
       }
       //balloon
       canv.context.fillStyle = "#FF0000";
-      canv.context.fillRect((self.balloon.x*canv.canvas.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.canvas.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
+      canv.context.fillRect((self.balloon.x*canv.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
     }
 
     /*
@@ -1776,7 +1776,7 @@ var GamePlayScene = function(game, stage)
     }
 
     canv.context.fillStyle = "rgba(0,0,0,0.5)";
-    canv.context.fillRect(self.options_x,0,canv.canvas.width,canv.canvas.height);
+    canv.context.fillRect(self.options_x,0,canv.width,canv.height);
     if(self.options_open)
     {
       canv.context.font = "25px Open Sans";
@@ -1802,31 +1802,31 @@ var GamePlayScene = function(game, stage)
     else
       canv.context.drawImage(icon_eye_img,self.options_button.x,self.options_button.y+5,self.options_button.w,self.options_button.h-10);
 
-    canv.context.drawImage(screen_cover_img,0,20,canv.canvas.width,canv.canvas.height-20);
+    canv.context.drawImage(screen_cover_img,0,20,canv.width,canv.height-20);
 
     if(self.levels[self.cur_level].complete_this_round)
     {
       canv.context.font = "30px stump";
       canv.context.textAlign = "center";
-      canv.outlineText("Complete!",canv.canvas.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
-      canv.outlineText("(Click to Continue)",canv.canvas.width/2,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText("Complete!",canv.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText("(Click to Continue)",canv.width/2,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
     }
     else if(self.levels[self.cur_level].timer > 0)
     {
       canv.context.font = "30px stump";
       canv.context.textAlign = "center";
-      canv.outlineText("Hold it!",canv.canvas.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText("Hold it!",canv.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
       canv.context.textAlign = "left";
-      canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.canvas.width/2-10,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.width/2-10,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
     }
 
     canv.context.fillStyle = blue;
-    canv.context.fillRect(0,0,canv.canvas.width,40);
+    canv.context.fillRect(0,0,canv.width,40);
     canv.context.drawImage(yard_logo_img,self.yard_button.x,self.yard_button.y,self.yard_button.w,self.yard_button.h);
     canv.context.fillStyle = "#FFFFFF";
     canv.context.font = "25px stump";
     canv.context.textAlign = "right";
-    canv.context.fillText("The Wind Generator",canv.canvas.width-70,30);
+    canv.context.fillText("The Wind Generator",canv.width-70,30);
     canv.context.drawImage(menu_img,self.menu_button.x,self.menu_button.y,self.menu_button.w,self.menu_button.h);
 
     self.clip.draw(canv);
