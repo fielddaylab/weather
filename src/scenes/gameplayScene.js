@@ -41,6 +41,7 @@ var blue = "#76DAE2";
 
 var global_bg_alpha;
 var global_blurb_up;
+var global_ticks;
 
 var ENUM;
 
@@ -326,11 +327,13 @@ var GamePlayScene = function(game, stage)
       self.y = self.sy*stage.drawCanv.canvas.height-(self.h/2);
       self.dragging = false;
       self.hovering = false;
+      self.dragged = false;
     }
     self.reset();
 
     self.dragging = false;
     self.hovering = false;
+    self.dragged = false;
 
     self.hover = function()
     {
@@ -346,6 +349,7 @@ var GamePlayScene = function(game, stage)
       if(scene.dragging_sys || scene.dragging_tool) return;
       scene.dragging_sys = self;
       self.dragging = true;
+      self.dragged = true;
     }
     self.drag = function(evt)
     {
@@ -365,12 +369,16 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
-      if(self.hovering || self.dragging)
+      if(scene.cur_level >= 5)
       {
-        canv.context.lineWidth = 3;
-        canv.context.strokeStyle = self.color_stroke;
-        canv.context.strokeRect(self.x-5,self.y-5,self.w+10,self.h+10);
+        if(!self.dragged)
+        {
+          canv.context.font = "30px stump";
+          canv.context.textAlign = "right";
+          canv.outlineText("Drag ->",self.x-20,self.y+self.h/2+10+Math.sin(global_ticks/10)*5,"#000000","#FFFFFF");
+        }
       }
+
       canv.context.drawImage(self.img,self.x-10,self.y-10,self.w+20,self.h+20);
     }
   }
@@ -723,6 +731,7 @@ var GamePlayScene = function(game, stage)
       self.y = self.sy*stage.drawCanv.canvas.height-(self.h/2);
       self.dragging = false;
       self.hovering = false;
+      self.dragged = false;
       self.met = false;
     }
     self.reset();
@@ -758,6 +767,7 @@ var GamePlayScene = function(game, stage)
 
     self.dragging = false;
     self.hovering = false;
+    self.dragged = false;
 
     self.hover = function()
     {
@@ -773,6 +783,7 @@ var GamePlayScene = function(game, stage)
       if(scene.dragging_flag) return;
       scene.dragging_flag = self;
       self.dragging = true;
+      self.dragged = true;
     }
     self.drag = function(evt)
     {
@@ -851,6 +862,13 @@ var GamePlayScene = function(game, stage)
         canv.context.beginPath();
         canv.context.arc(self.x+self.w/2,self.y+self.h/2,self.w/2,0,2*Math.PI);
         canv.context.stroke();
+
+        if(!self.dragged)
+        {
+          canv.context.font = "30px stump";
+          canv.context.textAlign = "right";
+          canv.outlineText("Drag ->",self.x-20,self.y+self.h/2+10+Math.sin(global_ticks/10)*5,"#000000","#FFFFFF");
+        }
       }
 
       //line
@@ -963,6 +981,7 @@ var GamePlayScene = function(game, stage)
   {
     global_bg_alpha = 0;
     global_blurb_up = false;
+    global_ticks = 0;
 
     self.dc = stage.drawCanv;
     click_aud = new Aud("assets/click_0.wav");
@@ -1077,7 +1096,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.1,0.1, 0.1,self));
     l.psys.push(new PSys(0.9,0.5,0.1, 0.1,self));
     l.psys.push(new PSys(0.5,0.9,0.1, 0.1,self));
-    l.text_0 = "Drag each vane to a position where it matches its green arrow.";
+    l.text_0 = "Drag each vane to a position where it matches its white arrow.";
     l.text_1 = "Click the eye to enable different visualizations for the wind- Can you see the underlying pattern of wind motion?";
     self.levels.push(l);
 
@@ -1444,7 +1463,6 @@ var GamePlayScene = function(game, stage)
     self.setMode(GAME_MODE_BLURB);
   }
 
-  self.ticks = 0;
   self.tick = function()
   {
     if(self.game_mode == GAME_MODE_MENU)
@@ -1623,7 +1641,7 @@ var GamePlayScene = function(game, stage)
       while(self.balloon.y < 0) self.balloon.y += 1;
     }
 
-    self.ticks++;
+    global_ticks++;
   };
 
   var USA = new Image();
@@ -1790,16 +1808,16 @@ var GamePlayScene = function(game, stage)
     {
       canv.context.font = "30px stump";
       canv.context.textAlign = "center";
-      canv.outlineText("Complete!",canv.canvas.width/2,100+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
-      canv.outlineText("(Click to Continue)",canv.canvas.width/2,130+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText("Complete!",canv.canvas.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText("(Click to Continue)",canv.canvas.width/2,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
     }
     else if(self.levels[self.cur_level].timer > 0)
     {
       canv.context.font = "30px stump";
       canv.context.textAlign = "center";
-      canv.outlineText("Hold it!",canv.canvas.width/2,100+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText("Hold it!",canv.canvas.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
       canv.context.textAlign = "left";
-      canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.canvas.width/2-10,130+Math.sin(self.ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.canvas.width/2-10,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
     }
 
     canv.context.fillStyle = blue;
