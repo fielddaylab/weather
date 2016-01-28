@@ -1145,6 +1145,18 @@ var GamePlayScene = function(game, stage)
     l.text_1 = "Notice difference in severity from your previous cyclone?";
     self.levels.push(l);
 
+    //COOKIES
+    if(document.cookie && document.cookie.indexOf("LEVELS=") != -1)
+    {
+      //console.log("Reading Cookie:"+document.cookie);
+      var levels_cookie = (document.cookie.substring(document.cookie.indexOf("LEVELS=")+7,self.levels.length)).split('');
+      for(var i = 0; i < self.levels.length; i++)
+      {
+        var c = parseInt(levels_cookie[i]);
+        if(!isNaN(c) && c > 0) self.levels[i].complete = true;
+      }
+    }
+
     self.clip = new ClipBoard(stage.drawCanv.width,stage.drawCanv.height,self,self.levels);
     self.clip.register(self.menu_clicker);
     self.blurb = new Blurb(self);
@@ -1619,6 +1631,19 @@ var GamePlayScene = function(game, stage)
       l.timer++;
       if(l.timer > l.req_timer || self.cur_level == 0)
       {
+        if(!l.complete)
+        {
+          l.complete = true;
+          //COOKIES
+          var levels_cookie = "LEVELS=";
+          for(var i = 0; i < self.levels.length; i++)
+          {
+            if(self.levels[i].complete) levels_cookie += "1";
+            else                        levels_cookie += "0";
+          }
+          document.cookie = levels_cookie;
+          //console.log("Wrote Cookie:"+document.cookie);
+        }
         l.complete = true;
         l.complete_this_round = true;
       }
