@@ -1694,9 +1694,10 @@ var GamePlayScene = function(game, stage)
     */
     x_space = canv.width / self.pmap.w;
     y_space = canv.height / self.pmap.h;
-    for(var i = 0; i < self.pmap.h; i++)
+    //starts at 1, ends at -1 to not draw borders (they leak out the sides of the assets)
+    for(var i = 1; i < self.pmap.h-1; i++)
     {
-      for(var j = 0; j < self.pmap.w; j++)
+      for(var j = 1; j < self.pmap.w-1; j++)
       {
         y = y_space*i;
         x = x_space*j;
@@ -1725,9 +1726,10 @@ var GamePlayScene = function(game, stage)
       canv.context.fillStyle = "#550055";
       x_space = canv.width / self.vfield.w;
       y_space = canv.height / self.vfield.h;
-      for(var i = 0; i < self.vfield.h; i++)
+      //starts at 1, ends at -1 to not draw borders (they leak out the sides of the assets)
+      for(var i = 1; i < self.vfield.h-1; i++)
       {
-        for(var j = 0; j < self.vfield.w; j++)
+        for(var j = 1; j < self.vfield.w-1; j++)
         {
           y = y_space*i+(y_space/2);
           x = x_space*j+(x_space/2);
@@ -1748,7 +1750,10 @@ var GamePlayScene = function(game, stage)
     {
       canv.context.fillStyle = "#8888FF";
       for(var i = 0; i < self.afield.n; i++)
+      {
+        if(self.afield.partxs[i] < 0.05 || self.afield.partxs[i] > 0.95 || self.afield.partys[i] < 0.05 || self.afield.partys[i] > 0.95) continue;
         canv.context.fillRect(self.afield.partxs[i]*canv.width-1,self.afield.partys[i]*canv.height-1,2,2);
+      }
     }
 
     /*
