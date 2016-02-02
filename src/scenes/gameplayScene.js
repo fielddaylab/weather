@@ -822,10 +822,12 @@ var GamePlayScene = function(game, stage)
       //line
       canv.context.lineWidth = 2;
       canv.context.strokeStyle = "#FFFFFF";
+      canv.context.setLineDash([5,5]);
       canv.context.beginPath();
       canv.context.moveTo(self.cache_x-self.goal_cache_xd,self.cache_y-self.goal_cache_yd);
       canv.context.lineTo(self.cache_x+self.goal_cache_xd,self.cache_y+self.goal_cache_yd);
       canv.context.stroke();
+      canv.context.setLineDash([0,0]);
 
       //head
       canv.context.save();
