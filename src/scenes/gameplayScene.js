@@ -5,6 +5,7 @@ var anneal = true;
 var airdeath = true;
 var tools = false;
 var tools_explicit = false;
+var cookies = false;
 
 var vec_length = 5;
 var flag_length = 20;
@@ -1145,15 +1146,18 @@ var GamePlayScene = function(game, stage)
     l.text_1 = "Notice difference in severity from your previous cyclone?";
     self.levels.push(l);
 
-    //COOKIES
-    if(document.cookie && document.cookie.indexOf("LEVELS=") != -1)
+    if(cookies)
     {
-      //console.log("Reading Cookie:"+document.cookie);
-      var levels_cookie = (document.cookie.substring(document.cookie.indexOf("LEVELS=")+7,self.levels.length)).split('');
-      for(var i = 0; i < self.levels.length; i++)
+      //COOKIES
+      if(document.cookie && document.cookie.indexOf("LEVELS=") != -1)
       {
-        var c = parseInt(levels_cookie[i]);
-        if(!isNaN(c) && c > 0) self.levels[i].complete = true;
+        //console.log("Reading Cookie:"+document.cookie);
+        var levels_cookie = (document.cookie.substring(document.cookie.indexOf("LEVELS=")+7,self.levels.length)).split('');
+        for(var i = 0; i < self.levels.length; i++)
+        {
+          var c = parseInt(levels_cookie[i]);
+          if(!isNaN(c) && c > 0) self.levels[i].complete = true;
+        }
       }
     }
 
@@ -1634,15 +1638,18 @@ var GamePlayScene = function(game, stage)
         if(!l.complete)
         {
           l.complete = true;
-          //COOKIES
-          var levels_cookie = "LEVELS=";
-          for(var i = 0; i < self.levels.length; i++)
+          if(cookies)
           {
-            if(self.levels[i].complete) levels_cookie += "1";
-            else                        levels_cookie += "0";
+            //COOKIES
+            var levels_cookie = "LEVELS=";
+            for(var i = 0; i < self.levels.length; i++)
+            {
+              if(self.levels[i].complete) levels_cookie += "1";
+              else                        levels_cookie += "0";
+            }
+            document.cookie = levels_cookie;
+            //console.log("Wrote Cookie:"+document.cookie);
           }
-          document.cookie = levels_cookie;
-          //console.log("Wrote Cookie:"+document.cookie);
         }
         l.complete = true;
         l.complete_this_round = true;
