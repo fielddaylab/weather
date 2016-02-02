@@ -1,4 +1,4 @@
-var default_complete = false;
+var default_complete = true;
 var paint = false;
 var sys = !paint;
 var anneal = true;
@@ -307,7 +307,7 @@ var GamePlayScene = function(game, stage)
 
     }
   }
-  var PSys = function(x,y,r,delta,scene)
+  var PSys = function(x,y,r,delta,visible,scene)
   {
     var self = this;
     self.start_sx = x;
@@ -315,6 +315,7 @@ var GamePlayScene = function(game, stage)
     self.r = r;
     self.w = 40;
     self.h = 40;
+    self.visible = visible;
 
     self.delta = delta;
     if(self.delta > 0) self.img = icon_h_img;
@@ -370,6 +371,7 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
+      if(!self.visible) return;
       if(scene.cur_level >= 5)
       {
         if(!self.dragged)
@@ -1032,8 +1034,8 @@ var GamePlayScene = function(game, stage)
     //playground
     l = new Level();
     l.type = L_TYPE_NONE;
-    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,true,self));
     l.text_0 = "This is a wind simulator. This simulator will help you observe how interactions between high and low pressure systems affect the speed and direction of wind. Before you start Level 1, just play around a little.";
     l.text_1 = "You can see that the map shows a high-pressure system (H) and a low-pressure system (L). Drawg around these pressure systems, and see what happens to the directions of speed of the wind. When you are ready to begin Level 1, click menu.";
     self.levels.push(l);
@@ -1042,8 +1044,8 @@ var GamePlayScene = function(game, stage)
     l = new Level();
     l.type = L_TYPE_FLAG;
     l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
-    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.4,0.5,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.6,0.5,0.1, 0.1,true,self));
     l.text_0 = "The white arrow points in the direction you want the wind to blow - north - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly north.";
     self.levels.push(l);
@@ -1052,8 +1054,8 @@ var GamePlayScene = function(game, stage)
     l = new Level();
     l.type = L_TYPE_FLAG;
     l.flags.push(new Flag(0.3,0.5,1.5,0.0,self));
-    l.psys.push(new PSys(0.5,0.4,0.1,-0.1,self));
-    l.psys.push(new PSys(0.5,0.6,0.1, 0.1,self));
+    l.psys.push(new PSys(0.5,0.4,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.5,0.6,0.1, 0.1,true,self));
     l.text_0 = "The white arrow points in the direction you want the wind to blow - east - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly east.";
     self.levels.push(l);
@@ -1062,9 +1064,9 @@ var GamePlayScene = function(game, stage)
     l = new Level();
     l.type = L_TYPE_FLAG;
     l.flags.push(new Flag(0.6,0.6,0.0,1.0,self));
-    l.psys.push(new PSys(0.5,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.3,0.5,0.1, 0.1,self));
-    l.psys.push(new PSys(0.7,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.5,0.5,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.3,0.5,0.1, 0.1,true,self));
+    l.psys.push(new PSys(0.7,0.5,0.1, 0.1,true,self));
     l.text_0 = "The white arrow points in the direction you want the wind to blow - south - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly south.";
     self.levels.push(l);
@@ -1080,23 +1082,23 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.33,0.8-(i/6)*0.7,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
     l.flags.push(new Flag(0.33,0.8-(i/6)*0.7,Math.cos(i/6*Math.PI*2),Math.sin(i/6*Math.PI*2),self)); i++;
     i = 0;
-    l.psys.push(new PSys(0.5,0.5,0.1, -0.1,self));
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,self)); i++;
-    l.psys.push(new PSys(0.1,0.1,0.1, 0.1,self));
-    l.psys.push(new PSys(0.9,0.1,0.1, 0.1,self));
-    l.psys.push(new PSys(0.1,0.9,0.1, 0.1,self));
-    l.psys.push(new PSys(0.9,0.9,0.1, 0.1,self));
-    l.psys.push(new PSys(0.1,0.5,0.1, 0.1,self));
-    l.psys.push(new PSys(0.5,0.1,0.1, 0.1,self));
-    l.psys.push(new PSys(0.9,0.5,0.1, 0.1,self));
-    l.psys.push(new PSys(0.5,0.9,0.1, 0.1,self));
+    l.psys.push(new PSys(0.5,0.5,0.1, -0.1,true,self));
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,true,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,false,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,true,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,false,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,true,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,false,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,true,self)); i++;
+    l.psys.push(new PSys(0.5+(Math.cos(i/8*Math.PI*2)*0.3),0.5+(Math.sin(i/8*Math.PI*2)*0.3),0.1, 0.1,false,self)); i++;
+    l.psys.push(new PSys(0.1,0.1,0.1, 0.1,false,self));
+    l.psys.push(new PSys(0.9,0.1,0.1, 0.1,false,self));
+    l.psys.push(new PSys(0.1,0.9,0.1, 0.1,false,self));
+    l.psys.push(new PSys(0.9,0.9,0.1, 0.1,false,self));
+    l.psys.push(new PSys(0.1,0.5,0.1, 0.1,false,self));
+    l.psys.push(new PSys(0.5,0.1,0.1, 0.1,false,self));
+    l.psys.push(new PSys(0.9,0.5,0.1, 0.1,false,self));
+    l.psys.push(new PSys(0.5,0.9,0.1, 0.1,false,self));
     l.text_0 = "Drag each vane to a position where it matches its white arrow.";
     l.text_1 = "Click the eye to enable different visualizations for the wind- Can you see the underlying pattern of wind motion?";
     self.levels.push(l);
@@ -1105,8 +1107,8 @@ var GamePlayScene = function(game, stage)
     l = new Level();
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
-    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,true,self));
     l.text_0 = "Drag the high-pressure and low-pressure systems to blow the red vane in the same speed and direction as the white vane.";
     l.text_1 = "Make sure to use both types of systems!";
     self.levels.push(l);
@@ -1115,8 +1117,8 @@ var GamePlayScene = function(game, stage)
     l = new Level();
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
-    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,self));
-    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.5,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.8,0.5,0.1, 0.1,true,self));
     l.text_1 = "Just as you did in the previous level, drag the high-pressure and low-pressure systems to blow the red vane in the same speed and direction as the white.";
     self.levels.push(l);
 
@@ -1125,10 +1127,10 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.40,0.5,0.0,1.5,self));
     l.flags.push(new Flag(0.60,0.5,0.0,-1.5,self));
-    l.psys.push(new PSys(0.2,0.2,0.1, 0.1,self));
-    l.psys.push(new PSys(0.2,0.4,0.1,-0.1,self));
-    l.psys.push(new PSys(0.2,0.6,0.1, 0.1,self));
-    l.psys.push(new PSys(0.2,0.8,0.1,-0.1,self));
+    l.psys.push(new PSys(0.2,0.2,0.1, 0.1,true,self));
+    l.psys.push(new PSys(0.2,0.4,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.2,0.6,0.1, 0.1,true,self));
+    l.psys.push(new PSys(0.2,0.8,0.1,-0.1,true,self));
     l.text_0 = "Place the high-pressure and low-pressure systems to create a cyclone (also called a tornado) in the directions indicated by the white vanes.";
     l.text_1 = "You should only need three pressure systems to create a cyclone.";
     self.levels.push(l);
@@ -1138,10 +1140,10 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_SYS;
     l.flags.push(new Flag(0.5,0.35,1.5,0.0,self));
     l.flags.push(new Flag(0.5,0.65,-1.5,0.0,self));
-    l.psys.push(new PSys(0.2,0.2,0.1,-0.1,self));
-    l.psys.push(new PSys(0.2,0.4,0.1, 0.1,self));
-    l.psys.push(new PSys(0.2,0.6,0.1,-0.1,self));
-    l.psys.push(new PSys(0.2,0.8,0.1, 0.1,self));
+    l.psys.push(new PSys(0.2,0.2,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.2,0.4,0.1, 0.1,true,self));
+    l.psys.push(new PSys(0.2,0.6,0.1,-0.1,true,self));
+    l.psys.push(new PSys(0.2,0.8,0.1, 0.1,true,self));
     l.text_0 = "Again, try to create a cyclone - This time, in the opposite direction!";
     l.text_1 = "Notice difference in severity from your previous cyclone?";
     self.levels.push(l);
@@ -1314,7 +1316,7 @@ var GamePlayScene = function(game, stage)
       self.p_store_h = new BinBox(100,90,60,60, fdstart, fdrag, fdfinish,
         function(evt)
         {
-          var p = new PSys(0.,0.,0.1,0.1,self);
+          var p = new PSys(0.,0.,0.1,0.1,true,self);
           self.psys.push(p);
           self.play_hoverer.register(p);
           self.play_dragger.register(p);
@@ -1332,7 +1334,7 @@ var GamePlayScene = function(game, stage)
       self.p_store_l = new BinBox(180,90,60,60, fdstart, fdrag, fdfinish,
         function(evt)
         {
-          var p = new PSys(0.,0.,0.1,-0.1,self);
+          var p = new PSys(0.,0.,0.1,-0.1,true,self);
           self.psys.push(p);
           self.play_hoverer.register(p);
           self.play_dragger.register(p);
