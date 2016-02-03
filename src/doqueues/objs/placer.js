@@ -1,4 +1,4 @@
-var Placer = function(asset, x,y,w,h)
+var Placer = function(asset, x,y,w,h, canv)
 {
   var self = this;
 
@@ -10,6 +10,7 @@ var Placer = function(asset, x,y,w,h)
   self.y = y;
   self.w = w;
   self.h = h;
+  self.canv = canv;
   self.offX = 0;
   self.offY = 0;
   self.deltaX = 0;
@@ -19,7 +20,7 @@ var Placer = function(asset, x,y,w,h)
   {
     canv.context.fillStyle = "#000000";
     canv.context.strokeRect(self.x,self.y,self.w,self.h);
-    canv.context.fillText(self.text,self.x,self.y+self.h);
+    //canv.context.fillText(self.text,self.x,self.y+self.h);
     /*
     canv.context.save();
     canv.context.globalAlpha = 0.8;
@@ -75,7 +76,9 @@ var Placer = function(asset, x,y,w,h)
 
   self.click = function(evt)
   {
-    console.log(self.x+","+self.y+","+self.w+","+self.h);
+    //console.log(self.x+","+self.y+","+self.w+","+self.h);
+    console.log("p("+invp(self.x,self.canv.width)+",drawCanv.width),p("+invp(self.y,self.canv.height)+",drawCanv.height),p("+invp(self.w,self.canv.width)+",drawCanv.width),p("+invp(self.h,self.canv.height)+",drawCanv.height)");
+
     self.stroke = !self.stroke;
   }
 }

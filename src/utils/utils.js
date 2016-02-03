@@ -28,9 +28,25 @@ function doSetPosOnEvent(evt)
   }
   else if(evt.touches != undefined && evt.touches[0] != undefined)
   {
-    var r = evt.touches[0].target.getBoundingClientRect();
-    evt.doX = evt.touches[0].pageX-r.left;
-    evt.doY = evt.touches[0].pageY-r.top;
+    //unfortunately, seems necessary...
+    var t = evt.touches[0].target;
+
+    var box = t.getBoundingClientRect();
+    var body = document.body;
+    var docEl = document.documentElement;
+
+    var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+    var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+    var clientTop = docEl.clientTop || body.clientTop || 0;
+    var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+    var top  = box.top +  scrollTop - clientTop;
+    var left = box.left + scrollLeft - clientLeft;
+
+    evt.doX = evt.touches[0].pageX-left;
+    evt.doY = evt.touches[0].pageY-top;
+
   }
   else if(evt.layerX != undefined && evt.originalTarget != undefined)
   {
@@ -80,6 +96,10 @@ function cdist(a,b)
   return dist;
 }
 
+function mapVal(from_min, from_max, to_min, to_max, v)
+{
+  return ((v-from_min)/(from_max-from_min))*(to_max-to_min)+to_min;
+}
 function mapPt(from,to,pt)
 {
   pt.x = ((pt.x-from.x)/from.w)*to.w+to.x;
@@ -108,15 +128,95 @@ var objWithinObj = function(obja, objb)
   console.log("not done!");
   return false;
 }
-var objIntersectsObj = function(obja, objb)
-{
-  return ptWithin(objb.x+objb.w/2, objb.y+objb.h/2, obja.x-objb.w/2, obja.y-objb.h/2, obja.w+objb.w, obja.h+objb.h);
-  }
 var ptNear = function(ptx, pty, x, y, r)
 {
   var w2 = (ptx-x)*(ptx-x);
   var h2 = (pty-y)*(pty-y);
   var d2 = r*r;
   return w2+h2 < d2;
+}
+
+var decToHex = function(dec, dig)
+{
+  var r = "";
+  dig--;
+  var mod = Math.pow(16,dig);
+
+  var index = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"];
+  for(; dig >= 0; dig--)
+  {
+    var v = Math.floor(dec/mod);
+    r += index[v];
+    dec -= Math.pow(16,dig)*v;
+    mod /= 16;
+  }
+
+  return r;
+}
+
+var RGB2HSL = function(rgb, hsl)
+{
+  var cmax = Math.max(rgb.r,rgb.g,rgb.b);
+  var cmin = Math.min(rgb.r,rgb.g,rgb.b);
+  var d = cmax-cmin;
+  hsl.l = (cmax+cmin)/2;
+  if(hsl.l < 0.5) hsl.s = (cmax-cmin)/(cmax+cmin);
+  else            hsl.s = (cmax-cmin)/(2-cmax-cmin);
+
+  if(cmax == rgb.r) hsl.h = (rgb.g-rgb.b)/(cmax-cmin);
+  if(cmax == rgb.g) hsl.h = 2 + (rgb.b-rgb.r)/(cmax-cmin);
+  if(cmax == rgb.b) hsl.h = 4 + (rgb.r-rgb.g)/(cmax-cmin);
+
+  hsl.h *= 60;
+
+  if(hsl.h < 0) hsl.h += 360;
+}
+
+var HSL2RGBHelperConvertTMPValToFinal = function(tmp_1, tmp_2, val)
+{
+  if(val*6 < 1) return tmp_2 + (tmp_1-tmp_2)*6*val;
+  else if(val*2 < 1) return tmp_1;
+  else if(val*3 < 2) return tmp_2 + (tmp_1-tmp_2)*(0.666-val)*6;
+  else return tmp_2;
+}
+var HSL2RGB = function(hsl, rgb)
+{
+  var tmp_1;
+  var tmp_2;
+  var tmp_3;
+
+  if(hsl.l < 0.5) tmp_1 = hsl.l * (1+hsl.s);
+  else            tmp_1 = hsl.l + hsl.s - (hsl.l*hsl.s);
+
+  tmp_2 = (2*hsl.l)-tmp_1;
+  tmp_3 = hsl.h/360;
+
+  rgb.r = tmp_3 + 0.333; while(rgb.r > 1) rgb.r -= 1; while(rgb.r < 0) rgb.r += 1;
+  rgb.g = tmp_3;         while(rgb.g > 1) rgb.g -= 1; while(rgb.g < 0) rgb.g += 1;
+  rgb.b = tmp_3 - 0.333; while(rgb.b > 1) rgb.b -= 1; while(rgb.b < 0) rgb.b += 1;
+
+  rgb.r = HSL2RGBHelperConvertTMPValToFinal(tmp_1, tmp_2, rgb.r);
+  rgb.g = HSL2RGBHelperConvertTMPValToFinal(tmp_1, tmp_2, rgb.g);
+  rgb.b = HSL2RGBHelperConvertTMPValToFinal(tmp_1, tmp_2, rgb.b);
+}
+
+var RGB2Hex = function(rgb)
+{
+  return "#"+dec2Hex(Math.floor(rgb.r*255))+dec2Hex(Math.floor(rgb.g*255))+dec2Hex(Math.floor(rgb.b*255));
+}
+var dec2Hex = function(n)
+{
+  return n.toString(16);
+}
+
+//short name- will be used often to place elements by percent, while guaranteeing integer results
+var p    = function(percent, of) { return Math.floor(percent * of); }
+var invp = function(      n, of) { return n/of; }
+var setBox = function(obj, x,y,w,h)
+{
+  obj.x = x;
+  obj.y = y;
+  obj.w = w;
+  obj.h = h;
 }
 
