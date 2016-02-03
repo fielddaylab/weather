@@ -6,6 +6,7 @@ var airdeath = true;
 var tools = false;
 var tools_explicit = false;
 var cookies = false;
+var placer_debug = false;
 
 var vec_length = 5;
 var flag_length = 20;
@@ -977,6 +978,9 @@ var GamePlayScene = function(game, stage)
   self.play_hoverer;
   self.play_dragger;
   self.blurb_clicker;
+  self.placer_dragger;
+  self.placer_clicker;
+  self.placer;
 
   self.ready = function()
   {
@@ -1022,6 +1026,11 @@ var GamePlayScene = function(game, stage)
     self.play_hoverer = new Hoverer({source:stage.dispCanv.canvas});
     self.play_dragger = new Dragger({source:stage.dispCanv.canvas});
     self.blurb_clicker = new Clicker({source:stage.dispCanv.canvas});
+    if(placer_debug)
+    {
+      self.placer_dragger = new Dragger({source:stage.dispCanv.canvas});
+      self.placer_clicker = new Clicker({source:stage.dispCanv.canvas});
+    }
 
     self.cur_level = 0;
     self.levels = [];
@@ -1383,6 +1392,13 @@ var GamePlayScene = function(game, stage)
 
     setTimeout(function(){ self.popBlurb(b); },1000);
   */
+
+    if(placer_debug)
+    {
+      self.placer = new Placer({},10,10,100,100,self);
+      self.placer_dragger.register(self.placer);
+      self.placer_clicker.register(self.placer);
+    }
   };
 
   self.setMode = function(mode)
@@ -1481,6 +1497,11 @@ var GamePlayScene = function(game, stage)
 
   self.tick = function()
   {
+    if(placer_debug)
+    {
+      self.placer_dragger.flush();
+      self.placer_clicker.flush();
+    }
     if(self.game_mode == GAME_MODE_MENU)
     {
       self.menu_clicker.flush();
@@ -1875,6 +1896,11 @@ var GamePlayScene = function(game, stage)
       self.blurb.draw(canv);
     }
     else global_blurb_up = false;
+
+    if(placer_debug)
+    {
+      self.placer.draw(canv);
+    }
   };
 
   self.cleanup = function()
