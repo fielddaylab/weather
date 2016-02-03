@@ -621,8 +621,10 @@ var GamePlayScene = function(game, stage)
   var Blurb = function(scene)
   {
     var self = this;
-    self.x = scene.dc.width-200;
-    self.y = scene.dc.height-200;
+    var box_height = 300;
+
+    self.x = scene.dc.width-140;
+    self.y = scene.dc.height-box_height+70+((scene.dc.height-20)-(scene.dc.height-box_height+70))/2-35;
     self.w = 100;
     self.h = 50;
 
@@ -677,7 +679,6 @@ var GamePlayScene = function(game, stage)
       global_bg_alpha = (1-((20*10)/canv.height));
       canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")"; //emulates clipboard fade
       canv.context.fillRect(0,0,canv.width,canv.height);
-      var box_height = 300;
       canv.context.fillStyle = blue;
       canv.context.fillRect(0,canv.height-box_height,canv.width,box_height);
 
@@ -685,21 +686,30 @@ var GamePlayScene = function(game, stage)
       canv.context.textAlign = "left";
       for(var i = 0; i < self.lines.length; i++)
       {
-        canv.context.fillStyle = "#000000";
+        canv.context.fillStyle = "#FFFFFF";
         canv.context.fillText(self.lines[i],200,canv.height-box_height+50+((i+1)*40),canv.width-420);
       }
 
       //if(self.img_el)
         //canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
 
+      canv.context.lineWidth = 4;
+      canv.context.strokeStyle = "#5CABB3";
+      canv.context.beginPath();
+      canv.context.moveTo(canv.width-200,canv.height-box_height+70);
+      canv.context.lineTo(canv.width-200,canv.height-20);
+      canv.context.stroke();
+      canv.context.lineWidth = 1;
+
       canv.context.fillStyle = "#CCCCCC";
       canv.context.fillRect(self.x,self.y+10,self.w,self.h);
       canv.context.fillStyle = "#FFFFFF";
       canv.context.fillRect(self.x,self.y,self.w,self.h);
-      canv.context.fillStyle = "#000000";
-      canv.context.font = "30px stump";
-      canv.context.fillText("Ok!",self.x+10,self.y+self.h-10,self.w);
-      canv.context.font = "12px stump";
+      canv.context.fillStyle = "#555555";
+      canv.context.font = "30px Open Sans";
+      canv.context.textAlign = "center";
+      canv.context.fillText("Ok!",self.x+self.w/2,self.y+self.h-10,self.w);
+      canv.context.font = "12px Open Sans";
 
       canv.context.drawImage(tall_img,50,canv.height-350,120,320);
     }
@@ -1039,7 +1049,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,true,self));
     l.text_0 = "This is a wind simulator. This simulator will help you observe how interactions between high and low pressure systems affect the speed and direction of wind. Before you start Level 1, just play around a little.";
-    l.text_1 = "You can see that the map shows a high-pressure system (H) and a low-pressure system (L). Drawg around these pressure systems, and see what happens to the directions of speed of the wind. When you are ready to begin Level 1, click menu.";
+    l.text_1 = "You can see that the map shows a high-pressure system (H) and a low-pressure system (L). Drag around these pressure systems, and see what happens to the directions of speed of the wind. When you are ready to begin Level 1, click menu.";
     self.levels.push(l);
 
     //blow north
@@ -1817,7 +1827,8 @@ var GamePlayScene = function(game, stage)
     }
 
     canv.context.fillStyle = "rgba(0,0,0,0.5)";
-    canv.context.fillRect(self.options_x,0,canv.width,canv.height);
+    if(self.options_x < canv.width-65)
+      canv.context.fillRect(self.options_x,30,(canv.width-65)-self.options_x,canv.height-60);
     if(self.options_open)
     {
       canv.context.font = "25px Open Sans";
