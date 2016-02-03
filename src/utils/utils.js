@@ -209,6 +209,17 @@ var dec2Hex = function(n)
   return n.toString(16);
 }
 
+var cartToPolar = function(cart,polar)
+{
+  polar.len = Math.sqrt((cart.x*cart.x)+(cart.y*cart.y));
+  polar.dir = Math.atan2(cart.y,cart.x);
+}
+var polarToCart = function(polar,cart)
+{
+  cart.x = Math.cos(polar.dir)*polar.len;
+  cart.y = Math.sin(polar.dir)*polar.len;
+}
+
 //short name- will be used often to place elements by percent, while guaranteeing integer results
 var p    = function(percent, of) { return Math.floor(percent * of); }
 var invp = function(      n, of) { return n/of; }

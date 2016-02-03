@@ -60,18 +60,6 @@ var GAME_MODE_MENU  = ENUM; ENUM++;
 var GAME_MODE_PLAY  = ENUM; ENUM++;
 var GAME_MODE_BLURB = ENUM; ENUM++;
 
-    var cartToPolar = function(cart,polar)
-    {
-      polar.len = Math.sqrt((cart.x*cart.x)+(cart.y*cart.y));
-      polar.dir = Math.atan2(cart.y,cart.x);
-    }
-    var polarToCart = function(polar,cart)
-    {
-      cart.x = Math.cos(polar.dir)*polar.len;
-      cart.y = Math.sin(polar.dir)*polar.len;
-    }
-
-
 var GamePlayScene = function(game, stage)
 {
   var self = this;
