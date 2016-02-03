@@ -44,6 +44,7 @@ var blue = "#76DAE2";
 var global_bg_alpha;
 var global_blurb_up;
 var global_ticks;
+var drawCanv;
 
 var ENUM;
 
@@ -64,6 +65,7 @@ var GAME_MODE_BLURB = ENUM; ENUM++;
 var GamePlayScene = function(game, stage)
 {
   var self = this;
+  drawCanv = stage.drawCanv;
 
   //index:  0 refers to first, 1 refers to second, 0.5 refers to "the value between first and second"
   //sample: both 0 AND 1 refer to, identically, "the value between last and first", 0.5 refers to "the value between first and last"
@@ -302,8 +304,8 @@ var GamePlayScene = function(game, stage)
     self.start_sx = x;
     self.start_sy = y;
     self.r = r;
-    self.w = 40;
-    self.h = 40;
+    self.w = 30;
+    self.h = 30;
     self.visible = visible;
 
     self.delta = delta;
@@ -365,7 +367,7 @@ var GamePlayScene = function(game, stage)
       {
         if(!self.dragged)
         {
-          canv.context.font = "30px stump";
+          canv.context.font = "20px stump";
           canv.context.textAlign = "right";
           canv.outlineText("Drag ->",self.x-20,self.y+self.h/2+10+Math.sin(global_ticks/10)*5,"#000000","#FFFFFF");
         }
@@ -422,7 +424,7 @@ var GamePlayScene = function(game, stage)
 
     self.draw = function(canv)
     {
-      canv.context.font = "30px arial";
+      canv.context.font = "20px Open Sans";
       canv.outlineText(self.name,self.x+self.w/2-10,self.y+self.h/2+10,"#FFFFFF","#000000");
 
       if(self.hovering || self.dragging)
@@ -439,7 +441,7 @@ var GamePlayScene = function(game, stage)
 
       if(self.explicit)
       {
-        canv.context.font = "20px arial";
+        canv.context.font = "20px Open Sans";
         canv.outlineText(self.measure(),self.x+self.w+10,self.y+self.h+10,"#FFFFFF","#000000");
       }
       else
@@ -610,12 +612,7 @@ var GamePlayScene = function(game, stage)
   var Blurb = function(scene)
   {
     var self = this;
-    var box_height = 300;
-
-    self.x = scene.dc.width-140;
-    self.y = scene.dc.height-box_height+70+((scene.dc.height-20)-(scene.dc.height-box_height+70))/2-35;
-    self.w = 100;
-    self.h = 50;
+    setBox(self,p(0.812987012987013,drawCanv.width),p(0.8046875,drawCanv.height),p(0.11168831168831168,drawCanv.width),p(0.0546875,drawCanv.height));
 
     self.txt = "";
     self.lines;
@@ -626,15 +623,20 @@ var GamePlayScene = function(game, stage)
     self.img_h = 0;
     self.img_el;
 
+    self.text_x = p(0.21948051948051947,drawCanv.width);
+    self.text_y = p(0.7515625,drawCanv.height);
+    self.text_width = p(0.5324675324675324,drawCanv.width);
+
+    var box_height = 188;
+
     self.format = function(canv)
     {
       self.lines = [];
       var found = 0;
       var searched = 0;
       var tentative_search = 0;
-      var width = canv.width-420;
 
-      canv.context.font = "25px Open Sans";
+      canv.context.font = "20px Open Sans";
 
       //stage.drawCanv.context.font=whaaaat;
       while(found < self.txt.length)
@@ -643,7 +645,7 @@ var GamePlayScene = function(game, stage)
         if(searched == -1) searched = self.txt.length;
         tentative_search = self.txt.indexOf(" ",searched+1);
         if(tentative_search == -1) tentative_search = self.txt.length;
-        while(canv.context.measureText(self.txt.substring(found,tentative_search)).width < width && searched != self.txt.length)
+        while(canv.context.measureText(self.txt.substring(found,tentative_search)).width < self.text_width && searched != self.txt.length)
         {
           searched = tentative_search;
           tentative_search = self.txt.indexOf(" ",searched+1);
@@ -668,37 +670,37 @@ var GamePlayScene = function(game, stage)
       global_bg_alpha = (1-((20*10)/canv.height));
       canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")"; //emulates clipboard fade
       canv.context.fillRect(0,0,canv.width,canv.height);
+      var box_height = 188;
       canv.context.fillStyle = blue;
       canv.context.fillRect(0,canv.height-box_height,canv.width,box_height);
 
-      canv.context.font = "25px Open Sans";
+      canv.context.font = "20px Open Sans";
       canv.context.textAlign = "left";
       canv.context.fillStyle = "#FFFFFF";
       for(var i = 0; i < self.lines.length; i++)
-        canv.context.fillText(self.lines[i],200,canv.height-box_height+50+((i+1)*40),canv.width-420);
+        canv.context.fillText(self.lines[i],self.text_x,self.text_y+((i+1)*24),self.text_width);
 
       //if(self.img_el)
         //canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
 
-      canv.context.lineWidth = 4;
+      canv.context.lineWidth = 3;
       canv.context.strokeStyle = "#5CABB3";
       canv.context.beginPath();
-      canv.context.moveTo(canv.width-200,canv.height-box_height+70);
-      canv.context.lineTo(canv.width-200,canv.height-20);
+      canv.context.moveTo(p(0.7688311688311689,drawCanv.width),p(0.75,drawCanv.height));
+      canv.context.lineTo(p(0.7688311688311689,drawCanv.width),p(0.96875,drawCanv.height));
       canv.context.stroke();
       canv.context.lineWidth = 1;
 
       canv.context.fillStyle = "#CCCCCC";
-      canv.context.fillRect(self.x,self.y+10,self.w,self.h);
+      canv.context.fillRect(self.x,self.y+8,self.w,self.h);
       canv.context.fillStyle = "#FFFFFF";
       canv.context.fillRect(self.x,self.y,self.w,self.h);
       canv.context.fillStyle = "#555555";
-      canv.context.font = "30px Open Sans";
+      canv.context.font = "25px Open Sans";
       canv.context.textAlign = "center";
-      canv.context.fillText("Ok!",self.x+self.w/2,self.y+self.h-10,self.w);
-      canv.context.font = "12px Open Sans";
+      canv.context.fillText("Ok!",self.x+self.w/2,self.y+self.h-8,self.w);
 
-      canv.context.drawImage(tall_img,50,canv.height-350,120,320);
+      canv.context.drawImage(tall_img,p(0.02987012987012987,drawCanv.width),p(0.5,drawCanv.height),p(0.14675324675324675,drawCanv.width),p(0.4671875,drawCanv.height));
     }
 
     self.click = function(evt)
@@ -867,7 +869,7 @@ var GamePlayScene = function(game, stage)
 
         if(!self.dragged)
         {
-          canv.context.font = "30px stump";
+          canv.context.font = "20px stump";
           canv.context.textAlign = "right";
           canv.outlineText("Drag ->",self.x-20,self.y+self.h/2+10+Math.sin(global_ticks/10)*5,"#000000","#FFFFFF");
         }
@@ -1175,10 +1177,10 @@ var GamePlayScene = function(game, stage)
     self.blurb = new Blurb(self);
     self.blurb_clicker.register(self.blurb);
 
-    self.yard_button = new ButtonBox(10,7,70,25, function(on) { window.location.href = "http://theyardgames.org/"; });
+    self.yard_button = new ButtonBox(p(0.01818181818181818,drawCanv.width),p(0.0046875,drawCanv.height),p(0.08311688311688312,drawCanv.width),p(0.05,drawCanv.height), function(on) { window.location.href = "http://theyardgames.org/"; });
     self.play_clicker.register(self.yard_button);
 
-    self.menu_button = new ButtonBox(stage.drawCanv.width-60,10,20,20, function(on) { click_aud.play(); self.setMode(GAME_MODE_MENU); });
+    self.menu_button = new ButtonBox(p(0.951948051948052,drawCanv.width),p(0.0078125,drawCanv.height),p(0.032467532467532464,drawCanv.width),p(0.040625,drawCanv.height), function(on) { click_aud.play(); self.setMode(GAME_MODE_MENU); });
     self.play_clicker.register(self.menu_button);
 
     self.next_button = new ButtonBox(stage.drawCanv.width/2-100,50,200,100, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
@@ -1816,12 +1818,12 @@ var GamePlayScene = function(game, stage)
     {
       self.p_type_toggle_h.draw(canv);
       self.p_type_toggle_l.draw(canv);
-      canv.context.font = "20px arial";
+      canv.context.font = "20px Open Sans";
       canv.outlineText("H",self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_h.h,"#FFFFFF","#000000");
       canv.outlineText("L",self.p_type_toggle_l.x,self.p_type_toggle_l.y+self.p_type_toggle_l.h,"#000000","#FFFFFF");
       canv.context.drawImage(button_h,self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_h.h);
       canv.context.drawImage(button_l,self.p_type_toggle_l.x,self.p_type_toggle_l.y+self.p_type_toggle_l.h);
-      canv.context.font = "15px arial";
+      canv.context.font = "15px Open Sans";
       canv.outlineText("Toggle Brush",self.p_type_toggle_h.x,self.p_type_toggle_h.y+self.p_type_toggle_l.h*2,"#000000","#FFFFFF");
     }
     if(sys)
@@ -1868,6 +1870,7 @@ var GamePlayScene = function(game, stage)
       canv.context.font = "30px stump";
       canv.context.textAlign = "center";
       canv.outlineText("Complete!",canv.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.context.font = "20px stump";
       canv.outlineText("(Click to Continue)",canv.width/2,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
     }
     else if(self.levels[self.cur_level].timer > 0)
@@ -1875,17 +1878,18 @@ var GamePlayScene = function(game, stage)
       canv.context.font = "30px stump";
       canv.context.textAlign = "center";
       canv.outlineText("Hold it!",canv.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.context.font = "20px stump";
       canv.context.textAlign = "left";
       canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.width/2-10,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
     }
 
     canv.context.fillStyle = blue;
-    canv.context.fillRect(0,0,canv.width,40);
+    canv.context.fillRect(0,0,canv.width,38);
     canv.context.drawImage(yard_logo_img,self.yard_button.x,self.yard_button.y,self.yard_button.w,self.yard_button.h);
     canv.context.fillStyle = "#FFFFFF";
     canv.context.font = "25px stump";
     canv.context.textAlign = "right";
-    canv.context.fillText("The Wind Generator",canv.width-70,30);
+    canv.context.fillText("The Wind Generator",p(0.9311688311688312,drawCanv.width),p(0.040625,drawCanv.height));
     canv.context.drawImage(menu_img,self.menu_button.x,self.menu_button.y,self.menu_button.w,self.menu_button.h);
 
     self.clip.draw(canv);

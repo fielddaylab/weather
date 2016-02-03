@@ -56,41 +56,43 @@ body,div
 <script type="text/javascript">
 var g;
 var d;
+//720 -> 577
+//960 -> 770
 function begin()
 {
-  var w = (window.innerWidth-960)/2;
+  var w = (window.innerWidth-770)/2;
   document.getElementById("side_a").style.width = w+"px";
   document.getElementById("side_b").style.width = w+"px";
   document.getElementById("stage_container").style.left = w+"px";
-  document.getElementById("side_b").style.left = (w+960)+"px";
-  document.getElementById("side_c").style.height = (window.innerHeight-720)+"px";
-  document.getElementById("blurb_bg").style.height = (window.innerHeight-420)+"px";
+  document.getElementById("side_b").style.left = (w+770)+"px";
+  document.getElementById("side_c").style.height = (window.innerHeight-577)+"px";
+  document.getElementById("blurb_bg").style.height = (window.innerHeight-389)+"px";
 
-  g = new Game({width:960,height:720,container:"stage_container"});
+  g = new Game({width:770,height:577,container:"stage_container"});
   g.begin();
 }
 window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prevent browser from doing anything funny
 window.addEventListener("load",begin,false);
 window.onresize = function(event)
 {
-  var w = (window.innerWidth-960)/2;
+  var w = (window.innerWidth-770)/2;
   document.getElementById("side_a").style.width = w+"px";
   document.getElementById("side_b").style.width = w+"px";
   document.getElementById("stage_container").style.left = w+"px";
-  document.getElementById("side_b").style.left = (w+960)+"px";
-  document.getElementById("side_c").style.height = (window.innerHeight-720)+"px";
-  document.getElementById("blurb_bg").style.height = (window.innerHeight-420)+"px";
+  document.getElementById("side_b").style.left = (w+770)+"px";
+  document.getElementById("side_c").style.height = (window.innerHeight-577)+"px";
+  document.getElementById("blurb_bg").style.height = (window.innerHeight-389)+"px";
 };
 </script>
 
 </head>
 <body style="background-image:url('assets/background.jpg'); width:100%; user-select:none;">
-<div style="position:absolute; top:0px; left:0px; background-color:#76DAE2; width:100%; height:40px; user-select:none;"></div>
-<div id="side_a" style="position:absolute; height:720px; user-select:none;"> </div>
-<div id="side_b" style="position:absolute; height:720px; user-select:none;"> </div>
-<div id="side_c" style="position:absolute; top:720px; width:100%; user-select:none;"> </div>
-<div id="blurb_bg" style="visibility:hidden; position:absolute; top:420px; left:0px; background-color:#76DAE2; width:100%; user-select:none;"></div>
-<div id="stage_container" style="position:absolute; width:960px; height:720px; user-select:none;"> </div>
+<div style="position:absolute; top:0px; left:0px; background-color:#76DAE2; width:100%; height:38px; user-select:none;"></div>
+<div id="side_a" style="position:absolute; height:577px; user-select:none;"> </div>
+<div id="side_b" style="position:absolute; height:577px; user-select:none;"> </div>
+<div id="side_c" style="position:absolute; top:577px; width:100%; user-select:none;"> </div>
+<div id="blurb_bg" style="visibility:hidden; position:absolute; top:389px; left:0px; background-color:#76DAE2; width:100%; user-select:none;"></div>
+<div id="stage_container" style="position:absolute; width:770px; height:577px; user-select:none;"> </div>
 </div>
 
 </body>
