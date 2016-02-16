@@ -5,7 +5,9 @@ var anneal = true;
 var airdeath = true;
 var tools = false;
 var tools_explicit = false;
-var cookies = false;
+var save_state = true;
+var save_cookie = false;
+var save_url = !save_cookie;
 var placer_debug = false;
 
 var vec_length = 5;
@@ -1157,16 +1159,18 @@ var GamePlayScene = function(game, stage)
     l.text_1 = "Notice difference in severity from your previous cyclone?";
     self.levels.push(l);
 
-    if(cookies)
+    if(save_state)
     {
-      //COOKIES
-      if(document.cookie && document.cookie.indexOf("LEVELS=") != -1)
+      var levels_string;
+      if(save_cookie) levels_string = document.cookie;
+      else if(save_url) levels_string = document.location.hash.substring(1);
+      if(levels_string && levels_string.indexOf("LEVELS=") != -1)
       {
-        //console.log("Reading Cookie:"+document.cookie);
-        var levels_cookie = (document.cookie.substring(document.cookie.indexOf("LEVELS=")+7,self.levels.length)).split('');
+        console.log("Reading levels:"+levels_string);
+        levels_string = (levels_string.substr(levels_string.indexOf("LEVELS=")+7,self.levels.length)).split('');
         for(var i = 0; i < self.levels.length; i++)
         {
-          var c = parseInt(levels_cookie[i]);
+          var c = parseInt(levels_string[i]);
           if(!isNaN(c) && c > 0) self.levels[i].complete = true;
         }
       }
@@ -1661,17 +1665,17 @@ var GamePlayScene = function(game, stage)
         if(!l.complete)
         {
           l.complete = true;
-          if(cookies)
+          if(save_state)
           {
-            //COOKIES
-            var levels_cookie = "LEVELS=";
+            var levels_string = "LEVELS=";
             for(var i = 0; i < self.levels.length; i++)
             {
-              if(self.levels[i].complete) levels_cookie += "1";
-              else                        levels_cookie += "0";
+              if(self.levels[i].complete) levels_string += "1";
+              else                        levels_string += "0";
             }
-            document.cookie = levels_cookie;
-            //console.log("Wrote Cookie:"+document.cookie);
+            if(save_cookie) document.cookie = levels_string;
+            else if(save_url) document.location.hash = levels_string;
+            console.log("Wrote levels:"+levels_string);
           }
         }
         l.complete = true;
