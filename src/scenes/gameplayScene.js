@@ -1893,7 +1893,7 @@ var GamePlayScene = function(game, stage)
     canv.context.fillStyle = "#FFFFFF";
     canv.context.font = "25px stump";
     canv.context.textAlign = "right";
-    canv.context.fillText("The Wind Generator",p(0.9311688311688312,drawCanv.width),p(0.040625,drawCanv.height)+5);
+    canv.context.fillText("The Wind Simulator",p(0.9311688311688312,drawCanv.width),p(0.040625,drawCanv.height)+5);
     canv.context.drawImage(menu_img,self.menu_button.x,self.menu_button.y,self.menu_button.w,self.menu_button.h);
 
     self.clip.draw(canv);
