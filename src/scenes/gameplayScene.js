@@ -1875,7 +1875,7 @@ var GamePlayScene = function(game, stage)
       canv.context.textAlign = "center";
       canv.outlineText("Complete!",canv.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
       canv.context.font = "20px stump";
-      canv.outlineText("(Click to Continue)",canv.width/2,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.outlineText("(Click Here to Continue)",canv.width/2,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
     }
     else if(self.levels[self.cur_level].timer > 0)
     {
