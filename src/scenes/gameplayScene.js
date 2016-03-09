@@ -1810,8 +1810,8 @@ var GamePlayScene = function(game, stage)
           self.tools[i].draw(canv);
       }
       //balloon
-      canv.context.fillStyle = "#FF0000";
-      canv.context.fillRect((self.balloon.x*canv.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
+      //canv.context.fillStyle = "#FF0000";
+      //canv.context.fillRect((self.balloon.x*canv.width)-(self.balloon.cache_w/2),(self.balloon.y*canv.height)-(self.balloon.cache_h/2),self.balloon.cache_w,self.balloon.cache_h);
     }
 
     /*
