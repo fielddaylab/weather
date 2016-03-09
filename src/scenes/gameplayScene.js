@@ -575,7 +575,7 @@ var GamePlayScene = function(game, stage)
     self.draw = function(canv)
     {
       global_bg_alpha = (1-((self.pretend_y*10)/self.h));
-      canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")";
+      canv.context.fillStyle = "rgba(118,218,227,"+global_bg_alpha+")";
       canv.context.fillRect(0,0,self.w,self.h);
 
       canv.context.font = "100px stump";
@@ -670,7 +670,7 @@ var GamePlayScene = function(game, stage)
     self.draw = function(canv)
     {
       global_bg_alpha = (1-((20*10)/canv.height));
-      canv.context.fillStyle = "rgba(0,0,0,"+global_bg_alpha+")"; //emulates clipboard fade
+      canv.context.fillStyle = "rgba(118,218,227,"+global_bg_alpha+")";
       canv.context.fillRect(0,0,canv.width,canv.height);
       var box_height = 188;
       canv.context.fillStyle = blue;
