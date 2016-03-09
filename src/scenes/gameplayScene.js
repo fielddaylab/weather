@@ -1190,10 +1190,10 @@ var GamePlayScene = function(game, stage)
     self.next_button = new ButtonBox(stage.drawCanv.width/2-100,50,200,100, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
     self.play_clicker.register(self.next_button);
 
-    self.options_button = new ButtonBox(stage.drawCanv.width-150,100,40,40, function(on) { click_aud.play(); self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
+    self.options_button = new ButtonBox(stage.drawCanv.width-130,stage.drawCanv.height-100,40,40, function(on) { click_aud.play(); self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
     self.play_clicker.register(self.options_button);
 
-    self.quality_button = new ButtonBox(stage.drawCanv.width-280,200,40,40, function(on)
+    self.quality_button = new ButtonBox(stage.drawCanv.width-280,100,40,40, function(on)
     {
       if(!self.options_open) return;
       click_aud.play();
@@ -1211,9 +1211,9 @@ var GamePlayScene = function(game, stage)
         self.afield = self.afield_lq;
       }
     });
-    self.vec_button = new ButtonBox(stage.drawCanv.width-280,250,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.vec_mode = !self.vec_mode; });
-    self.air_button = new ButtonBox(stage.drawCanv.width-280,300,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.air_mode = !self.air_mode; });
-    self.help_button = new ButtonBox(stage.drawCanv.width-280,350,40,40, function(on)
+    self.vec_button = new ButtonBox(stage.drawCanv.width-280,150,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.vec_mode = !self.vec_mode; });
+    self.air_button = new ButtonBox(stage.drawCanv.width-280,200,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.air_mode = !self.air_mode; });
+    self.help_button = new ButtonBox(stage.drawCanv.width-280,250,40,40, function(on)
     {
       if(!self.options_open) return;
       click_aud.play();
@@ -1848,7 +1848,7 @@ var GamePlayScene = function(game, stage)
       canv.context.fillStyle = "#FFFFFF";
       canv.context.textAlign = "left";
 
-      canv.context.drawImage(icon_close_img,self.options_x+150,self.options_button.y,self.options_button.w,self.options_button.h);
+      canv.context.drawImage(icon_close_img,self.options_x+170,self.options_button.y,self.options_button.w,self.options_button.h);
 
       if(!self.quality_mode) canv.context.drawImage(icon_check_img,         self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
       else                   canv.context.drawImage(icon_check_selected_img,self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
