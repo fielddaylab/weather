@@ -1047,6 +1047,13 @@ var GamePlayScene = function(game, stage)
     l.type = L_TYPE_NONE;
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,true,self));
+    l.new_blurbs = [
+      ["francis", "The wind simulator helps you see how high and low pressure systems affect the wind."],
+      ["honey", "I wanna play!"],
+      ["francis", "Okay, but be sure to pay attention to what happens when you add and move the H and L. They can get that wind blowing!"],
+      ["honey", "What are those?"],
+      ["francis", "The H and the L are the HIGH and the LOW pressure systems."],
+    ];
     l.text_0 = "This is a wind simulator. This simulator will help you observe how interactions between high and low pressure systems affect the speed and direction of wind. Before you start Level 1, just play around a little.";
     l.text_1 = "You can see that the map shows a high-pressure system (H) and a low-pressure system (L). Drag around these pressure systems, and see what happens to the directions of speed of the wind. When you are ready to begin Level 1, click menu.";
     self.levels.push(l);
@@ -1057,6 +1064,9 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.3,0.5,0.0,-1.5,self));
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,true,self));
+    l.new_blurbs = [
+      ["francis", "The arrows are like flags and they point in the direction the wind is blowing. Here, the white arrow is pointing the way you want the wind to blow: north. The arrow's length shows how fast the wind is blowing. I'm pretty good at figuring out where the wind is blowing. Your turn!"],
+    ];
     l.text_0 = "The white arrow points in the direction you want the wind to blow - north - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly north.";
     self.levels.push(l);
@@ -1067,6 +1077,9 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.3,0.5,1.5,0.0,self));
     l.psys.push(new PSys(0.5,0.4,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.5,0.6,0.1, 0.1,true,self));
+    l.new_blurbs = [
+      ["francis", "Wanna see if you can find a place where the wind is blowing strongly to the east?"],
+    ];
     l.text_0 = "The white arrow points in the direction you want the wind to blow - east - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly east.";
     self.levels.push(l);
@@ -1078,6 +1091,9 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.3,0.5,0.1, 0.1,true,self));
     l.psys.push(new PSys(0.7,0.5,0.1, 0.1,true,self));
+    l.new_blurbs = [
+      ["honey", "I totally get it now! I bet you can find a place where the wind is blowing to the south now."],
+    ];
     l.text_0 = "The white arrow points in the direction you want the wind to blow - south - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly south.";
     self.levels.push(l);
@@ -1110,6 +1126,10 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.1,0.1, 0.1,false,self));
     l.psys.push(new PSys(0.9,0.5,0.1, 0.1,false,self));
     l.psys.push(new PSys(0.5,0.9,0.1, 0.1,false,self));
+    l.new_blurbs = [
+      ["honey", "Whoa, that's so many arrows! I don't think I can do this!!"],
+      ["francis", "Yeah, it looks like more but it's the same idea as before. There is a trick if you need help. You can turn on the Vector (click the EYE) to see the direction the wind is going."],
+    ];
     l.text_0 = "Drag each vane to a position where it matches its white arrow.";
     l.text_1 = "Click the eye to enable different visualizations for the wind- Can you see the underlying pattern of wind motion?";
     self.levels.push(l);
@@ -1120,6 +1140,9 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,-2.0,0.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,true,self));
+    l.new_blurbs = [
+      ["francis", "You've got the hang of moving the arrows to find the wind's direction. Now you get to be in charge of moving the wind around! Move the high-pressure and low-pressure systems to blow the flags."],
+    ];
     l.text_0 = "Drag the high-pressure and low-pressure systems to blow the red vane in the same speed and direction as the white vane.";
     l.text_1 = "Make sure to use both types of systems!";
     self.levels.push(l);
@@ -1130,6 +1153,9 @@ var GamePlayScene = function(game, stage)
     l.flags.push(new Flag(0.5,0.5,2.0,2.0,self));
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,true,self));
+    l.new_blurbs = [
+      ["honey", "Easy peasy. This one looks just like the last one."],
+    ];
     l.text_1 = "Just as you did in the previous level, drag the high-pressure and low-pressure systems to blow the red vane in the same speed and direction as the white.";
     self.levels.push(l);
 
@@ -1142,6 +1168,9 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.4,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.2,0.6,0.1, 0.1,true,self));
     l.psys.push(new PSys(0.2,0.8,0.1,-0.1,true,self));
+    l.new_blurbs = [
+      ["francis", "See if you can create a cyclone—like a tornado. You'll need three pressure systems to get one going."],
+    ];
     l.text_0 = "Place the high-pressure and low-pressure systems to create a cyclone (also called a tornado) in the directions indicated by the white vanes.";
     l.text_1 = "You should only need three pressure systems to create a cyclone.";
     self.levels.push(l);
@@ -1155,6 +1184,9 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.4,0.1, 0.1,true,self));
     l.psys.push(new PSys(0.2,0.6,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.2,0.8,0.1, 0.1,true,self));
+    l.new_blurbs = [
+      ["honey", "Wait a minute, this cyclone looks different—it's going in the opposite direction!"],
+    ];
     l.text_0 = "Again, try to create a cyclone - This time, in the opposite direction!";
     l.text_1 = "Notice difference in severity from your previous cyclone?";
     self.levels.push(l);
