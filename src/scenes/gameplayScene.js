@@ -472,17 +472,15 @@ var GamePlayScene = function(game, stage)
       {
         scene.beginLevel(self.level_i);
         scene.setMode(GAME_MODE_PLAY);
-        if(self.level.text_0 && self.level.text_0 != "")
+        if(self.level.new_blurbs && self.level.new_blurbs.length > 0)
         {
-          var b_0 = new Blurb(scene);
-          b_0.txt = self.level.text_0;
-          setTimeout(function(){ scene.popBlurb(b_0); },200);
-          if(self.level.text_1 && self.level.text_1 != "")
-          {
-            var b_1 = new Blurb(scene);
-            b_1.txt = self.level.text_1;
-            b_0.click = function(evt) { click_aud.play(); scene.popBlurb(b_1); };
-          }
+          scene.blurb.loadDialog(self.level.new_blurbs, stage.drawCanv);
+          scene.setMode(GAME_MODE_BLURB);
+        }
+        else if(self.level.text_0 && self.level.text_0 != "")
+        {
+          scene.blurb.loadLegacy(self.level.text_0, self.level.text_1, stage.drawCanv);
+          scene.setMode(GAME_MODE_BLURB);
         }
       }
     }
@@ -631,6 +629,25 @@ var GamePlayScene = function(game, stage)
 
     var box_height = 188;
 
+    self.loadDialog = function(dialog, canv)
+    {
+      var first_line = dialog[0];
+      self.img = first_line[0];
+      self.txt = first_line[1];
+      self.rest_lines = dialog.slice(1);
+      self.canv = canv;
+      self.format(canv);
+      scene.setMode(GAME_MODE_BLURB);
+    };
+
+    self.loadLegacy = function(text_0, text_1, canv)
+    {
+      var dialog = [['scout', text_0]];
+      if(text_1 && text_1 != "")
+        dialog.push(['scout', text_1]);
+      self.loadDialog(dialog, canv);
+    };
+
     self.format = function(canv)
     {
       self.lines = [];
@@ -662,6 +679,34 @@ var GamePlayScene = function(game, stage)
       {
         self.img_el = new Image();
         self.img_el.src = "assets/"+self.img+".png";
+        switch(self.img)
+        {
+          case 'francis':
+            self.img_x = p(0,canv.width);
+            self.img_y = p(0.55,canv.height);
+            self.img_w = p(0.2,drawCanv.width);
+            self.img_h = p(0.4247159090909091,drawCanv.height);
+            break;
+          case 'honey':
+            self.img_x = p(0,canv.width);
+            self.img_y = p(0.55,canv.height);
+            self.img_w = p(0.23,drawCanv.width);
+            self.img_h = p(0.4,drawCanv.height);
+            break;
+          case 'jack':
+            self.img_x = p(0,canv.width);
+            self.img_y = p(0.6,canv.height);
+            self.img_w = p(0.23,drawCanv.width);
+            self.img_h = p(0.368,drawCanv.height);
+            break;
+          case 'scout':
+          default:
+            self.img_x = p(0.02987012987012987,canv.width);
+            self.img_y = p(0.5,canv.height);
+            self.img_w = p(0.14675324675324675,drawCanv.width);
+            self.img_h = p(0.4671875,drawCanv.height);
+            break;
+        }
       }
       else
         self.img_el = undefined;
@@ -682,8 +727,8 @@ var GamePlayScene = function(game, stage)
       for(var i = 0; i < self.lines.length; i++)
         canv.context.fillText(self.lines[i],self.text_x,self.text_y+((i+1)*24),self.text_width);
 
-      //if(self.img_el)
-        //canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
+      if(self.img_el)
+        canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
 
       canv.context.lineWidth = 3;
       canv.context.strokeStyle = "#5CABB3";
@@ -701,14 +746,15 @@ var GamePlayScene = function(game, stage)
       canv.context.font = "25px Open Sans";
       canv.context.textAlign = "center";
       canv.context.fillText("Ok!",self.x+self.w/2,self.y+self.h-8,self.w);
-
-      canv.context.drawImage(tall_img,p(0.02987012987012987,drawCanv.width),p(0.5,drawCanv.height),p(0.14675324675324675,drawCanv.width),p(0.4671875,drawCanv.height));
     }
 
     self.click = function(evt)
     {
       click_aud.play();
-      scene.setMode(GAME_MODE_PLAY);
+      if (self.rest_lines && self.rest_lines.length > 0)
+        self.loadDialog(self.rest_lines, self.canv);
+      else
+        scene.setMode(GAME_MODE_PLAY);
     }
   }
 
@@ -1250,17 +1296,15 @@ var GamePlayScene = function(game, stage)
       if(!self.options_open) return;
       click_aud.play();
       var l = self.levels[self.cur_level];
-      if(l.text_0 && l.text_0 != "")
+      if(l.new_blurbs && l.new_blurbs.length > 0)
       {
-        var b_0 = new Blurb(self);
-        b_0.txt = l.text_0;
-        if(l.text_1 && l.text_1 != "")
-        {
-          var b_1 = new Blurb(self);
-          b_1.txt = l.text_1;
-          b_0.click = function(evt) { click_aud.play(); self.popBlurb(b_1); };
-        }
-        self.popBlurb(b_0);
+        scene.blurb.loadDialog(l.new_blurbs, stage.drawCanv);
+        scene.setMode(GAME_MODE_BLURB);
+      }
+      else if(l.text_0 && l.text_0 != "")
+      {
+        scene.blurb.loadLegacy(l.text_0, l.text_1, stage.drawCanv);
+        scene.setMode(GAME_MODE_BLURB);
       }
     });
     self.play_clicker.register(self.quality_button);
@@ -1518,19 +1562,6 @@ var GamePlayScene = function(game, stage)
     }
     l.timer = 0;
     l.complete_this_round = false;
-  }
-
-  self.popBlurb = function(blurb)
-  {
-    self.blurb.txt = blurb.txt;
-    self.blurb.img = blurb.img;
-    self.blurb.img_x = blurb.img_x;
-    self.blurb.img_y = blurb.img_y;
-    self.blurb.img_w = blurb.img_w;
-    self.blurb.img_h = blurb.img_h;
-    self.blurb.format(stage.drawCanv);
-    self.blurb.click = blurb.click;
-    self.setMode(GAME_MODE_BLURB);
   }
 
   self.tick = function()
