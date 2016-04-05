@@ -762,8 +762,8 @@ var GamePlayScene = function(game, stage)
   {
     var self = this;
 
-    self.w = 20;
-    self.h = 20;
+    self.w = 27;
+    self.h = 27;
 
     //normalized vals
     self.start_sx = x;
