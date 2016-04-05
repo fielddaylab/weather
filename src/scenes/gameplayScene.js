@@ -1291,9 +1291,9 @@ var GamePlayScene = function(game, stage)
         self.afield = self.afield_lq;
       }
     });
-    self.vec_button = new ButtonBox(stage.drawCanv.width-280,150,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.vec_mode = !self.vec_mode; });
-    self.air_button = new ButtonBox(stage.drawCanv.width-280,200,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.air_mode = !self.air_mode; });
-    self.help_button = new ButtonBox(stage.drawCanv.width-280,250,40,40, function(on)
+    self.vec_button = new ButtonBox(stage.drawCanv.width-280,180,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.vec_mode = !self.vec_mode; });
+    self.air_button = new ButtonBox(stage.drawCanv.width-280,230,40,40, function(on) { if(!self.options_open) return; click_aud.play(); self.air_mode = !self.air_mode; });
+    self.help_button = new ButtonBox(stage.drawCanv.width-280,280,40,40, function(on)
     {
       if(!self.options_open) return;
       click_aud.play();
@@ -1924,6 +1924,9 @@ var GamePlayScene = function(game, stage)
       if(!self.air_mode) canv.context.drawImage(icon_check_img,         self.options_x+20,self.air_button.y,self.air_button.w,self.air_button.h);
       else               canv.context.drawImage(icon_check_selected_img,self.options_x+20,self.air_button.y,self.air_button.w,self.air_button.h);
       canv.context.fillText("Particles",self.options_x+80,self.air_button.y+self.air_button.h-10);
+
+      canv.context.font = "15px Open Sans";
+      canv.context.fillText("(click for Chromebook)",self.options_x+20,self.quality_button.y+self.quality_button.h+25);
 /*
       canv.context.drawImage(icon_check_img,         self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
       canv.outlineText("Help",self.options_x+80,self.help_button.y+self.help_button.h-10,"#000000","#FFFFFF");
