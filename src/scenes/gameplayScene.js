@@ -1111,7 +1111,9 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,true,self));
     l.new_blurbs = [
-      ["francis", "The arrows are like flags and they point in the direction the wind is blowing. Here, the white arrow is pointing the way you want the wind to blow: north. The arrow's length shows how fast the wind is blowing. I'm pretty good at figuring out where the wind is blowing. Your turn!"],
+      ["francis", "The arrows are like flags and they point in the direction the wind is blowing."],
+      ["francis", "Here, the white arrow is pointing the way you want the wind to blow: north. The arrow's length shows how fast the wind is blowing."],
+      ["francis", "I'm pretty good at figuring out where the wind is blowing. Your turn!"],
     ];
     l.text_0 = "The white arrow points in the direction you want the wind to blow - north - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly north.";
