@@ -1005,8 +1005,6 @@ var GamePlayScene = function(game, stage)
   self.dragging_tool;
 
   self.clip;
-  self.yard_button;
-  self.menu_button;
   self.next_button;
   self.options_button;
   self.quality_button;
@@ -1261,11 +1259,7 @@ var GamePlayScene = function(game, stage)
     self.blurb = new Blurb(self);
     self.blurb_clicker.register(self.blurb);
 
-    self.yard_button = new ButtonBox(p(0.01818181818181818,drawCanv.width),p(0.0046875,drawCanv.height),p(0.08311688311688312,drawCanv.width),p(0.05,drawCanv.height), function(on) { window.location.href = "http://theyardgames.org/"; });
-    self.play_clicker.register(self.yard_button);
-
-    self.menu_button = new ButtonBox(p(0.951948051948052,drawCanv.width),p(0.0108125,drawCanv.height),p(0.032467532467532464,drawCanv.width),p(0.040625,drawCanv.height), function(on) { click_aud.play(); self.setMode(GAME_MODE_MENU); });
-    self.play_clicker.register(self.menu_button);
+    window.addEventListener('menuButton', function(){ click_aud.play(); self.setMode(GAME_MODE_MENU); }, false);
 
     self.next_button = new ButtonBox(stage.drawCanv.width/2-100,50,200,100, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
     self.play_clicker.register(self.next_button);
@@ -1954,15 +1948,6 @@ var GamePlayScene = function(game, stage)
       canv.context.textAlign = "left";
       canv.outlineText(""+(Math.round(30-((self.levels[self.cur_level].timer/self.levels[self.cur_level].req_timer)*30))/10),canv.width/2-10,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
     }
-
-    canv.context.fillStyle = blue;
-    canv.context.fillRect(0,0,canv.width,38);
-    canv.context.drawImage(yard_logo_img,self.yard_button.x,self.yard_button.y,self.yard_button.w,self.yard_button.h);
-    canv.context.fillStyle = "#FFFFFF";
-    canv.context.font = "22px Open Sans";
-    canv.context.textAlign = "right";
-    canv.context.fillText("THE WIND SIMULATOR",p(0.9311688311688312,drawCanv.width),p(0.040625,drawCanv.height)+5);
-    canv.context.drawImage(menu_img,self.menu_button.x,self.menu_button.y,self.menu_button.w,self.menu_button.h);
 
     self.clip.draw(canv);
 
