@@ -1768,7 +1768,7 @@ var GamePlayScene = function(game, stage)
   {
     var canv = stage.drawCanv;
 
-    canv.context.drawImage(screen_bg_img,0,0,canv.width,canv.height);
+    canv.context.drawImage(screen_bg_img,0,20,canv.width,canv.height-20);
 
     var x_space;
     var y_space;
@@ -1780,24 +1780,23 @@ var GamePlayScene = function(game, stage)
     */
     x_space = canv.width / self.pmap.w;
     y_space = canv.height / self.pmap.h;
-    //starts at 1, ends at -1 to not draw borders (they leak out the sides of the assets)
-    for(var i = 1; i < self.pmap.h-1; i++)
+    var px = 0;
+    var py = 1;
+    if(self.quality_mode)
     {
-      for(var j = 1; j < self.pmap.w-1; j++)
+      py = 3;
+      px = 1;
+    }
+    //starts at p, ends at -p to not draw borders (they leak out the sides of the assets)
+    for(var i = py; i < self.pmap.h-py; i++)
+    {
+      for(var j = px; j < self.pmap.w-px; j++)
       {
         y = y_space*i;
         x = x_space*j;
         index = self.pmap.iFor(j,i);
-        if(true || self.quality_mode)
-        {
-          var color = .8-(self.pmap.data[index]*.8);
-          canv.context.fillStyle = "rgba(0,0,0,"+color+")";
-        }
-        else
-        {
-          var color = Math.round(self.pmap.data[index]*255);
-          canv.context.fillStyle = "rgba("+color+","+color+","+color+",1.0)";
-        }
+        var color = .8-(self.pmap.data[index]*.8);
+        canv.context.fillStyle = "rgba(0,0,0,"+color+")";
         canv.context.fillRect(x,y,x_space,y_space);
       }
     }
@@ -1812,10 +1811,10 @@ var GamePlayScene = function(game, stage)
       canv.context.fillStyle = "#550055";
       x_space = canv.width / self.vfield.w;
       y_space = canv.height / self.vfield.h;
-      //starts at 1, ends at -1 to not draw borders (they leak out the sides of the assets)
-      for(var i = 1; i < self.vfield.h-1; i++)
+      //starts at p, ends at -p to not draw borders (they leak out the sides of the assets)
+      for(var i = py; i < self.vfield.h-py; i++)
       {
-        for(var j = 1; j < self.vfield.w-1; j++)
+        for(var j = px; j < self.vfield.w-px; j++)
         {
           y = y_space*i+(y_space/2);
           x = x_space*j+(x_space/2);
