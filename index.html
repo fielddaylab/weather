@@ -57,35 +57,20 @@ body,div
 <script type="text/javascript">
 var g;
 var d;
-//720 -> 577
-//960 -> 770
 function begin()
 {
-  var w = (window.innerWidth-770)/2;
-  document.getElementById("side_a").style.width = w+"px";
-  document.getElementById("side_b").style.width = w+"px";
-  document.getElementById("top_nav").style.left = w+"px";
-  document.getElementById("stage_container").style.left = w+"px";
-  document.getElementById("side_b").style.left = (w+770)+"px";
-  document.getElementById("side_c").style.height = (window.innerHeight-577-38)+"px";
-  document.getElementById("blurb_bg").style.height = (window.innerHeight-389-38)+"px";
+  var w = 880;
+  var h = 660;
+  var content          = document.getElementById("content");
+  var stage_container  = document.getElementById("stage_container");
+  content.style.width          = w; content.style.height          = h;
+  stage_container.style.width  = w; stage_container.style.height  = h;
 
-  g = new Game({width:770,height:577,container:"stage_container"});
+  g = new Game({width:w,height:h,container:"stage_container"});
   g.begin();
 }
 window.addEventListener('touchstart', function(e){ e.preventDefault() }); //prevent browser from doing anything funny
 window.addEventListener("load",begin,false);
-window.onresize = function(event)
-{
-  var w = (window.innerWidth-770)/2;
-  document.getElementById("side_a").style.width = w+"px";
-  document.getElementById("side_b").style.width = w+"px";
-  document.getElementById("top_nav").style.left = w+"px";
-  document.getElementById("stage_container").style.left = w+"px";
-  document.getElementById("side_b").style.left = (w+770)+"px";
-  document.getElementById("side_c").style.height = (window.innerHeight-577-38)+"px";
-  document.getElementById("blurb_bg").style.height = (window.innerHeight-389-38)+"px";
-};
 
 window.menuButtonEvent = new Event('menuButton');
 
@@ -94,18 +79,16 @@ window.menuButtonEvent = new Event('menuButton');
 </head>
 <body style="background-image:url('assets/background.jpg'); width:100%; -moz-user-select: none; -webkit-user-select: none; -ms-user-select: none;">
 <div style="position:absolute; top:0px; left:0px; background-color:#76DAE2; width:100%; height:38px;"></div>
-<div id="side_a" style="position:absolute; top:38px; height:577px;"> </div>
-<div id="side_b" style="position:absolute; top:38px; height:577px;"> </div>
-<div id="side_c" style="position:absolute; top:615px; width:100%;"> </div>
-<div id="blurb_bg" style="visibility:hidden; position:absolute; top:427px; left:0px; background-color:#76DAE2; width:100%;"></div>
-<div id="top_nav" style="position:absolute; top:0; width:770px; height:38px;">
+<div id="top_nav" style="margin:0px auto; position:relative; width:770px; height:38px;">
   <a href="http://theyardgames.org/">
-    <img src="assets/theyard-logo.png" style="float:left; height:31px; margin: 3.5px 13px;">
+    <img src="assets/theyard-logo.png" style="float:left; height:31px; margin:3.5px 13px;">
   </a>
-  <img src="assets/icon-menu.png" style="float:right; height:24px; margin: 7px 12px; cursor: pointer;" onclick="window.dispatchEvent(window.menuButtonEvent);">
-  <span style="float: right; color: white; font: 22px Open Sans; margin: 3px 4px;">THE WIND SIMULATOR</span>
+  <img src="assets/icon-menu.png" style="float:right; height:24px; margin:7px 12px; cursor: pointer;" onclick="window.dispatchEvent(window.menuButtonEvent);">
+  <span style="float: right; color: white; font: 22px Open Sans; margin:3px 4px;">THE WIND SIMULATOR</span>
 </div>
-<div id="stage_container" style="position:absolute; top:38px; width:770px; height:577px;"> </div>
+
+<div id="content" style="margin:0px auto; position:relative;">
+  <div id="stage_container" style="position:absolute; top:0px; left:0px; user-select:none;"> </div>
 </div>
 
 </body>
