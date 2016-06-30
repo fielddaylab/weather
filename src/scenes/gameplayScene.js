@@ -738,14 +738,7 @@ var GamePlayScene = function(game, stage)
       canv.context.stroke();
       canv.context.lineWidth = 1;
 
-      canv.context.fillStyle = "#CCCCCC";
-      canv.context.fillRect(self.x,self.y+8,self.w,self.h);
-      canv.context.fillStyle = "#FFFFFF";
-      canv.context.fillRect(self.x,self.y,self.w,self.h);
-      canv.context.fillStyle = "#555555";
-      canv.context.font = "25px Open Sans";
-      canv.context.textAlign = "center";
-      canv.context.fillText("Ok!",self.x+self.w/2,self.y+self.h-8,self.w);
+      canv.context.drawImage(next_button_img,self.x,self.y,self.w,self.h);
     }
 
     self.click = function(evt)
@@ -1065,6 +1058,7 @@ var GamePlayScene = function(game, stage)
     green_flag_tail_img = new Image(); green_flag_tail_img.src = "assets/vane-tail-green.png";
     dotted_flag_tip_img = new Image(); dotted_flag_tip_img.src = "assets/dotted-vane-tip.png";
     dotted_flag_tail_img = new Image(); dotted_flag_tail_img.src = "assets/dotted-vane-tail.png";
+    next_button_img = new Image(); next_button_img.src = "assets/nextbtn-white.png";
 
     self.menu_clicker = new Clicker({source:stage.dispCanv.canvas});
     self.bin_presser = new Presser({source:stage.dispCanv.canvas});
