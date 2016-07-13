@@ -1314,9 +1314,9 @@ var GamePlayScene = function(game, stage)
     self.vfield_lq = new VecField2d(20,20);
     self.afield_lq = new AirField(1000);
 
-    self.pmap = self.pmap_hq;
-    self.vfield = self.vfield_hq;
-    self.afield = self.afield_hq;
+    self.pmap = self.pmap_lq;
+    self.vfield = self.vfield_lq;
+    self.afield = self.afield_lq;
 
     self.balloon = new Balloon();
 
@@ -1441,7 +1441,7 @@ var GamePlayScene = function(game, stage)
     self.options_open = false;
     self.options_dir = 0;
     self.options_x = 9999;
-    self.quality_mode = true;
+    self.quality_mode = false;
     self.vec_mode = false;
     self.air_mode = false;
     self.beginLevel(0);
@@ -1908,7 +1908,7 @@ var GamePlayScene = function(game, stage)
 
       if(!self.quality_mode) canv.context.drawImage(icon_check_img,         self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
       else                   canv.context.drawImage(icon_check_selected_img,self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
-      canv.context.fillText("Quality",self.options_x+80,self.quality_button.y+self.quality_button.h-10);
+      canv.context.fillText("High Def.",self.options_x+80,self.quality_button.y+self.quality_button.h-10);
       if(!self.vec_mode) canv.context.drawImage(icon_check_img,         self.options_x+20,self.vec_button.y,self.vec_button.w,self.vec_button.h);
       else               canv.context.drawImage(icon_check_selected_img,self.options_x+20,self.vec_button.y,self.vec_button.w,self.vec_button.h);
       canv.context.fillText("Vectors",self.options_x+80,self.vec_button.y+self.vec_button.h-10);
@@ -1917,7 +1917,7 @@ var GamePlayScene = function(game, stage)
       canv.context.fillText("Particles",self.options_x+80,self.air_button.y+self.air_button.h-10);
 
       canv.context.font = "15px Open Sans";
-      canv.context.fillText("(click for Chromebook)",self.options_x+20,self.quality_button.y+self.quality_button.h+25);
+      canv.context.fillText("(uncheck for Chromebook)",self.options_x+20,self.quality_button.y+self.quality_button.h+25);
 /*
       canv.context.drawImage(icon_check_img,         self.options_x+20,self.quality_button.y,self.quality_button.w,self.quality_button.h);
       canv.outlineText("Help",self.options_x+80,self.help_button.y+self.help_button.h-10,"#000000","#FFFFFF");
