@@ -269,6 +269,7 @@ var GamePlayScene = function(game, stage)
     }
     self.drag = function(evt)
     {
+      clampDrag(evt);
       self.last_evt = evt;
       self.down = true;
     }
@@ -348,6 +349,7 @@ var GamePlayScene = function(game, stage)
     }
     self.drag = function(evt)
     {
+      clampDrag(evt);
       if(self.dragging)
       {
         self.sx = evt.doX/stage.drawCanv.width;
@@ -410,6 +412,7 @@ var GamePlayScene = function(game, stage)
     }
     self.drag = function(evt)
     {
+      clampDrag(evt);
       if(self.dragging)
       {
         self.sx = (evt.doX+(self.w/2)+5)/stage.drawCanv.width;
@@ -830,6 +833,7 @@ var GamePlayScene = function(game, stage)
     }
     self.drag = function(evt)
     {
+      clampDrag(evt);
       if(self.dragging)
       {
         if(platform == "MOBILE")
@@ -1960,6 +1964,16 @@ var GamePlayScene = function(game, stage)
   self.cleanup = function()
   {
   };
+
+  var clampDrag = function(evt)
+  {
+    var xpad = 65;
+    var ypad = 75;
+    if(evt.doX < xpad)                 evt.doX = xpad;
+    if(evt.doX > drawCanv.width-xpad)  evt.doX = drawCanv.width-xpad;
+    if(evt.doY < ypad)                 evt.doY = ypad;
+    if(evt.doY > drawCanv.height-ypad) evt.doY = drawCanv.height-ypad;
+  }
 
 };
 
