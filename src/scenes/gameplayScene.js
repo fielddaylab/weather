@@ -1930,11 +1930,7 @@ var GamePlayScene = function(game, stage)
 
     if(self.levels[self.cur_level].complete_this_round)
     {
-      canv.context.font = "30px stump";
-      canv.context.textAlign = "center";
-      canv.outlineText("Complete!",canv.width/2,100+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
-      canv.context.font = "20px stump";
-      canv.outlineText("(Click Here to Continue)",canv.width/2,130+Math.sin(global_ticks/10)*10,"#000000","#FFFFFF");
+      canv.context.drawImage(next_button_img,canv.width/2-158/2,80+Math.sin(global_ticks/10)*10,158,56);
     }
     else if(self.levels[self.cur_level].timer > 0)
     {
