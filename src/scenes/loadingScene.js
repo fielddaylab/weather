@@ -102,7 +102,7 @@ var LoadingScene = function(game, stage)
     img_srcs.push("assets/vane-tail-green.png");
     img_srcs.push("assets/dotted-vane-tip.png");
     img_srcs.push("assets/dotted-vane-tail.png");
-    for(var i = 0; i < 1; i++)
+    for(var i = 0; i < 13; i++)
       img_srcs.push("assets/comic/comic_"+i+".png");
     for(var i = 0; i < img_srcs.length; i++)
     {
