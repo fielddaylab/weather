@@ -13,6 +13,14 @@ var placer_debug = false;
 var vec_length = 5;
 var flag_length = 20;
 
+var blurb_t;
+var char_xs;
+var char_ys;
+var char_ws;
+var char_hs;
+var char_ts;
+var char_imgs;
+
 var click_aud;
 var yard_logo_img;
 var menu_img;
@@ -44,7 +52,6 @@ var dotted_flag_tail_img;
 var blue = "#76DAE2";
 
 var global_bg_alpha;
-var global_blurb_up;
 var global_ticks;
 var drawCanv;
 
@@ -63,6 +70,12 @@ ENUM = 0;
 var GAME_MODE_MENU  = ENUM; ENUM++;
 var GAME_MODE_PLAY  = ENUM; ENUM++;
 var GAME_MODE_BLURB = ENUM; ENUM++;
+
+ENUM = 0;
+var CHAR_GIRL  = ENUM; ENUM++;
+var CHAR_ANNOY = ENUM; ENUM++;
+var CHAR_AXE   = ENUM; ENUM++;
+var CHAR_TALL  = ENUM; ENUM++;
 
 var GamePlayScene = function(game, stage)
 {
@@ -612,23 +625,35 @@ var GamePlayScene = function(game, stage)
     }
   }
 
+  var grad_img = GenIcon(10,100);
+  var grd=grad_img.context.createLinearGradient(0,0,0,grad_img.height);
+  grd.addColorStop(0,"rgba(99,228,248,0)");
+  grd.addColorStop(0.5,"rgba(99,228,248,1)");
+  grad_img.context.fillStyle = grd;
+  grad_img.context.fillRect(0,0,grad_img.width,grad_img.height);
+
   var Blurb = function(scene)
   {
+    var dc = stage.drawCanv;
     var self = this;
-    setBox(self,p(0.812987012987013,drawCanv.width),p(0.8046875,drawCanv.height),p(0.11168831168831168,drawCanv.width),p(0.0546875,drawCanv.height));
+    self.x = 0;
+    self.y = 0;
+    self.w = dc.width;
+    self.h = dc.height;
 
     self.txt = "";
     self.lines;
-    self.img = "";
+    self.img = 0;
     self.img_x = 0;
     self.img_y = 0;
     self.img_w = 0;
     self.img_h = 0;
     self.img_el;
 
-    self.text_x = p(0.21948051948051947,drawCanv.width);
-    self.text_y = p(0.7515625,drawCanv.height);
-    self.text_width = p(0.5324675324675324,drawCanv.width);
+    self.text_x = 250;
+    self.text_w = dc.width-self.text_x-20;
+    self.text_h = 100;
+    self.text_y = dc.height-self.text_h-20;
 
     var box_height = 188;
 
@@ -645,9 +670,9 @@ var GamePlayScene = function(game, stage)
 
     self.loadLegacy = function(text_0, text_1, canv)
     {
-      var dialog = [['scout', text_0]];
+      var dialog = [[CHAR_TALL, text_0]];
       if(text_1 && text_1 != "")
-        dialog.push(['scout', text_1]);
+        dialog.push([CHAR_TALL, text_1]);
       self.loadDialog(dialog, canv);
     };
 
@@ -667,7 +692,7 @@ var GamePlayScene = function(game, stage)
         if(searched == -1) searched = self.txt.length;
         tentative_search = self.txt.indexOf(" ",searched+1);
         if(tentative_search == -1) tentative_search = self.txt.length;
-        while(canv.context.measureText(self.txt.substring(found,tentative_search)).width < self.text_width && searched != self.txt.length)
+        while(canv.context.measureText(self.txt.substring(found,tentative_search)).width < self.text_w && searched != self.txt.length)
         {
           searched = tentative_search;
           tentative_search = self.txt.indexOf(" ",searched+1);
@@ -677,71 +702,36 @@ var GamePlayScene = function(game, stage)
         self.lines.push(self.txt.substring(found,searched));
         found = searched;
       }
-
-      if(self.img && self.img.length)
-      {
-        self.img_el = new Image();
-        self.img_el.src = "assets/"+self.img+".png";
-        switch(self.img)
-        {
-          case 'francis':
-            self.img_x = p(0,canv.width);
-            self.img_y = p(0.55,canv.height);
-            self.img_w = p(0.2,drawCanv.width);
-            self.img_h = p(0.4247159090909091,drawCanv.height);
-            break;
-          case 'honey':
-            self.img_x = p(0,canv.width);
-            self.img_y = p(0.55,canv.height);
-            self.img_w = p(0.23,drawCanv.width);
-            self.img_h = p(0.4,drawCanv.height);
-            break;
-          case 'jack':
-            self.img_x = p(0,canv.width);
-            self.img_y = p(0.6,canv.height);
-            self.img_w = p(0.23,drawCanv.width);
-            self.img_h = p(0.368,drawCanv.height);
-            break;
-          case 'scout':
-          default:
-            self.img_x = p(0.02987012987012987,canv.width);
-            self.img_y = p(0.5,canv.height);
-            self.img_w = p(0.14675324675324675,drawCanv.width);
-            self.img_h = p(0.4671875,drawCanv.height);
-            break;
-        }
-      }
-      else
-        self.img_el = undefined;
     }
 
     self.draw = function(canv)
     {
-      global_bg_alpha = (1-((20*10)/canv.height));
-      canv.context.fillStyle = "rgba(118,218,227,"+global_bg_alpha+")";
-      canv.context.fillRect(0,0,canv.width,canv.height);
       var box_height = 188;
-      canv.context.fillStyle = blue;
-      canv.context.fillRect(0,canv.height-box_height,canv.width,box_height);
+      var yoff = 400-400*blurb_t;
+      canv.context.drawImage(grad_img,0,canv.height-box_height+yoff,canv.width,box_height);
 
-      canv.context.font = "20px Open Sans";
-      canv.context.textAlign = "left";
-      canv.context.fillStyle = "#FFFFFF";
-      for(var i = 0; i < self.lines.length; i++)
-        canv.context.fillText(self.lines[i],self.text_x,self.text_y+((i+1)*24),self.text_width);
+      if(self.lines)
+      {
+        canv.context.font = "20px Open Sans";
+        canv.context.textAlign = "left";
+        canv.context.fillStyle = "#FFFFFF";
+        canv.fillRoundRect(self.text_x,self.text_y,self.text_w,self.text_h,5);
+        canv.context.beginPath();
+        canv.context.moveTo(self.text_x   ,self.text_y+10);
+        canv.context.lineTo(self.text_x-10,self.text_y+15);
+        canv.context.lineTo(self.text_x   ,self.text_y+20);
+        canv.context.fill();
+        canv.context.fillStyle = "#000000";
+        for(var i = 0; i < self.lines.length; i++)
+          canv.context.fillText(self.lines[i],self.text_x+10,self.text_y+((i+1)*24),self.text_w);
+      }
 
-      if(self.img_el)
-        canv.context.drawImage(self.img_el, self.img_x, self.img_y, self.img_w, self.img_h);
-
-      canv.context.lineWidth = 3;
-      canv.context.strokeStyle = "#5CABB3";
-      canv.context.beginPath();
-      canv.context.moveTo(p(0.7688311688311689,drawCanv.width),p(0.75,drawCanv.height));
-      canv.context.lineTo(p(0.7688311688311689,drawCanv.width),p(0.96875,drawCanv.height));
-      canv.context.stroke();
-      canv.context.lineWidth = 1;
-
-      canv.context.drawImage(next_button_img,self.x,self.y,self.w,self.h);
+      for(var i = 0; i < char_imgs.length; i++)
+      {
+        if(i == self.img) char_ts[i] = lerp(char_ts[i],1,0.1);
+        else              char_ts[i] = lerp(char_ts[i],0,0.1);
+        canv.context.drawImage(char_imgs[i],char_xs[i]+20,char_ys[i]+150+400-(400*char_ts[i])+yoff,char_ws[i],char_hs[i]);
+      }
     }
 
     self.click = function(evt)
@@ -750,7 +740,10 @@ var GamePlayScene = function(game, stage)
       if (self.rest_lines && self.rest_lines.length > 0)
         self.loadDialog(self.rest_lines, self.canv);
       else
+      {
         scene.setMode(GAME_MODE_PLAY);
+        self.lines = undefined;
+      }
     }
   }
 
@@ -1030,7 +1023,6 @@ var GamePlayScene = function(game, stage)
   self.ready = function()
   {
     global_bg_alpha = 0;
-    global_blurb_up = false;
     global_ticks = 0;
 
     self.dc = stage.drawCanv;
@@ -1090,11 +1082,11 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,true,self));
     l.new_blurbs = [
-      ["francis", "The wind simulator helps you see how high and low pressure systems affect the wind."],
-      ["honey", "I wanna play!"],
-      ["francis", "Okay, but be sure to pay attention to what happens when you add and move the H and L. They can get that wind blowing!"],
-      ["honey", "What are those?"],
-      ["francis", "The H and the L are the HIGH and the LOW pressure systems."],
+      [CHAR_GIRL, "The wind simulator helps you see how high and low pressure systems affect the wind."],
+      [CHAR_ANNOY, "I wanna play!"],
+      [CHAR_GIRL, "Okay, but be sure to pay attention to what happens when you add and move the H and L. They can get that wind blowing!"],
+      [CHAR_ANNOY, "What are those?"],
+      [CHAR_GIRL, "The H and the L are the HIGH and the LOW pressure systems."],
     ];
     l.text_0 = "This is a wind simulator. This simulator will help you observe how interactions between high and low pressure systems affect the speed and direction of wind. Before you start Level 1, just play around a little.";
     l.text_1 = "You can see that the map shows a high-pressure system (H) and a low-pressure system (L). Drag around these pressure systems, and see what happens to the directions of speed of the wind. When you are ready to begin Level 1, click menu.";
@@ -1107,9 +1099,9 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.4,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.6,0.5,0.1, 0.1,true,self));
     l.new_blurbs = [
-      ["francis", "The arrows are like flags and they point in the direction the wind is blowing."],
-      ["francis", "Here, the white arrow is pointing the way you want the wind to blow: north. The arrow's length shows how fast the wind is blowing."],
-      ["francis", "I'm pretty good at figuring out where the wind is blowing. Your turn!"],
+      [CHAR_GIRL, "The arrows are like flags and they point in the direction the wind is blowing."],
+      [CHAR_GIRL, "Here, the white arrow is pointing the way you want the wind to blow: north. The arrow's length shows how fast the wind is blowing."],
+      [CHAR_GIRL, "I'm pretty good at figuring out where the wind is blowing. Your turn!"],
     ];
     l.text_0 = "The white arrow points in the direction you want the wind to blow - north - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly north.";
@@ -1122,7 +1114,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.5,0.4,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.5,0.6,0.1, 0.1,true,self));
     l.new_blurbs = [
-      ["francis", "Wanna see if you can find a place where the wind is blowing strongly to the east?"],
+      [CHAR_GIRL, "Wanna see if you can find a place where the wind is blowing strongly to the east?"],
     ];
     l.text_0 = "The white arrow points in the direction you want the wind to blow - east - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly east.";
@@ -1136,7 +1128,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.3,0.5,0.1, 0.1,true,self));
     l.psys.push(new PSys(0.7,0.5,0.1, 0.1,true,self));
     l.new_blurbs = [
-      ["honey", "I totally get it now! I bet you can find a place where the wind is blowing to the south now."],
+      [CHAR_ANNOY, "I totally get it now! I bet you can find a place where the wind is blowing to the south now."],
     ];
     l.text_0 = "The white arrow points in the direction you want the wind to blow - south - and its length indicates how fast it is blowing.";
     l.text_1 = "Drag the vane around the map to find a position where the wind is blowing strongly south.";
@@ -1171,8 +1163,8 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.9,0.5,0.1, 0.1,false,self));
     l.psys.push(new PSys(0.5,0.9,0.1, 0.1,false,self));
     l.new_blurbs = [
-      ["honey", "Whoa, that's so many arrows! I don't think I can do this!!"],
-      ["francis", "Yeah, it looks like more but it's the same idea as before. There is a trick if you need help. You can turn on the Vector (click the EYE) to see the direction the wind is going."],
+      [CHAR_ANNOY, "Whoa, that's so many arrows! I don't think I can do this!!"],
+      [CHAR_GIRL, "Yeah, it looks like more but it's the same idea as before. There is a trick if you need help. You can turn on the Vector (click the EYE) to see the direction the wind is going."],
     ];
     l.text_0 = "Drag each vane to a position where it matches its white arrow.";
     l.text_1 = "Click the eye to enable different visualizations for the wind- Can you see the underlying pattern of wind motion?";
@@ -1185,7 +1177,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,true,self));
     l.new_blurbs = [
-      ["francis", "You've got the hang of moving the arrows to find the wind's direction. Now you get to be in charge of moving the wind around! Move the high-pressure and low-pressure systems to blow the flags."],
+      [CHAR_GIRL, "You've got the hang of moving the arrows to find the wind's direction. Now you get to be in charge of moving the wind around! Move the high-pressure and low-pressure systems to blow the flags."],
     ];
     l.text_0 = "Drag the high-pressure and low-pressure systems to blow the red vane in the same speed and direction as the white vane.";
     l.text_1 = "Make sure to use both types of systems!";
@@ -1198,7 +1190,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.5,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.8,0.5,0.1, 0.1,true,self));
     l.new_blurbs = [
-      ["honey", "Easy peasy. This one looks just like the last one."],
+      [CHAR_ANNOY, "Easy peasy. This one looks just like the last one."],
     ];
     l.text_1 = "Just as you did in the previous level, drag the high-pressure and low-pressure systems to blow the red vane in the same speed and direction as the white.";
     self.levels.push(l);
@@ -1213,7 +1205,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.6,0.1, 0.1,true,self));
     l.psys.push(new PSys(0.2,0.8,0.1,-0.1,true,self));
     l.new_blurbs = [
-      ["francis", "See if you can create a cyclone—like a tornado. You'll need three pressure systems to get one going."],
+      [CHAR_GIRL, "See if you can create a cyclone—like a tornado. You'll need three pressure systems to get one going."],
     ];
     l.text_0 = "Place the high-pressure and low-pressure systems to create a cyclone (also called a tornado) in the directions indicated by the white vanes.";
     l.text_1 = "You should only need three pressure systems to create a cyclone.";
@@ -1229,7 +1221,7 @@ var GamePlayScene = function(game, stage)
     l.psys.push(new PSys(0.2,0.6,0.1,-0.1,true,self));
     l.psys.push(new PSys(0.2,0.8,0.1, 0.1,true,self));
     l.new_blurbs = [
-      ["honey", "Wait a minute, this cyclone looks different—it's going in the opposite direction!"],
+      [CHAR_ANNOY, "Wait a minute, this cyclone looks different—it's going in the opposite direction!"],
     ];
     l.text_0 = "Again, try to create a cyclone - This time, in the opposite direction!";
     l.text_1 = "Notice difference in severity from your previous cyclone?";
@@ -1242,7 +1234,7 @@ var GamePlayScene = function(game, stage)
       else if(save_url) levels_string = document.location.hash.substring(1);
       if(levels_string && levels_string.indexOf("LEVELS=") != -1)
       {
-        console.log("Reading levels:"+levels_string);
+        //console.log("Reading levels:"+levels_string);
         levels_string = (levels_string.substr(levels_string.indexOf("LEVELS=")+7,self.levels.length)).split('');
         for(var i = 0; i < self.levels.length; i++)
         {
@@ -1254,6 +1246,23 @@ var GamePlayScene = function(game, stage)
 
     self.clip = new ClipBoard(stage.drawCanv.width,stage.drawCanv.height,self,self.levels);
     self.clip.register(self.menu_clicker);
+
+    var dc = stage.drawCanv;
+    blurb_t = 0;
+    char_xs = [p(0,dc.width),p(0,dc.width),p(0,dc.width),p(0.02987012987012987,dc.width)];
+    char_ys = [p(0.55,dc.height),p(0.55,dc.height),p(0.6,dc.height),p(0.5,dc.height)];
+    char_ws = [p(0.2,dc.width),p(0.23,dc.width),p(0.23,dc.width),p(0.14675324675324675,dc.width)];
+    char_hs = [p(0.4247159090909091,dc.height),p(0.4,dc.height),p(0.368,dc.height),p(0.4671875,dc.height)];
+    char_ts = [0,0,0,0];
+    char_imgs = [];
+    char_imgs[CHAR_GIRL] = new Image();
+    char_imgs[CHAR_GIRL].src = "assets/francis.png";
+    char_imgs[CHAR_ANNOY] = new Image();
+    char_imgs[CHAR_ANNOY].src = "assets/honey.png";
+    char_imgs[CHAR_AXE] = new Image();
+    char_imgs[CHAR_AXE].src = "assets/jack.png";
+    char_imgs[CHAR_TALL] = new Image();
+    char_imgs[CHAR_TALL].src = "assets/scout.png";
     self.blurb = new Blurb(self);
     self.blurb_clicker.register(self.blurb);
 
@@ -1732,7 +1741,7 @@ var GamePlayScene = function(game, stage)
             }
             if(save_cookie) document.cookie = levels_string;
             else if(save_url) document.location.hash = levels_string;
-            console.log("Wrote levels:"+levels_string);
+            //console.log("Wrote levels:"+levels_string);
           }
         }
         l.complete = true;
@@ -1944,10 +1953,15 @@ var GamePlayScene = function(game, stage)
 
     if(self.game_mode == GAME_MODE_BLURB)
     {
-      global_blurb_up = true;
-      self.blurb.draw(canv);
+      blurb_t = lerp(blurb_t,1,0.1);
     }
-    else global_blurb_up = false;
+    else
+    {
+      blurb_t = lerp(blurb_t,0,0.1);
+      for(var i = 0; i < char_ts.length; i++)
+        char_ts[i] = lerp(char_ts[i],0,0.1);
+    }
+    self.blurb.draw(canv);
 
     if(placer_debug)
     {

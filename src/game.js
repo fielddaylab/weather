@@ -25,8 +25,6 @@ var Game = function(init)
     tick();
   };
 
-  var known_global_bg_alpha = -99999;
-  var known_global_blurb_up = false;
   var tick = function()
   {
     requestAnimFrame(tick,stage.dispCanv.canvas);
@@ -34,18 +32,6 @@ var Game = function(init)
     scenes[currentScene].tick();
     scenes[currentScene].draw();
     stage.draw(); //blits from offscreen canvas to on screen one
-
-    if(currentScene == 2)
-    {
-      if(known_global_bg_alpha != global_bg_alpha)
-      {
-        known_global_bg_alpha = global_bg_alpha;
-      }
-      if(known_global_blurb_up != global_blurb_up)
-      {
-        known_global_blurb_up = global_blurb_up;
-      }
-    }
   };
 
   self.nextScene = function()
