@@ -1760,8 +1760,6 @@ var GamePlayScene = function(game, stage)
     global_ticks++;
   };
 
-  var USA = new Image();
-  USA.src = "assets/usa.png";
   self.draw = function()
   {
     var canv = stage.drawCanv;
