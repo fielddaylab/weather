@@ -1937,7 +1937,8 @@ var GamePlayScene = function(game, stage)
 
     if(self.levels[self.cur_level].complete_this_round)
     {
-      canv.context.drawImage(next_button_img,canv.width/2-158/2,80+Math.sin(global_ticks/10)*10,158,56);
+      var scale = 0.8;
+      canv.context.drawImage(next_button_img,canv.width/2-(158*scale)/2,80+Math.sin(global_ticks/10)*10,158*scale,56*scale);
     }
     else if(self.levels[self.cur_level].timer > 0)
     {
