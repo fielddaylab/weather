@@ -1731,6 +1731,7 @@ var GamePlayScene = function(game, stage)
         if(!l.complete)
         {
           l.complete = true;
+          ga('send', 'event', 'wind_level', 'complete', self.cur_level, 0);
           if(save_state)
           {
             var levels_string = "LEVELS=";
