@@ -264,3 +264,24 @@ var GenIcon = function(w,h)
   return icon;
 }
 
+//straight up stolen from the internet
+function setCookie(name, val, days)
+{
+  var d = new Date();
+  d.setTime(d.getTime() + (days*24*60*60*1000));
+  document.cookie = name + "=" + val + "; expires="+ d.toGMTString() + "; path=/";
+}
+
+function getCookie(name)
+{
+  var full_cookie = decodeURIComponent(document.cookie);
+  var cookies = full_cookie.split(';');
+  var name = name + "="; //to ensure "indexOf" doesn't return true unless full name matches
+  for(var i = 0; i < cookies.length; i++)
+  {
+      var c = cookies[i];
+      while(c.charAt(0) == ' ') c = c.substring(1);
+      if(c.indexOf(name) == 0) return c.substring(name.length, c.length);
+  }
+  return "";
+}

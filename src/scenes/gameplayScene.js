@@ -55,6 +55,14 @@ var global_bg_alpha;
 var global_ticks;
 var drawCanv;
 
+var dragStartPos;
+var dragEndPos;
+var dragStartTime;
+var dragEndTime;
+var dragStartVec;
+var levelStartTime;
+var levelDistance = 0;
+
 var ENUM;
 
 ENUM = 0;
@@ -81,6 +89,86 @@ var GamePlayScene = function(game, stage)
 {
   var self = this;
   drawCanv = stage.drawCanv;
+
+  //log functions
+  var log_level_begin = function(selectedLevel)
+  {
+    var log_data =
+    {
+      level:selectedLevel,
+      event:"BEGIN",
+      event_data_complex:{}
+    };
+    for(var i = 0; i < self.levels.length; i++)
+    {
+      log_data.event_data_complex[i] = (self.levels[i].complete);
+    }
+    
+    //log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
+    //mySlog.log(log_data);
+    console.log(log_data);
+  }
+  var log_drag_arrow = function(startPos, endPos, dragTime, startVec, endVec)
+  {
+    var log_data =
+    {
+      event:"CUSTOM",
+      event_custom:0, // "FLAG_RELEASE"
+      event_data_complex:{
+        event_custom:"FLAG_RELEASE",
+        startPosition:startPos,
+        endPosition:endPos,
+        time:dragTime,
+        startVector:startVec,
+        endVector:endVec
+      }
+    };
+    
+    //log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
+    //mySlog.log(log_data);
+    console.log(log_data);
+  }
+  var log_drag_wind = function(startPos, endPos, dragTime, direction)
+  {
+    var log_data =
+    {
+      event:"CUSTOM",
+      event_custom:1, // "WIND_RELEASE"
+      event_data_complex:{
+        event_custom:"WIND_RELEASE",
+        startPosition:startPos,
+        endPosition:endPos,
+        time:dragTime,
+        orientation:direction,
+        flags:{}
+      }
+    };
+
+    for (var i = 0; i < self.flags.length; i++) {
+      log_data.event_data_complex.flags[i] = self.flags[i].getInfo();
+    }
+    
+    //log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
+    //mySlog.log(log_data);
+    console.log(log_data);
+  }
+  var log_level_complete = function(lvl, time, vecEnabled, partEnabled)
+  {
+    var log_data =
+    {
+      event:"COMPLETE",
+      level:lvl,
+      event_data_complex:{
+        levelTime:time,
+        vectorsEnabled:vecEnabled,
+        particlesEnabled:partEnabled
+      }
+    };
+    
+    //log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
+    //mySlog.log(log_data);
+    console.log(log_data);
+  }
 
   //index:  0 refers to first, 1 refers to second, 0.5 refers to "the value between first and second"
   //sample: both 0 AND 1 refer to, identically, "the value between last and first", 0.5 refers to "the value between first and last"
@@ -359,6 +447,10 @@ var GamePlayScene = function(game, stage)
       scene.dragging_sys = self;
       self.dragging = true;
       self.dragged = true;
+
+      dragStartTime = new Date().getTime();
+      dragStartPos = {x:self.x, y:self.y};
+
     }
     self.drag = function(evt)
     {
@@ -373,6 +465,12 @@ var GamePlayScene = function(game, stage)
     }
     self.dragFinish = function(evt)
     {
+      // negative delta means low (ccw) wind, positive means high (cw) wind
+      var direction = (self.delta < 0) ? 'ccw' : 'cw';
+      dragEndTime = new Date().getTime();
+      dragEndPos = {x:self.x, y:self.y}
+      log_drag_wind(dragStartPos, dragEndPos, (dragEndTime - dragStartTime) / 1000, direction);
+
       self.dragging = false;
       scene.dragging_sys = undefined;
     }
@@ -762,6 +860,16 @@ var GamePlayScene = function(game, stage)
     self.goal_xd = xd;
     self.goal_yd = yd;
 
+    self.getInfo = function()
+    {
+      return {
+        position:{x:self.x, y:self.y},
+        goal:{x:self.goal_xd, y:self.goal_yd},
+        direction:{x:self.xd, y:self.yd},
+        magnitude:Math.sqrt(self.xd*self.xd+self.yd*self.yd)
+      }
+    }
+
     self.reset = function()
     {
       self.sx = self.start_sx;
@@ -818,11 +926,15 @@ var GamePlayScene = function(game, stage)
     }
     self.dragStart = function(evt)
     {
+      dragStartPos = {x:self.x, y:self.y}
+      dragStartTime = new Date().getTime();
+      dragStartVec = {x:self.xd, y:self.yd}
       click_aud.play();
       if(scene.dragging_flag) return;
       scene.dragging_flag = self;
       self.dragging = true;
       self.dragged = true;
+
     }
     self.drag = function(evt)
     {
@@ -842,6 +954,13 @@ var GamePlayScene = function(game, stage)
     }
     self.dragFinish = function(evt)
     {
+      // xd/yd is direction
+      // x/y is position on map
+      // Right is x+, Down is y+
+      dragEndPos = {x:self.x, y:self.y}
+      dragEndTime = new Date().getTime();
+      var endVec = {x:self.xd, y:self.yd}
+      log_drag_arrow(dragStartPos, dragEndPos, (dragEndTime - dragStartTime) / 1000, dragStartVec, endVec);
       self.dragging = false;
       scene.dragging_flag = undefined;
     }
@@ -1022,6 +1141,8 @@ var GamePlayScene = function(game, stage)
 
   self.ready = function()
   {
+    mySlog = new slog("WIND",1);
+
     global_bg_alpha = 0;
     global_ticks = 0;
 
@@ -1533,6 +1654,11 @@ var GamePlayScene = function(game, stage)
     //set new level
     self.cur_level = l;
     var l = self.levels[self.cur_level];
+    
+    //log level start
+    log_level_begin(self.cur_level);
+    levelDistance = 0;
+    levelStartTime = new Date().getTime();
 
     //flags
     var f;
@@ -1732,6 +1858,8 @@ var GamePlayScene = function(game, stage)
         {
           l.complete = true;
           ga('send', 'event', 'wind_level', 'complete', self.cur_level, 0);
+          var levelTime = (new Date().getTime() - levelStartTime) / 1000;
+          log_level_complete(self.cur_level, levelTime, self.vec_mode, self.air_mode);
           if(save_state)
           {
             var levels_string = "LEVELS=";
