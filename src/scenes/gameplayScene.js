@@ -108,7 +108,7 @@ var GamePlayScene = function(game, stage)
     //mySlog.log(log_data);
     console.log(log_data);
   }
-  var log_drag_arrow = function(startPos, endPos, dragTime, startVec, endVec)
+  var log_drag_arrow = function(startPos, endPos, dragTime, startVec, endVec, goalVec)
   {
     var log_data =
     {
@@ -120,7 +120,8 @@ var GamePlayScene = function(game, stage)
         endPosition:endPos,
         time:dragTime,
         startVector:startVec,
-        endVector:endVec
+        endVector:endVec,
+        goalVector:goalVec
       }
     };
     
@@ -960,7 +961,8 @@ var GamePlayScene = function(game, stage)
       dragEndPos = {x:self.x, y:self.y}
       dragEndTime = new Date().getTime();
       var endVec = {x:self.xd, y:self.yd}
-      log_drag_arrow(dragStartPos, dragEndPos, (dragEndTime - dragStartTime) / 1000, dragStartVec, endVec);
+      var goalVec = {x:self.goal_xd, y:self.goal_yd};
+      log_drag_arrow(dragStartPos, dragEndPos, (dragEndTime - dragStartTime) / 1000, dragStartVec, endVec, goalVec);
       self.dragging = false;
       scene.dragging_flag = undefined;
     }
