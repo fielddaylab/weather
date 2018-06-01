@@ -104,9 +104,9 @@ var GamePlayScene = function(game, stage)
       log_data.event_data_complex[i] = (self.levels[i].complete);
     }
     
-    //log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
-    //mySlog.log(log_data);
-    console.log(log_data);
+    log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
+    mySlog.log(log_data);
+    //console.log(log_data);
   }
   var log_drag_arrow = function(startPos, endPos, dragTime, startVec, endVec, goalVec)
   {
@@ -125,9 +125,9 @@ var GamePlayScene = function(game, stage)
       }
     };
     
-    //log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
-    //mySlog.log(log_data);
-    console.log(log_data);
+    log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
+    mySlog.log(log_data);
+    //console.log(log_data);
   }
   var log_drag_wind = function(startPos, endPos, dragTime, direction)
   {
@@ -149,9 +149,9 @@ var GamePlayScene = function(game, stage)
       log_data.event_data_complex.flags[i] = self.flags[i].getInfo();
     }
     
-    //log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
-    //mySlog.log(log_data);
-    console.log(log_data);
+    log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
+    mySlog.log(log_data);
+    //console.log(log_data);
   }
   var log_level_complete = function(lvl, time, vecEnabled, partEnabled)
   {
@@ -166,9 +166,9 @@ var GamePlayScene = function(game, stage)
       }
     };
     
-    //log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
-    //mySlog.log(log_data);
-    console.log(log_data);
+    log_data.event_data_complex = JSON.stringify(log_data.event_data_complex);
+    mySlog.log(log_data);
+    //console.log(log_data);
   }
 
   //index:  0 refers to first, 1 refers to second, 0.5 refers to "the value between first and second"
@@ -1143,7 +1143,7 @@ var GamePlayScene = function(game, stage)
 
   self.ready = function()
   {
-    mySlog = new slog("WIND",1);
+    var mySlog = new slog("WIND",1);
 
     global_bg_alpha = 0;
     global_ticks = 0;
