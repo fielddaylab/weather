@@ -18,6 +18,26 @@ var doMapInitDefaults = function(obj, init, defaults)
   }
 }
 
+var UUIDint = function() //17 digits = 64 bit int; each second guaranteed unique, within a second = 1/99999 chance of collision (aka "not unique") 
+{ 
+  var d = new Date(); 
+  var id = (""+d.getFullYear()).substring(2); //2 
+  if(d.getMonth() < 10) id += "0"; 
+  id += d.getMonth(); //4 
+  if(d.getDay() < 10) id += "0"; 
+  id += d.getDay(); //6 
+  if(d.getHours() < 10) id += "0"; 
+  id += d.getHours(); //8 
+  if(d.getMinutes() < 10)  id += "0"; 
+  id += d.getMinutes(); //10 
+  if(d.getSeconds() < 10)  id += "0"; 
+  id += d.getSeconds(); //12 
+  for(var i = 0; i < 5; i++) 
+    id += Math.floor(Math.random()*10); //17 
+ 
+  return parseInt(id); 
+} 
+
 //sets doX and doY as x/y offset into the object listening for the event
 function doSetPosOnEvent(evt)
 {
@@ -244,3 +264,24 @@ var GenIcon = function(w,h)
   return icon;
 }
 
+//straight up stolen from the internet
+function setCookie(name, val, days)
+{
+  var d = new Date();
+  d.setTime(d.getTime() + (days*24*60*60*1000));
+  document.cookie = name + "=" + val + "; expires="+ d.toGMTString() + "; path=/";
+}
+
+function getCookie(name)
+{
+  var full_cookie = decodeURIComponent(document.cookie);
+  var cookies = full_cookie.split(';');
+  var name = name + "="; //to ensure "indexOf" doesn't return true unless full name matches
+  for(var i = 0; i < cookies.length; i++)
+  {
+      var c = cookies[i];
+      while(c.charAt(0) == ' ') c = c.substring(1);
+      if(c.indexOf(name) == 0) return c.substring(name.length, c.length);
+  }
+  return "";
+}
