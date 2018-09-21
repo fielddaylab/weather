@@ -112,8 +112,9 @@ var GamePlayScene = function(game, stage)
   {
     var log_data =
     {
+      level:self.cur_level,
       event:"CUSTOM",
-      event_custom:0, // "FLAG_RELEASE"
+      event_custom:1, // "FLAG_RELEASE"
       event_data_complex:{
         event_custom:"FLAG_RELEASE",
         startPosition:startPos,
@@ -133,8 +134,9 @@ var GamePlayScene = function(game, stage)
   {
     var log_data =
     {
+      level:self.cur_level,
       event:"CUSTOM",
-      event_custom:1, // "WIND_RELEASE"
+      event_custom:2, // "WIND_RELEASE"
       event_data_complex:{
         event_custom:"WIND_RELEASE",
         startPosition:startPos,
