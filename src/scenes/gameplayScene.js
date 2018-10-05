@@ -90,6 +90,8 @@ var GamePlayScene = function(game, stage)
   var self = this;
   drawCanv = stage.drawCanv;
 
+  var mySlog;
+
   //log functions
   var log_level_begin = function(selectedLevel)
   {
@@ -1145,7 +1147,7 @@ var GamePlayScene = function(game, stage)
 
   self.ready = function()
   {
-    var mySlog = new slog("WIND",1);
+    mySlog = new slog("WIND",1);
 
     global_bg_alpha = 0;
     global_ticks = 0;
