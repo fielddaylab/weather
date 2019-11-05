@@ -1,0 +1,1 @@
+Game log events have not been created/documented. Get Involved! Contact Us!
