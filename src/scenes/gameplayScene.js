@@ -1395,7 +1395,14 @@ var GamePlayScene = function(game, stage)
 
     window.addEventListener('menuButton', function(){ click_aud.play(); self.setMode(GAME_MODE_MENU); }, false);
 
-    self.next_button = new ButtonBox(stage.drawCanv.width/2-100,50,200,100, function(on) { if(self.levels[self.cur_level].complete_this_round) { click_aud.play(); self.setMode(GAME_MODE_MENU); }});
+    self.next_button = new ButtonBox(stage.drawCanv.width/2-100,50,200,100, function(on) 
+    { 
+    if(self.levels[self.cur_level].complete_this_round) 
+    { 
+      click_aud.play(); 
+      self.setMode(GAME_MODE_MENU); 
+      }
+    });
     self.play_clicker.register(self.next_button);
 
     self.options_button = new ButtonBox(stage.drawCanv.width-130,stage.drawCanv.height-100,40,40, function(on) { click_aud.play(); self.options_open = !self.options_open; if(self.options_open) self.options_dir = -1; else self.options_dir = 1; });
@@ -1701,6 +1708,7 @@ var GamePlayScene = function(game, stage)
 
   self.tick = function()
   {
+    if (gameIsPaused) return;
     if(placer_debug)
     {
       self.placer_dragger.flush();
@@ -1906,6 +1914,7 @@ var GamePlayScene = function(game, stage)
 
   self.draw = function()
   {
+    //if (gameIsPaused) return;
     var canv = stage.drawCanv;
 
     canv.context.drawImage(screen_bg_img,0,20,canv.width,canv.height-20);
@@ -2072,6 +2081,8 @@ var GamePlayScene = function(game, stage)
 
     if(self.levels[self.cur_level].complete_this_round)
     {
+      setTutPoints(self.cur_level);
+      checkGameEnd();
       var scale = 0.8;
       canv.context.drawImage(next_button_img,canv.width/2-(158*scale)/2,80+Math.sin(global_ticks/10)*10,158*scale,56*scale);
     }
